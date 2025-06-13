@@ -1,0 +1,36 @@
+format ELF64 executable 3 at 0F0000000h
+entry Start
+
+use AMD64, CET_IBT
+
+include 'fastcall_v1.inc'
+include 'stdio.inc'
+
+_code
+          Start:              endbr64
+                              fprintf(**stderr, <"An error message.",10,0>);
+                              fprintf(**stdout, <"A normal message.",10,0>);
+                              usleep(2068779);
+                              exit(0);
+
+; NOTE: it is not a good option to use **ptrdata all time when used multiple times,
+;    because it always generates:
+;
+;    mov creg, [ptrdata]    ; get the pointer from data
+;    mov creg, [creg]       ; recurse 1 time to get the data
+;
+; A better approach is to initialize data to the final value.
+; Example:
+;
+; ; During initialization code:
+;     mov rax, [stdout] ; get the pointer
+;     mov rax, [rax]    ; recurse 1 time to get data
+;     mov [stdout], rax ; store the data at [stdout]
+;
+; From now on, you'll be able to use stdout in the best way possible:
+;
+;   fprintf(*stdout, <"Any text.",10,0>);
+;   fprintf([stdout], <"It does the same as above",10,0>);
+;
+; The above just pass [data]; it does not generate 1 extra recursion to get [data].
+;

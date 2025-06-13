@@ -1,0 +1,33 @@
+format ELF64 executable 3 at 100000000h
+entry Start
+
+include 'fastcall_v1.inc'
+include 'stdio.inc'
+
+PI = 3.14159265358979323846
+
+_code
+        Start:              endbr64
+                            printf(<"Testing signed numbers: %d, %ld, %d, %ld,", \
+                                "  %u, %ld, %d, %ld, %u, %ld, 0x%016lX",10,0>, \
+                                -578906, dq -2147483648, -2147483648, dq -1, 4294967295, \
+                                -4294967295, 0, -4294967296, +2147483647, +2147483648, \
+                                8000#0000#0000#0000h);
+                            printf(<"Value of π on FPU:   %.19Lf.",10,0>, π); ; TT or π is a tword only parameter!
+                            printf(<"π as a 64-bit float: %.19lf.",10,0>, PI);
+                            mov         edx, PI
+                            movd        xmm15, edx
+                            cvtss2sd    xmm0, xmm15
+                            printf(<"π as a 32-bit float: %.19lf.",10,0>, xmm0);
+                            exit(EXIT_SUCCESS);
+
+; NOTE
+; π is a constant supported natively by x87 FPU.
+; When you pass either TT or π to a vararg parameter or tword size parameter,
+; fastcall macro code process with fldpi instruction.
+; SSE/AVX don't have this constant hardcoded, so, I choose to not directly
+; support π for them. But you can create a constant with a name and pass it
+; anyway, as shown in this example.
+; If you have not defined TT or π, it will always be a tword parameter. So,
+; for vararg, it is detected as tword type and size by default.
+;

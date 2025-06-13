@@ -1,0 +1,24 @@
+format ELF64 executable 3 at 800000h
+entry Start
+
+include 'fastcall_v1.inc'
+
+library 'libc.so.6'
+
+ext noreturn indirect proto exit, dword
+ext indirect proto usleep, qword
+ext indirect proto fprintf, qword, qword, vararg
+ext indirect proto fflush, qword
+ext data stdout
+
+_code
+          Start:              endbr64
+                              mov       rax, [stdout]
+                              mov       rax, [rax]
+                              mov       [stdout], rax
+                              fprintf(*stdout, "Sleeping now...");
+                              fflush(*stdout);
+                              usleep(3000000);
+                              fprintf(*stdout, <" done.",10,0>);
+                              exit(0);
+

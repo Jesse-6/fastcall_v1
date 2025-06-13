@@ -1,0 +1,46 @@
+format ELF64 executable 3
+
+include 'fastcall_v1.inc'
+include 'stdio.inc'
+
+_bss align 4096         ; "bare metal" bss segment
+        array:                  rb 8192
+        buffer:                 rb 8192
+        endptr                  dd ?
+
+_data align 16          ; data segment and output point
+        floatnum                dt 98723.311675
+
+_code align 16          ; "bare metal" code segment
+        entry $
+                                endbr64
+                                mov         rax, [stdout]
+                                push        [rax]
+                                pop         [stdout]
+                                movq        mm5, [stdout]
+                                fprintf(mm5, <"File descriptor for ", 27, "[1;30m", \
+                                    "%u%u%u%u%u%u%u%u%u%u%c%c%c%c%c%c", 27, "[0m" , \
+                                    " 'stdout': ", "0x%016lX.",10,0>, \
+                                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ("A"), ("B"), ("C"), ("D"), \
+                                    ("E"), ("F"), mm5);
+                                fprintf(mm5, <"Hex value of chars: %016lX.",10,0>, ("Jessé!"));
+                                fputs(<"This is a test.",10,0>, mm5);    ; Trusting MMX register value
+                                fprintf(mm5, <"True: %u.",10,0>, TRUE);  ; preservation across calls is
+                                fprintf(mm5, <"False: %u.",10,0>, FALSE);; risky. Don't do it in production code!
+                                finit
+                                fldpi
+                                fxch        st6
+                                nop
+                                nop     ; (¹)
+
+_data   ; This will be appended to the data output point above
+        fstring0                db 'String at cascading virtual data.', 10, 0
+
+_code   ; close virtual data above and restore the bare metal code segment from previous point (¹)
+                                fprintf(*stdout, <"New float80 algorithm: ", \
+                                    "%Lf, %Lf, %Lf, %Lf, %.18Lf.",10,0>, \
+                                    dt 1.0, dt 0.0, *floatnum, dt 100101.564732, st6);
+                                fprintf(*stdout, &fstring0);
+                                mov         [endptr], dword -1
+                                exit(EXIT_SUCCESS);
+

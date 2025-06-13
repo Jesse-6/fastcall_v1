@@ -1,0 +1,318 @@
+=============== Fastcall macro quick guide, for v1. ===================
+
+1. How it works?
+
+      Fastcall is a set of macros for fasmg (developed at fasm2 environment) used to call functions in a "horizontal" manner, by following what is defined at System V ABI specification. It is enhanced to not only be C-style looking macro (it is similar, not equal), but to generate assembly code that is very close to what C compilers generate when calling functions. Because C is very good at calling functions; by this aspect, it is almost impossible even for an experienced in assembly language human programmer to beat C generated code (a draw is not accounted under this quote). So, I keep the most benefits I've learned from debugging C code implemented in this macro, as a collection of decisions based on parameter types and sizes and ordering. Hence the countless if blocks inside its code. ;)
+      Its usage is enabled by defining a prototype earlier using 'proto' macro. Then, the proto macro will create a lot of hints for every parameter of the prototyped function, so fastcall can parse them when used, setting proper sizes and types of parameters in the right place. Also, proto macro generates a macro with the name of the function for every function, so, no need to 'fastcall function, args': you just 'function(args);' and that's it.
+
+      To use it, just copy fastcall_v1.inc to the standard fasmg or fasm2 include path, and include it on your source files.
+      This package is also bundled with my partially made stdio.inc and gtk3.inc headers, also my anonymous multi level label macro anon_label.inc file. If you want to use them also, copy them to the same location.
+
+2. Important concepts
+
+      1. Trashed registers
+
+      This is the concept number 0 in understanding what you CANNOT do when using fastcall macro. In this case, avoid using the trashed register after is has been trashed. The order of trashed registers, are in reverse order, and the overall sequence of classes is also reverse ordering as follows:
+
+           - memory integer class parameters will be pushed onto stack, and r9 is the auxiliary register for anything that needs a register to be prepared (e.g., an effective addressor 64-bit sized immediate number);
+           - memory float point class parameters can be mixed with the above, following general prototyped RTL ordering, and they don't use any GP register at all; data is created as float point data in the first defined virtual location¹ found and then pushed as normal parameters;
+           - exception is tword (or long double or l_double, all synonyms) data types, they are allocated at stack, aligned, and uses FPU register st0 for moving the 10-byte data, and that data might be also created in the first virtual location¹ as above;
+           - then, comes xmm class parameters, they're created as data if immediate FP numbers, and/or passed directly to current xmm register otherwise;
+           - then, comes register class parameters, in reverse order, passed onto corresponding position register.
+
+        All of the above might be mixed, depending on the RTL sequence of the prototype for the called function. Important to remember is:
+
+           Register class RTL order: r9, r8, rcx, rdx, rsi, rdi
+           XMM class RTL order: xmm7, xmm6, xmm5, xmm4, xmm3, xmm2, xmm1, xmm0
+
+        This shows the order of trashed registers, so for the above, the leftmost, when used by the prototype, is always the most volatile. This is why I choose r9 for being the only auxiliary register; so all others are safe until it comes its time in the RTL queue. And r9 is not used if there are no memory class tyep integer parameters to be passed on. Trashed registers also depends on how many register parameters the function has: if less, the volatile level will be displaced to the right of the above sequece. Example:
+
+            proto func, qword, qword, dword, double, double  ; 3 integer parameters (register), 2 float point parameters (xmm)
+
+            fastcall writing sequence: xmm1, xmm0, edx, rsi, rdi
+            Trashed order (GP registers): rdx, rsi, rdi     ; rcx, r8 and r9 are immune here
+            Trashed order (XMM registers): xmm1, xmm0       ; xmm7 to xmm2 are immune here
+
+
+
+            proto func2, double, dword, double, double      ; 1 integer, 3 float
+
+            fastcall writing sequence: xmm2, xmm1, edi, xmm0
+            Trashed GP register order: rdi                  ; rsi, rdx, rcx, r8 and r9 are immune
+            Trashed XMM register order: xmm2, xmm1, xmm0    ; xmm7 to xmm3 are immune
+
+            In the case of func2(), no GP register is vulnerable, because rdi is already the last parameter of its kind.
+
+        The prototype creates the definition in forward mode (LTR), so, one can find the current affected register at any parameter:
+
+            proto x, dword, dword, dword, dword, dword, dword   ; 6 integer parameters
+            proto y, double, double, double, double, double, double, double, double ; 8 float point parameters
+            proto z, dword, double, dword, double, dword, double    ; mixed 3 x 3 integer x float point parameters
+            proto j, qword, tword, qword, dword ; 1 long double mixed with 3 integers
+            proto k, qword, qword, double, qword, qword, dword, dword, double, dword, dword ; mixed parameters
+            proto l, qword, dword, qword, vararg    ; 3 integers and then vararg
+            proto m, none   ; no parameters
+
+            x => edi, esi, edx, ecx, r8d, r9d       ; x() => 6th, 5th, 4th, 3rd, 2nd, 1st
+            y => xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7   ; y() => 8th, 7th, 6th, 5th, 4th, 3rd, 2nd, 1st
+            z => edi, xmm0, esi, xmm1, edx, xmm2    ; z() => 6th, 5th, 4th, 3rd, 2nd, 1st
+            j => rdi, [memory], rsi, edx            ; j() => 4th, [3rd], 2nd, 1st
+            k => rdi, rsi, xmm0, rdx, rcx, r8d, r9d, xmm1, [memory], [memory] ; [10],[9],8,7,6,5,4,3,2,1
+            l => rdi, esi, rdx, ...     ; ..., 3rd, 2nd, 1st, (hidden) al -> xmm count
+            m =>    ; no register or memory affected
+
+        For better understanding, it is recommended to read the System V ABI specification.
+        In the prototype sequence, the rightmost are the first ones to be delivered, and then, they're also modified prior to the others; this makes rdi and xmm0 the safest registers to be used; they will survive until it is its time to be delivered. It means that one should not use, for example, rcx as the second parameter in a 4+ integer parameter function, because rcx will be modified first by the RTL order, then the second parameter will receive the 4th parameter data as well, because rcx is the 4th parameter destination, and in the RTL order is written first. Therefore, contents or rcx are now lost/replaced by 4th parameter.
+        It is always better understandable if one is writing code and using a debugger to see its output. I must recommend edb-debugger for anyone using Linux. It's the birds-eye view of the program and the context aboard processor and memory.
+
+        There's also an important rule when passing anything that is or uses rsp register: memory class parameters are passed onto stack, and they're usually passed first in RTL ordering: one must be cautious for calculating the exact rsp value at the given parameter rsp takes part. If rsp is passed after a memory parameter is passed RTL, its value has already changed, and even alignment calculation might had been modified rsp already! For this specification, Systm V ABI also can clarify better than I. Any uncertainty should be checked with a debugger if the expected behavior occured.
+
+        An important rule to remember for the fascall when having memory class parameters is its sequence of events:
+
+         - calculates and applies overall alignment at rsp;
+         - passes parameters RTL: memory will be pushed, register will be passed, starting from the last;
+         - if vararg type function, passes 'al' = number of xmm registers used;
+         - if any stX FPU register is used as parameter, issue emms assembly instruction;
+         - calls or jumps function;
+         - if call type, deallocates previous allocated stack space.
+
+        And without memory class:
+
+         - passes register (GP and xmm) parameters RTL as above;
+         - if vararg type, 'al' register will have the number of xmm registers used;
+         - if any stX FPU register is used as parameter, issue emms assembly instruction;
+         - calls or jumps function.
+
+        Also, an important thing to be known by the user: the default method for creating imported functions entries in the final program is by macros built-in inside fastcall: it is copy-based on 'import64.inc' and 'elfsym.inc' files that came as an example in fasmg package, which generates the cleanest executable possible (also the smallest), free from all of the unneeded bloat common external linkers (like 'ld' or 'gcc') append to your file. One intended to use standard .o object model externally linked should modify the macro to use 'extrn' directive instead. But I had not tested this approach in any time during developing: maybe I'll fully support it properly in later revisions of this macro collection. With which is already included, you'll get the final ELF64 executable by just adding 'include fastcall.inc' as it is now.
+        Note: version 2 of this (to be done) will have extrn support by default.
+
+        2. parameter formatting
+
+        Fastcall parameters follow the following rules:
+
+            &location  -> passes effective address of location (will use r9 to be prepared if memory class)
+            *location  -> passes data at location
+            [location] -> also passes data at location
+            34567      -> pass 32 bit number
+            9999999999 -> pass 64 bit number (will use r9 if integer memory class)
+            (23*4+FIX) -> pass result as a number, 32 or 64 bit
+            ("CHARS")  -> pass up to qword size "CHARS" as direct data, not string
+            +3245      -> pass signed number
+            -45637     -> pass signed number
+            rax        -> pass register as integer parameter
+            xmm5       -> pass xmm register as xmm class parameter or memory class parameter
+            mm3        -> pass MMX register as integer class parameter
+            st4        -> pass FPU register as long double type, memory class parameter
+            &rax+rcx*2+14 -> pass effective address of complex addressing parameter
+            &esi+edi*2+18 -> pass 32 bit effective address parameter (recommended for algebra usage only)
+            123.4567   -> pass float point parameter as (if prototyped) xmm or memory class
+            **location -> gets the pointer at [location], and then pass the data located at this pointer
+            "stringz"  -> creates "string",0 as db data, then passes a pointer to string data
+            <"string",10,0> creates "string",10,0 as db data and passes its pointer
+            π or TT    -> pass π number constant as tword size, memory class parameter
+            .          -> empty parameter: This parameter will be skipped, filled with an empty state in the output code
+
+         Float point and string datas are created as data in the first virtual location¹.
+         "string" simple string is always create with null termination, whereas <"string",...> is created literally as "string",... db data, without any addition.
+
+         'proto' macro accepts the following types for parameters:
+
+            byte    -> 1 byte, byte integer parameter
+            word    -> 2 bytes, word integer parameter
+            dword   -> 4 bytes, dword integer parameter
+            qword   -> 8 bytes, qword integer parameter (default for vararg)
+            tword   -> 10 bytes, tword float point parameter (known as long double)
+            float   -> 32-bit single precision float point parameter
+            double  -> 64-bit double precision float point parameter (default for vararg)
+            vararg  -> from this and beyond, function is variable number of arguments
+            none    -> function has no parameters
+
+        'vararg' parameters has a best guess method for passing them in the most optimized and coherent way, but every vararg parameter can be overriden by size prefixes below.
+
+        Also, are available for fastcall size override prefixes:
+
+            db param    -> pass param as forced byte size
+            dw param    -> pass param as forced word size
+            dd param    -> pass param as forced dword size
+            dq param    -> pass param as forced qword size
+            dt param    -> pass param as forced tword size
+            df param    -> pass param as forced 32 bit float point size
+            dp param    -> pass param as forced 64 bit float point size
+
+        'param' can be any of the fastcall supported parameters, be careful!
+        When using size override, it can override even the prototyped sizes, and results can be unpredictable. Recommended usage is only as a hint for vararg types.
+
+3. Auxiliary macros
+
+        There are the following macros used to support fastcall and proto macros:
+
+            _bss    -> creates a read-write uninitialized data segment. The output of this section does not add size to the final executable. It is only allocated. Uninitialized variables must be placed only here, otherwise they will be initialized as 0.
+
+            _rdata  -> creates a read-only initialized data segment, and the most favorite virtual location¹ for anonymous data to be placed;
+                    Your read-only data might be placed here.
+
+            _data   -> creates a read-write initialized data segment, and a virtual location¹ for anonymous data to be placed;
+                    Your read/write data might be placed here.
+
+            _code   -> create read execute code segment, the least favorite virtual location¹ for anonymous data to be placed;
+                    Your code will probably be placed here.
+
+             _code rwx -> create read write execute code segment, also the least favorite virtual location¹ for anonymous data to be placed.
+
+            library -> defines the external libraries needed for the application, in quoted strings each;
+                    Can be used multiple times.
+
+            ext      -> proto prefix, indicates that this function should be prepared to be used from 'extern';
+            noreturn -> proto prefix, prototypes the function as jmp function instead of call function;
+            indirect -> proto prefix, prototypes function to be called indirectly (i.e., call [function]);
+
+            ext data -> defines imported data symbols from external libraries
+
+            alias    -> defines an alias name() to be used instead of function(). Alias has 2 formats:
+             - inline: does not dismiss external function() macro; internal function() is dismissed;
+             - last proto parameter 'alias new': dismiss function() and replaces it with new() macro.
+
+        Any of the following combinations are valid for proto macro:
+
+            ext proto func, params                      ; external function, direct call func
+            ext noreturn proto func, params             ; external function, direct jump func
+            proto func, params                          ; internal function, direct call _func ²
+            noreturn proto func, params                 ; internal function, direct jump _func ²
+            ext indirect proto func, params             ; external function, indirect call [func]
+
+            ext noreturn indirect proto func, params    ;
+            ext indirect noreturn proto func, params    ; external function, indirect jump [func]
+
+            indirect proto func, params                 ; internal function, indirect call [_ptr_func] ²
+
+            noreturn indirect proto func, params        ;
+            indirect noreturn proto func, params        ; internal function, indirect jump [_ptr_func] ²
+
+            ext data stdin, stdout                      ; external data variables stdin and stdout
+
+        ² For internal function, there is a limitation so far: due to fasm not having backward reference support (or forward reference), 'macro func()' cannot 'fascall func', because they have same names. So, internal called functions shoud be prefixed as '_function:' for direct call/jmp, or the variable holding the function pointer should the prefixed as '_ptr_func'. The underline '_' is the differentiator:
+
+             proto indirect pfunc1, qword
+             proto func2, qword
+
+             _pfunc1  dq func1
+             ; ...
+             func1: ; do stuff
+                    ret
+
+            _func2: ; do stuff
+                    ret
+
+            pfunc1(param); ; This calls [_pfunc1] pointer
+            func2(param);  ; This calls _func2 directly
+
+        Also for internal functions, it is possible to use alias macro to define a new function() name. By using it, the conflict is gone because alias is used to replace the original name with other.
+
+             proto func3, double, alias replace3
+             proto func4, dword, alias func4 ; This is allowed...
+
+             func3: ; do stuff
+                    ret
+
+             ?func4: ; do stuff
+                     ret
+
+             replace3(param); ; This calls func3 directly
+             func4(param);    ; This calls ?func4 directly
+
+
+        The external functions' namespace is '__imp', and the default jump point for direct calls to external functions (located at namespace __imp too) is prefixed as 'proto', resulting in 'proto.function' external jump point name. This is similar to what PLT does, but it is not PLT! PLT is loaded on demand by the linker, this has everything resolved by dynamic linker at startup.
+        'ext' defines one of two things: if direct type, it creates a jmp [__imp.function] entry at a separate code segment; if indirect type, it just append function name to a "list" of functions that can be parsed by internal importv macro on demand. So, only symbols used in code and data segments are installed in the final executable, allowing one to have a set of prototype headers to be reused.
+        So, if your functions are called 'g_print', 'snprintf', 'exit' and 'getpid', for example, the whole thing will be:
+
+            library 'libc.so.6', 'libglib-2.0.so.0' ; the needed libraries where functions are located
+
+            ; Functions' prototypes to be used by fastcall
+            ext proto snprintf, qword, dword, qword, vararg
+            ext noreturn proto exit, dword
+            ext proto getpid, none
+            ext indirect proto g_print, qword, vararg
+
+            ; Imported data symbols
+            ext data stderr, stdout
+
+            ; The first of _bss, _code, _data or _rdata also commits imported symbols
+            _rdata      ; virtual output point for read only data
+            ; ...
+            _data       ; virtual output point for read write data
+            ; ...
+            _bss        ; uninitialized real point for read write data
+            ; ...
+            _code       ; real point for read execute code segment
+            ; ...
+            ; Your code below will fastcall functions as follows:
+
+            snprintf(&buffer, 512, "Format anonymous string %s %u", &complement, r10d);
+            ; Resolve to:
+            ;    mov r8d, r10d
+            ;    lea rcx, [complement]
+            ;    lea rdx, [..anonymous_data_ptr]
+            ;    mov esi, 512
+            ;    lea rdi, [buffer]
+            ;    xor al, al ; This is hidden vararg parameter from System V ABI, see the manual
+            ;    call proto.snprintf        ; This is direct call to jump table
+            ;    ; ...
+            ;    ; Below is in the jump table:
+            ;    proto.snprintf: jmp [__imp.snprintf]
+
+            g_print(&buffer+64);
+            ; Resolve to:
+            ;    lea rdi, [buffer+64]
+            ;    xor al, al
+            ;    call [__imp.g_print]       ; This is indirect call to [__imp.g_print] pointer variable
+            ; ...
+            ;    ; No jump table for this one
+
+            getpid();
+            ; Resolve to:
+            ;    call proto.getpid
+            ;    ;...
+            ;    ; Jump table:
+            ;    proto.getpid: jmp [__imp.getpid]
+
+            ; This example with dt size override at 2nd, and default double for 3rd:
+            g_print("Long double is: %Lf, double is %lf",10,0>, dt 1234.567890, 987.654321);
+            ; Resolve to:
+            ;    movsd xmm0, [..anonymous_data_ptr] ; This ..anonymous_data_ptr is redefined every time a new
+            ;    fld tword [..anonymous_data_ptr]   ; anonymous data is created at virtual location¹
+            ;    fstp tword [rsp-16]
+            ;    sub rsp, 16    ; alocate needed stack
+            ;    lea rdi, [..anonymous_data_ptr]
+            ;    mov al, 1  ; Hidden parameter: 1 xmm register used.
+            ;    call [__imp.g_print]
+            ;    add rsp, 16    ; release stack back
+            ;
+
+
+            exit(0);
+            ; Resolve to:
+            ;    sub rsp, 8     ; fastcall automatically allocates, aligns and releases stack for the function
+            ;    xor edi, edi   ; best way of passing 0 as data
+            ;    jmp proto.exit
+            ;    ; ...
+            ;    ; Jump table:
+            ;    proto.exit: jmp [__imp.exit]
+
+4. Tips, feedback and suggestions
+
+      Any feedback will be appreciated if you're using this, and should preferably be posted in the topic: https://board.flatassembler.net/topic.php?t=23838, where I had announced this macro. Maybe more experienced people there can help faster than I can, and I also be there very often to help whenever I can.
+      For bugs, or any failures that occured, the post should contain the code causing the problem and the output error (in any) of the fasmg/fasm2 assembler for better handling off the problem.
+      For suggestions, also an usage example might be required, depending of what kind of suggestion it is.
+      This is, as I said there, more an idea than a final undivisible/unchangeable concept: anyone can modify this and enhance it for it to fit one's purposes, and for benefit for others too. Updates on it can be freely posted at the forum, or even e-mailed me at: jesse6.2023@proton.me, also suggestions and feedback as well.
+      As a final word, I must alert one using this that I made this macros on demand, so I only implemented what I could and can use and test from System V ABI specification: it has more features that, by myself not finding yet usage for it, I have no way to test and implement them properly. If anyone finds something missing, please send example code that uses it so I can learn from your example and implement or repair it.
+
+5. Final considerations
+
+      Anything else that I forgot could be assimilated by the exmaples at this package. They were done as test subjects to whatever I was refining then.
+      If you like this macro toolkit, please share its usage whenever possible, so others can benefit from these productive tools as well.
+      I use this for almost 20 years (in another assembler) now, and, I know that, once you get used to it, you will never want the "raw mode" way back.
+
+
+
+
+

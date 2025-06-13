@@ -1,0 +1,153 @@
+format ELF64 executable 3
+entry Start
+
+include 'anon_label.inc'
+include 'fastcall_v1.inc'
+include 'stdio.inc'
+
+_data                              ;   08   19   2A   3B   4C   5D   6E   7F
+     escapetable:                  db 255, 255, '"', 255, 255, 255, 255, "'" ; 20 - 27
+                                   db 255, 255, 255, 255, 255, 255, 255, 255 ; 28 - 2F
+                                   db 254, 254, 254, 254, 254, 254, 254, 254 ; 30 - 37
+                                   db 255, 255, 255, 255, 255, 255, 255, '?' ; 38 - 3F
+                                   db 255, 255, 255, 255, 255, 255, 255, 255 ; 40 - 47
+                                   db 255, 255, 255, 255, 255, 255, 255, 255 ; 48 - 4F
+                                   db 255, 255, 255, 255, 255, 255, 255, 255 ; 50 - 57
+                                   db 255, 255, 255, 255, '\', 255, 255, 255 ; 58 - 5F
+                                   db 255, 007, 008, 255, 255, 027, 012, 255 ; 60 - 67
+                                   db 255, 255, 255, 255, 255, 255, 010, 255 ; 68 - 6F
+                                   db 255, 255, 013, 255, 009, 255, 011, 255 ; 70 - 77
+                                   db 253, 255, 255, 255, 255, 255, 255, 255 ; 78 - 7F
+
+_code
+          ParseEscapedString:      endbr64   ; rdi = destination buffer; rsi = source string
+                                   push      rbx
+                                   lea       rbx, [escapetable-20h]
+               .nextchar:          lodsb
+                                   test      al, al
+                                   jz        .endsuccess
+                                   cmp       al, '\'
+                                   je        .escape
+                                   stosb
+                                   jmp       .nextchar
+               .endsuccess:        clc
+                                   pop       rbx
+                                   ret
+               .escape:            lodsb
+                                   test      al, al
+                                   js        .ignoreescape
+                                   xlatb
+                                   test      al, -1
+                                   jns       .store
+                                   cmp       al, 254
+                                   je        .octal
+                                   cmp       al, 253
+                                   je        .hex
+               .ignoreescape:      mov       ax, [rsi-2]
+                                   stosw
+                                   jmp       .nextchar
+               .store:             stosb
+                                   jmp       .nextchar
+               .octal:             mov       eax, [rsi-1]
+                                   mov       ch, 1     ; Invalid octal flag before process
+                                   cmp       al, '0'
+                                   jb        .endoctal
+                                   cmp       al, '7'
+                                   ja        .endoctal
+                                   xor       ecx, ecx  ; Valid octal + cl = number of octal chars
+                                   sub       al, '0'
+                                   movzx     edx, al
+                                   inc       cl
+                                   shr       eax, 8
+                                   cmp       al, '0'
+                                   jb        .endoctal
+                                   cmp       al, '7'
+                                   ja        .endoctal
+                                   sub       al, '0'
+                                   shl       edx, 3
+                                   inc       cl
+                                   or        dl, al
+                                   shr       eax, 8
+                                   cmp       al, '0'
+                                   jb        .endoctal
+                                   cmp       al, '7'
+                                   ja        .endoctal
+                                   sub       al, '0'
+                                   shl       edx, 3
+                                   or        dl, al
+                                   inc       cl
+               .endoctal:          test      ch, ch
+                                   jnz       .ignoreescape
+                                   lea       rsi, [rsi+rcx-1]
+                                   mov       al, dl
+                                   stosb
+                                   jmp       .nextchar
+               .hex:               mov       dx, [rsi] ; supporting 2 char hex \xNN
+                                   mov       ch, 1     ; Set invalid flag before process
+                                   cmp       dx, '00'
+                                   jb        .endhex
+                                   cmp       dx, 'ff'
+                                   ja        .endhex
+                                   sub       dx, '00'
+                                   cmp       dl, 9
+                                   jbe       @f
+                                   sub       dl, 7
+                                   cmp       dl, 0Fh
+                                   jbe       @f
+                                   sub       dl, 20h
+                                   cmp       dl, 0Fh
+                                   ja        .endhex
+                                   cmp       dl, 0Ah
+                                   jb        .endhex
+                              @@   cmp       dh, 9
+                                   jbe       @f
+                                   sub       dh, 7
+                                   cmp       dh, 0Fh
+                                   jbe       @f
+                                   sub       dh, 20h
+                                   cmp       dh, 0Fh
+                                   ja        .endhex
+                                   cmp       dh, 0Ah
+                                   jb        .endhex
+                              @@   xor       ch, ch    ; Valid hex escape
+               .endhex:            test      ch, ch
+                                   jnz       .ignoreescape
+                                   shl       dl, 4
+                                   or        dl, dh
+                                   mov       al, dl
+                                   stosb
+                                   add       rsi, 2
+                                   jmp       .nextchar
+
+          Start:                   endbr64
+                                   cmp       [rsp], dword 2
+                                   jne       .err0
+                                   ; mov       rdx, [stdout]
+                                   ; mov       rcx, [stderr]
+                                   ; mov       rdx, [rdx]
+                                   ; mov       rcx, [rcx]
+                                   ; mov       [stdout], rdx
+                                   ; mov       [stderr], rcx
+                                   mov       rbp, [rsp+16]  ; argv[1]
+                                   mov       rdi, [rsp+16]  ; argv[1]
+                                   xor       al, al
+                                   mov       ecx, -1        ; 4 GB string limit
+                                   repne     scasb
+                                   not       ecx            ; String size with \0 char
+                                   malloc(ecx);
+                                   test      rax, rax
+                                   jz        .err1
+                                   mov       rsi, rbp
+                                   mov       rdi, rax
+                                   mov       rbp, rax
+                                   call      ParseEscapedString
+                                   jc        .err2
+                                   puts(rbp);
+                                   free(rbp);
+                                   exit(0);
+
+               .err2:              free(rbp);
+                                   exit(3);
+
+               .err1:              perror("Parsing failed");
+               .err0:              exit(1);

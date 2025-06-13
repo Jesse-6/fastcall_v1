@@ -1,0 +1,71 @@
+format ELF64 executable 3 at 100000h
+entry Start
+
+include 'fastcall_v1.inc'
+
+library 'libc.so.6'
+
+ext indirect proto printf, qword, vararg
+ext indirect proto sleep, qword
+ext indirect noreturn proto exit, dword
+noreturn indirect proto to_intexit, dword
+noreturn proto intexit, dword
+
+_bss
+        e_offset                dq ?
+
+_code
+        _to_intexit             dq _intexit
+        _intexit:               endbr64
+                                nop
+                                nop
+                                nop
+                                nop
+                                exit(edi);
+
+        Start:                  endbr64
+                                finit
+                                xor     eax, eax
+                                mfence                          ; Measure empty benchmark frame impact
+                                rdtsc
+                                shl     rdx, 32
+                                or      rax, rdx
+                                push    rax
+                                mfence
+                                rdtsc
+                                shl     rdx, 32
+                                or      rax, rdx
+                                push    rax
+                                fild    qword [rsp]
+                                fild    qword [rsp+8]
+                                fsubp   st1, st0
+                                fistp   qword [rsp]
+                                pop     qword [e_offset]        ; empty number of cycles*, save it elsewhere
+
+                                mfence    ; Do benchmark
+                                rdtsc
+                                shl     rdx, 32
+                                or      rax, rdx
+                                push    rax
+                                ; test code goes here
+                                ;sleep(1);
+                                enter   0, 0
+                                leave
+                                mfence
+                                rdtsc
+                                shl     rdx, 32
+                                or      rax, rdx
+                                push    rax
+                                fild    qword [rsp]
+                                fild    qword [rsp+8]
+                                fsubp   st1, st0
+                                fistp   qword [rsp]
+                                pop     rcx
+                                sub     rcx, [e_offset]         ; Number of cycles
+                                add     rsp, 16                 ; release allocated stack
+                                
+                                printf(<"Done in %li cycles. Frame offset: %lu cycles.",10,0>, rcx, *e_offset);
+                                ; to_intexit(0);
+                                intexit(0);
+                                ; jmp     [_to_intexit]
+

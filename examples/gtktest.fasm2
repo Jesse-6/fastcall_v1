@@ -1,0 +1,95 @@
+format ELF64 executable 3 at 100000h
+entry Start
+
+use AMD64, CET_IBT
+
+include 'fastcall_v1.inc'
+
+; include 'stdio.inc'
+; include 'gtk3.inc'
+
+; Disable everything up to '### END ###' if you enable stdio and gtk3 include files!
+library 'libc.so.6'
+library 'libgtk-3.so.0'
+library 'libgdk-3.so.0'
+library 'libz.so.1'
+library 'libpangocairo-1.0.so.0'
+library 'libpango-1.0.so.0'
+library 'libharfbuzz.so.0'
+library 'libatk-1.0.so.0'
+library 'libcairo-gobject.so.2'
+library 'libcairo.so.2'
+library 'libgdk_pixbuf-2.0.so.0'
+library 'libgio-2.0.so.0'
+library 'libgobject-2.0.so.0'
+library 'libglib-2.0.so.0'
+
+ext proto __errno_location, none, alias errno
+ext noreturn proto __libc_start_main, qword, dword, qword, qword, dword, qword, qword
+ext proto gtk_application_new, qword, dword
+ext proto g_signal_connect_data, qword, qword, qword, dword, dword, dword
+ext proto g_application_run, qword, dword, qword
+ext proto g_object_unref, qword
+ext proto g_print, qword, vararg
+ext proto gtk_application_window_new, qword
+ext proto gtk_window_set_title, qword, qword
+ext proto gtk_window_set_default_size, qword, dword, dword
+ext proto gtk_widget_get_opacity, qword
+ext proto gtk_widget_set_opacity, qword, double
+ext proto gtk_widget_show_all, qword
+
+; This is a standard GTK3 macro within GTK3 documentation, so, why not?
+macro g_signal_connect params&
+    match (param), params
+        g_signal_connect_data(param, NULL, G_CONNECT_DEFAULT);
+    end match
+end macro
+; ### END ###
+
+NULL                            = 0
+FALSE                           = 0
+TRUE                            = 1
+G_APPLICATION_DEFAULT_FLAGS     = 0
+G_CONNECT_DEFAULT               = 0
+
+_bss
+        app             rq 1
+        window          rq 1
+
+_code
+        Start:          endbr64
+                        __libc_start_main(&lcMain, [rsp+8], &rsp+16, NULL, NULL, rdx, rsp);
+                        
+        lcMain:         endbr64
+                        push    rbp
+                        push    r15
+                        push    r14
+                        mov     r15d, edi
+                        mov     r14, rsi
+                        errno();
+                        mov     ebx, [rax]
+                        gtk_application_new("org.gtk3.fasmg.x64.gtkwindow", \
+                                G_APPLICATION_DEFAULT_FLAGS);
+                        mov     [app], rax
+                        g_signal_connect(rax, "activate", &Activate, NULL);
+                        g_application_run(*app, r15d, r14);
+                        g_object_unref(*app);
+                        pop     r14
+                        pop     r15
+                        pop     rbp
+                        xor     eax, eax
+                        ret
+                        
+        Activate:       endbr64
+                        push    rbp
+                        g_print(<"It worked!",10,0>);
+                        gtk_application_window_new(*app);
+                        mov     [window], rax
+                        gtk_window_set_title(rax, "Made with (fasm2 headers with) famsg!");
+                        gtk_window_set_default_size(*window, 530, 300);
+                        gtk_widget_set_opacity(*window, 0.93265);
+                        gtk_widget_get_opacity(*window);
+                        g_print(<"Opacity: %lf",10,0>, xmm0);   ; <- ATTENTION: this is the source of BETA2 problems
+                        gtk_widget_show_all(*window);           ; only with 2 parameters!
+                        pop     rbp
+                        ret
