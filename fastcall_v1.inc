@@ -2344,7 +2344,9 @@ macro proto? func*, args&
 		match =alias?= pretty, arg	; 'alias' should be the last parameter!
 			aliased = 1				; Only pretty() is available as a macro here
 			define func__.#func.par0.aliased 1
-			display "Alias: '", `func, "' as '", `pretty, "()'", 10
+			if used __imp.func
+				display "Alias: '", `func, "' as '", `pretty, "()'", 10
+			end if
 			macro ?pretty params&
 				if totalcnt = 0
 					match (), params
