@@ -2420,7 +2420,16 @@ macro proto? func*, args&
 				define func__.#func.par#k.size vararg
 				define func__.#func.par0.isVararg k	; index of vararg parameter
 			end repeat
-			break
+			if (% + 1) <= %%
+				indx % + 1
+				match =alias? gorgeous, arg
+					aliased = 0
+				else
+					break
+				end match
+			else
+				break
+			end if
 		else if arg eq none
 			repeat 1, i:0 k:%
 				define func__.#func.par#k.class SYSTEMV_PARA_CLASS_NONE
