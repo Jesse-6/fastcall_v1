@@ -2001,6 +2001,7 @@ macro fastcall func, args&
 				indx %% - % + 1
 				repeat 1, r:regcount, x:xmmcount, m:memcount, i: %% - % + 1 - func__.#func.par0.isVararg + 1
 					__type_id_ = __vararg.par#i.type	; used by put_parameter
+					__type_size_ = __vararg.par#i.size
 					if __vararg.par#i.class = SYSTEMV_PARA_CLASS_REGISTER
 						put_parameter2 r, SYSTEMV_PARA_CLASS_REGISTER, \
 							__vararg.par#i.data, __vararg.par#i.size
