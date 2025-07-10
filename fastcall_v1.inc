@@ -607,7 +607,13 @@ macro testtype dest&
 		end match
 	else match (i), dest
 		__type_id_ = FUNC_PARA_TYPE_EQUATION
-		if i eqtype ""
+		local tmpresult
+		tmpresult = (i)
+		if tmpresult eqtype 0.0		; Added equation with float point numbers
+			__type_id_ = FUNC_PARA_TYPE_FLOAT
+			define __type_para_ i
+			__type_size_ = 8
+		else if i eqtype ""
 			repeat 1, num:i
 				define __type_para_ num
 			end repeat
