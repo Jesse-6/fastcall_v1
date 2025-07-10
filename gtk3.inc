@@ -35,6 +35,33 @@ define G_CONNECT_DEFAULT 0
 define G_CONNECT_AFTER 1
 define G_CONNECT_SWAPPED 2
 
+define GDK_EXPOSURE_MASK            2
+define GDK_POINTER_MOTION_MASK      4
+define GDK_POINTER_MOTION_HINT_MASK 8
+define GDK_BUTTON_MOTION_MASK       16
+define GDK_BUTTON1_MOTION_MASK      32
+define GDK_BUTTON2_MOTION_MASK      64
+define GDK_BUTTON3_MOTION_MASK      128
+define GDK_BUTTON_PRESS_MASK        256
+define GDK_BUTTON_RELEASE_MASK      512
+define GDK_KEY_PRESS_MASK           1024
+define GDK_KEY_RELEASE_MASK         2048
+define GDK_ENTER_NOTIFY_MASK        4096
+define GDK_LEAVE_NOTIFY_MASK        8192
+define GDK_FOCUS_CHANGE_MASK        16384
+define GDK_STRUCTURE_MASK           32768
+define GDK_PROPERTY_CHANGE_MASK     65536
+define GDK_VISIBILITY_NOTIFY_MASK   131072
+define GDK_PROXIMITY_IN_MASK        262144
+define GDK_PROXIMITY_OUT_MASK       524288
+define GDK_SUBSTRUCTURE_MASK        1048576
+define GDK_SCROLL_MASK              2097152
+define GDK_TOUCH_MASK               4194304
+define GDK_SMOOTH_SCROLL_MASK       8388608
+define GDK_TOUCHPAD_GESTURE_MASK    16777216
+define GDK_TABLET_PAD_MASK          33554432
+define GDK_ALL_EVENTS_MASK          67108862
+
 define GDK_WINDOW_STATE_WITHDRAWN        1
 define GDK_WINDOW_STATE_ICONIFIED        2
 define GDK_WINDOW_STATE_MAXIMIZED        4
@@ -160,7 +187,9 @@ ext proto g_print, qword, vararg
 ext proto g_printerr, qword, vararg
 ext proto g_signal_connect_data, qword, qword, qword, qword, dword, dword
 ext noreturn proto g_thread_exit, qword
+ext proto g_thread_get_initialized, none
 ext proto g_thread_get_name, qword
+ext proto g_thread_init, qword
 ext proto g_thread_join, qword
 ext proto g_thread_new, qword, qword, qword
 ext proto g_thread_ref, qword
@@ -174,6 +203,9 @@ ext proto gdk_event_handler_set, qword, qword, qword
 ext proto gdk_screen_get_default, none
 ext proto gdk_screen_is_composited, qword
 ext proto gdk_threads_add_idle_full, dword, qword, qword, qword
+ext proto gdk_threads_enter, none
+ext proto gdk_threads_init, none
+ext proto gdk_threads_leave, none
 ext proto gtk_application_new, qword, dword
 ext proto gtk_application_window_new, qword
 ext proto gtk_box_new, dword, dword
@@ -212,6 +244,7 @@ ext proto gtk_css_provider_load_from_resource, qword, qword
 ext proto gtk_css_provider_to_string, qword
 ext proto gtk_dialog_new_with_buttons, qword, qword, dword, vararg
 ext proto gtk_dialog_run, qword
+ext proto gtk_drawing_area_new, none
 ext proto gtk_grid_attach, qword, qword, dword, dword, dword, dword
 ext proto gtk_grid_insert_column, qword, dword
 ext proto gtk_grid_insert_row, qword, dword
@@ -284,10 +317,14 @@ ext proto gtk_toggle_button_set_active, qword, byte
 ext proto gtk_toggle_button_set_inconsistent, qword, byte
 ext proto gtk_toggle_button_set_mode, qword, byte
 ext proto gtk_toggle_button_toggled, qword      ; according to GTK team, don't use this.
+ext proto gtk_widget_add_events, qword, dword
 ext proto gtk_widget_destroy, qword
 ext proto gtk_widget_get_style_context, qword
 ext proto gtk_widget_get_opacity, qword
 ext proto gtk_widget_get_parent, qword
+ext proto gtk_widget_queue_draw, qword
+ext proto gtk_widget_queue_draw_area, qword, dword, dword, dword, dword
+ext proto gtk_widget_set_events, qword, dword
 ext proto gtk_widget_set_halign, qword, dword
 ext proto gtk_widget_set_hexpand, qword, byte
 ext proto gtk_widget_set_margin_bottom, qword, dword
