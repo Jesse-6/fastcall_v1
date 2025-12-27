@@ -179,6 +179,7 @@ ext proto get_nprocs, none                      ; number of processors in the sy
 ext proto get_nprocs_conf, none                 ; number of processors online
 ext proto getchar, none
 ext proto getenv, qword                         ; rdi = *environment string
+ext proto geteuid, none
 ext proto getgrgid, dword                       ; edi = Group ID
 ext proto getitimer, dword, qword               ; edi = which timer, rsi = *itimerval current settings
 ext proto getline, qword, qword, qword
