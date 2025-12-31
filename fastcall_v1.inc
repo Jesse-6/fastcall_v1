@@ -240,6 +240,7 @@ namespace __imp
 
 	macro importv &definitions
 		local strtab,strsz,symtab,rel,relsz,hash
+		; aligned to 8-byte padding of 0's inside previous interpreter section
 		segment dynamic readable
 		irpv library, needed@dynamic
 			dq DT_NEEDED,strtab.needed#%-strtab
@@ -282,6 +283,7 @@ namespace __imp
 		end irpv
 		strsz = $-strtab
 		ptrtab:
+		align 8, 255
 		irpv name, definitions
 			?name dq 0
 		end irpv
@@ -329,7 +331,12 @@ macro _rdata line&  ; Read only initialized data segment
       end virtual
     end postpone
     virtual __rdata_ptr
-      line
+      match =align?= any, line
+        line
+      else
+        align 64, '*'
+        line
+	  end match
     end virtual
     db __rdata_ptr.contents
     esc virtual __rdata_ptr
@@ -368,7 +375,12 @@ macro _data line&   ; Read/write initialized data segment
       __V_SECTION_OPEN__ = 0
     end postpone
     virtual __data_ptr
-      line
+      match =align?= any, line
+        line
+      else
+        align 64, '*'
+        line
+      end match
 	end virtual
 	db __data_ptr.contents
 	esc virtual __data_ptr
@@ -407,7 +419,12 @@ macro _bss line&	;WARNING: Alpha stage. ; Uninitialized data segment
       __V_SECTION_OPEN__ = 0
     end postpone
     ; esc virtual __bss_ptr
-    line
+    match =align?= any, line
+      line
+    else
+      align 64
+      line
+    end match
     __V_SECTION_OPEN__ = 0
   else
     if __V_SECTION_OPEN__
@@ -449,13 +466,26 @@ macro _code line&   ; Code segment
         __V_SECTION_OPEN__ = 0
       end virtual
     end postpone
+    match =align?= any, line
+      line
+    end match
     db __code_ptr.contents	; If there's only a _code section, anonymous data will be placed
     ; esc virtual __code_ptr	; before the code in the same section.
     match =rwx?= any, line
-      any
+      match =align?= value, any
+        any
+      else
+        align 4, 90h
+      end match
     else match =rwx?, line
+      align 4, 90h
     else
-      line
+      match =align?= any, line
+        line
+      else
+        align 4, 90h
+        line
+      end match
     end match
     __V_SECTION_OPEN__ = 0
   else
@@ -2193,6 +2223,7 @@ macro extern2_
 	namespace __imp
 		segment interpreter readable
 		db '/lib64/ld-linux-x86-64.so.2', 0
+		align 8									; This only accepts 0's as padding bytes, executable fails otherwise
 		irpv xfunc, __IMPORT_LIST_
 			display "Importing: ", `xfunc, 10
 		end irpv
