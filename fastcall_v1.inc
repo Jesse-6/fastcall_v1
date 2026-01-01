@@ -830,10 +830,13 @@ macro put_anon_data dtype, data&	; It depends on _code, _radata or _data macros 
 				else if dtype = PUT_ANON_DATA_STRING	; exact string (no alteration)
 					.._anon_data_#i db data
 				else if dtype eq dword 					; 32-bit number
+					align 4
 					.._anon_data_#i dd data
 				else if dtype eq qword					; 64-bit number
+					align 8
 					.._anon_data_#i dq data
 				else if dtype eq tword					; 80-bit float number
+					align 16
 					.._anon_data_#i dt data
 				else
 					err "Unsupported anon data type.", 10
