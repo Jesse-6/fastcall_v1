@@ -1651,6 +1651,27 @@ macro put_parameter2 index, class, parameter, psize	; detect forced size beforeh
 	else
 		put_parameter index, class, parameter, psize
 	end if
+	; irpv param, parameter
+	; 	indx %%
+	; 	display "parameter '", `param, "' "
+	; 	irpv size, psize
+	; 		indx %%
+	; 		display "passed with psize: ", `size, 32
+	; 		irpv ts, __type_size_
+	; 			indx %%
+	; 			if ts eqtype 0
+	; 				repeat 1, val:ts
+	; 					 display "type size: ", `val, 10
+	; 				end repeat
+	; 			else
+	; 				display "type size: ", `ts, 10
+	; 			end if
+	; 			break
+	; 		end irpv
+	; 		break
+	; 	end irpv
+	; 	break
+	; end irpv
 end macro
 
 ; internal fastcall macro itself
@@ -1761,7 +1782,11 @@ macro fastcall func, args&
 								repeat 1, i:%, r:regcount
 									define __vararg.par#i.class SYSTEMV_PARA_CLASS_REGISTER
 									define __vararg.par#i.count r
-									define __vararg.par#i.size qword
+									if __type_id_ = FUNC_PARA_TYPE_ADDR
+										__vararg.par#i.size = __type_size_	; trust testtype parameter
+									else
+										define __vararg.par#i.size qword
+									end if
 									define __vararg.par#i.align %
 									__vararg.par#i.rawdata equ argp
 									put_value __vararg.par#i.data, __type_para_
@@ -1773,7 +1798,11 @@ macro fastcall func, args&
 								repeat 1, i:%, m:memcount
 									define __vararg.par#i.class SYSTEMV_PARA_CLASS_MEMORY
 									define __vararg.par#i.count m
-									define __vararg.par#i.size qword
+									if __type_id_ = FUNC_PARA_TYPE_ADDR
+										__vararg.par#i.size = __type_size_	; correctly detects 32|64 address size
+									else
+										define __vararg.par#i.size qword
+									end if
 									define __vararg.par#i.align %
 									__vararg.par#i.rawdata equ argp
 									put_value __vararg.par#i.data, __type_para_
