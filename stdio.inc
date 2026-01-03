@@ -1,5 +1,9 @@
 library 'libc.so.6'
 
+define AF_UNIX          1
+define AF_INET          2
+define AF_INET6         10
+
 define EAGAIN          11
 define EACCES          13
 define EINVAL          22
@@ -26,6 +30,12 @@ define F_WRLCK         1
 define F_UNLCK         2
 
 define ICANON          0x00002
+
+define IPPROTO_ICMP     1
+define IPPROTO_TCP      6
+define IPPROTO_UDP      17
+define IPPROTO_GRE      47
+define IPPROTO_ICMPV6   58
 
 define ITIMER_REAL     0
 define ITIMER_VIRTUAL  1
@@ -115,6 +125,10 @@ define SIGLOST         29
 define SIGPWR          30
 define SIGSYS          31
 
+define SOCK_STREAM      1
+define SOCK_DGRAM       2
+define SOCK_RAW         3
+
 define STDIN_FILENO    0
 define STDOUT_FILENO   1
 define STDERR_FILENO   2
@@ -144,6 +158,7 @@ ext proto __errno_location, none, alias errno   ; rax = errno ptr
 ext proto asctime, qword                        ; rdi = *TM structure; rax = *strtime
 ext proto calloc, qword, qword                  ; rdi = n, rsi = size
 ext proto cfmakeraw, qword                      ; rdi = *TERMIOS filled structure
+ext proto clearerr, qword                       ; rdi = * FILE
 ext proto close, dword                          ; edi = int file descriptor
 ext proto closedir, qword                       ; rdi = directory descriptor
 ext proto ctime, qword                          ; rdi = *TIMEP structure; rax = *strtime
@@ -171,18 +186,25 @@ ext proto fputs, qword, qword
 ext proto fputwc, dword, qword
 ext proto fread, qword, qword, qword, qword     ; rdi = *data, rsi = size, rdx = num elements, rcx = *file stream
 ext proto free, qword
+ext proto freeaddrinfo, qword
 ext proto fseek, qword, qword, dword
 ext proto fstat, qword, qword
 ext proto ftell, qword
+ext proto ftruncate, dword, dword               ; edi = fd, esi = length
 ext proto fwrite, qword, qword, qword, qword    ; Same as fread()
+ext proto gai_strerror, dword
 ext proto get_nprocs, none                      ; number of processors in the system
 ext proto get_nprocs_conf, none                 ; number of processors online
+ext proto getaddrinfo, qword, qword, qword, qword
 ext proto getchar, none
 ext proto getenv, qword                         ; rdi = *environment string
 ext proto geteuid, none
 ext proto getgrgid, dword                       ; edi = Group ID
+ext proto gethostbyaddr, qword, dword, dword    ; 
+ext proto gethostbyname, qword
 ext proto getitimer, dword, qword               ; edi = which timer, rsi = *itimerval current settings
 ext proto getline, qword, qword, qword
+ext proto getnameinfo, qword, dword, qword, dword, qword, dword, dword
 ext proto getpass, qword
 ext proto getpid, none
 ext proto getpriority, dword, dword
@@ -216,12 +238,16 @@ ext proto sched_getaffinity, dword, dword, qword
 ext proto sched_getscheduler, dword
 ext proto sched_setaffinity, dword, dword, qword
 ext proto sched_setscheduler, dword, dword, qword
+ext proto setegid, dword
+ext proto seteuid, dword
 ext proto setitimer, dword, qword, qword        ; edi = which timer, rsi = *itimerval new, rdx = *itimerval old
 ext proto setlocale, dword, qword               ; edi = flags; rsi = *locale
 ext proto setpriority, dword, dword, dword
+ext proto setuid, dword
 ext proto signal, dword, qword                  ; edi = sig, rsi = *handler
 ext proto sleep, dword                          ; edi = seconds to sleep
 ext proto snprintf, qword, qword, qword, vararg ; rdi = *buffer, rsi = size, rdx = format, ...
+ext proto socket, dword, dword, dword           ; edi = domain, esi, type, edx = protocol
 ext proto sprintf, qword, qword, vararg         ; rdi = *buffer; rsi = *format; ...
 ext proto stat, qword, qword
 ext proto strcmp, qword, qword
