@@ -7,6 +7,19 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define AF_UNIX          1
 	define AF_INET          2
 	define AF_INET6         10
+	
+    define CLOCK_REALTIME           0
+    define CLOCK_MONOTONIC          1
+    define CLOCK_PROCESS_CPUTIME_ID 2
+    define CLOCK_THREAD_CPUTIME_ID  3
+    define CLOCK_MONOTONIC_RAW      4
+    define CLOCK_REALTIME_COARSE    5
+    define CLOCK_MONOTONIC_COARSE   6
+    define CLOCK_BOOTTIME           7
+    define CLOCK_REALTIME_ALARM     8
+    define CLOCK_BOOTTIME_ALARM     9
+    define CLOCK_SGI_CYCLE          10
+    define CLOCK_TAI                11
 
 	define EAGAIN          11
 	define EACCES          13
@@ -64,8 +77,38 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define ICMP_HOST_UNR_TOS	12
 	define ICMP_PKT_FILTERED	13	; Packet filtered 
 	define ICMP_PREC_VIOLATION	14	; Precedence violation 
-	define ICMP_PREC_CUTOFF		15	; Precedence cut off 
+	define ICMP_PREC_CUTOFF		15	; Precedence cut off
+	
+	define IP_TOS					1
+	define IP_TTL					2
+	define IP_HDRINCL				3
+	define IP_OPTIONS				4
+	define IP_ROUTER_ALERT			5
+	define IP_RECVOPTS				6
+	define IP_RETOPTS				7
+	define IP_PKTINFO				8
+	define IP_PKTOPTIONS			9
+	define IP_MTU_DISCOVER			10
+	define IP_RECVERR				11
+	define IP_RECVTTL				12
+	define IP_MTU					14
+	define IP_FREEBIND				15
+	define IP_IPSEC_POLICY			16
+	define IP_XFRM_POLICY			17
+	define IP_PASSSEC				18
+	define IP_TRANSPARENT			19
+	define IP_RECVRETOPTS			IP_RETOPTS
+	define IP_ORIGDSTADDR			20
+	define IP_RECVORIGDSTADDR		IP_ORIGDSTADDR
+	define IP_MINTTL       			21
+	define IP_NODEFRAG     			22
+	define IP_CHECKSUM				23
+	define IP_BIND_ADDRESS_NO_PORT	24
+	define IP_RECVFRAGSIZE			25
+	define IP_RECVERR_RFC4884		26
 
+
+	define IPPROTO_IP       0
 	define IPPROTO_ICMP     1
 	define IPPROTO_TCP      6
 	define IPPROTO_UDP      17
@@ -77,6 +120,30 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define ITIMER_PROF     2
 
 	define LC_ALL          6
+	
+	define	MSG_OOB			0x01	; Process out-of-band data.  
+	define	MSG_PEEK		0x02	; Peek at incoming messages.  
+	define	MSG_DONTROUTE	0x04	; Don't use local routing.  
+	define	MSG_TRYHARD		MSG_DONTROUTE
+	define	MSG_CTRUNC		0x08	; Control data lost before delivery.  
+	define	MSG_PROXY		0x10	; Supply or ask second address.  
+	define	MSG_TRUNC		0x20
+	define	MSG_DONTWAIT	0x40 ; Nonblocking IO.  
+	define	MSG_EOR			0x80 ; End of record.  
+	define	MSG_WAITALL		0x100 ; Wait for a full request.  
+	define	MSG_FIN			0x200
+	define	MSG_SYN			0x400
+	define	MSG_CONFIRM		0x800 ; Confirm path validity.  
+	define	MSG_RST			0x1000
+	define	MSG_ERRQUEUE	0x2000 ; Fetch message from error queue.  
+	define	MSG_NOSIGNAL	0x4000 ; Do not generate SIGPIPE.  
+	define	MSG_MORE		0x8000  ; Sender will send more.  
+	define	MSG_WAITFORONE	0x10000 ; Wait for at least one packet to return.
+	define	MSG_BATCH		0x40000 ; sendmmsg: more messages coming.  
+	define	MSG_SOCK_DEVMEM	0x2000000 ; Receive devmem skbs as cmsg.  
+	define	MSG_ZEROCOPY	0x4000000 ; Use user data in kernel path.  
+	define	MSG_FASTOPEN	0x20000000 ; Send data in TCP SYN.  
+	define	MSG_CMSG_CLOEXEC 0x40000000	; Set close_on_exit for file
 
 	define NULL            0
 
@@ -93,6 +160,9 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define O_TMPFILE       (20000000o + O_DIRECTORY)
 	define O_TRUNC         1000o
 	define O_WRONLY        1o
+	
+	define POLLIN			0001h
+	define POLLERR			0008h
 
 	define PRIO_PROCESS    0
 	define PRIO_PGRP       1
@@ -160,9 +230,29 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define SIGPWR          30
 	define SIGSYS          31
 
+	define SO_EE_ORIGIN_NONE		0
+	define SO_EE_ORIGIN_LOCAL		1
+	define SO_EE_ORIGIN_ICMP		2
+	define SO_EE_ORIGIN_ICMP6		3
+	define SO_EE_ORIGIN_TXSTATUS	4
+	define SO_EE_ORIGIN_ZEROCOPY	5
+	define SO_EE_ORIGIN_TXTIME		6
+	define SO_EE_ORIGIN_TIMESTAMPING SO_EE_ORIGIN_TXSTATUS
+	
+	define SO_RCVTIMEO      20
+	define SO_SNDTIMEO      21
+	define SO_TIMESTAMP_OLD 29
+
 	define SOCK_STREAM      1
 	define SOCK_DGRAM       2
 	define SOCK_RAW         3
+	
+	define SOL_IP           0
+	define SOL_SOCKET       1
+	define SOL_TCP          6
+	define SOL_UDP          17
+	define SOL_IPV6         41
+	define SOL_ICMPV6       58
 
 	define STDIN_FILENO    0
 	define STDOUT_FILENO   1
@@ -190,10 +280,14 @@ if ~ defined __STDIO_INC_INCLUDED__
 
 	ext proto __cxa_atexit, qword, alias atexit
 	ext proto __errno_location, none, alias errno   ; rax = errno ptr
+	ext proto __h_errno_location, none, alias h_errno
 	ext proto asctime, qword                        ; rdi = *TM structure; rax = *strtime
 	ext proto calloc, qword, qword                  ; rdi = n, rsi = size
 	ext proto cfmakeraw, qword                      ; rdi = *TERMIOS filled structure
 	ext proto clearerr, qword                       ; rdi = * FILE
+	ext proto clock_getres, dword, qword            ; edi = clockid, rsi = * timespec
+	ext proto clock_gettime, dword, qword           ;
+	ext proto clock_settime, dword, qword           ;
 	ext proto close, dword                          ; edi = int file descriptor
 	ext proto closedir, qword                       ; rdi = directory descriptor
 	ext proto ctime, qword                          ; rdi = *TIMEP structure; rax = *strtime
@@ -237,6 +331,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto getgrgid, dword                       ; edi = Group ID
 	ext proto gethostbyaddr, qword, dword, dword    ; 
 	ext proto gethostbyname, qword
+	ext proto gethostbyname2, qword, dword			; * name, AF
 	ext proto getitimer, dword, qword               ; edi = which timer, rsi = *itimerval current settings
 	ext proto getline, qword, qword, qword
 	ext proto getnameinfo, qword, dword, qword, dword, qword, dword, dword
@@ -244,8 +339,11 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto getpid, none
 	ext proto getpriority, dword, dword
 	ext proto getpwuid, dword                       ; edi = user ID
+	ext proto getsockname, dword, qword, qword		; fd, * sockaddr, * size
+	ext proto getsockopt, dword, dword, dword, qword, qword	; socket, level, option, *value, *size
 	ext proto gettimeofday, qword, qword            ; *TIMEVAL structure, *TIMEZONE struct
 	ext proto grantpt, dword                        ; edi = int file descriptor
+	ext proto hstrerror, dword						; edi = int h_errno
 	ext proto ioctl, dword, vararg                  ; edi = int file descriptor
 	ext proto inet_aton, qword, qword				; rdi = *cp, rsi = *in_addr
 	ext proto inet_ntoa, dword						; edi = in_addr
@@ -258,6 +356,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto open, qword, dword, dword     ; rdi = pathname, esi = flags, edx = mode
 	ext proto opendir, qword                        ; rdi = *dirpath
 	ext proto perror, qword                         ; rdi = *string before error string (can be NULL)
+	ext proto poll, qword, qword, dword				; * pollfd, num x pollfd, timeout ms
 	ext proto posix_openpt, dword                   ; edi = flags. eax = pts lowest number available
 	ext proto printf, qword, vararg
 	ext proto ptsname, dword                        ; edi = int file descriptor. rax = str PTS name
@@ -269,6 +368,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto realloc, qword, qword
 	ext proto reallocarray, qword, dword, dword
 	ext proto recvfrom, dword, qword, qword, dword, qword, dword
+	ext proto recvmsg, dword, qword, dword
 	ext proto remove, qword                         ; rdi = *filepath
 	ext proto rewind, qword
 	ext proto scanf, qword, vararg
@@ -277,12 +377,14 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto sched_setaffinity, dword, dword, qword
 	ext proto sched_setscheduler, dword, dword, qword
 	ext proto select, dword, qword, qword, qword, qword
+	ext proto sendmsg, dword, qword, dword
 	ext proto sendto, dword, qword, qword, dword, qword, dword
 	ext proto setegid, dword
 	ext proto seteuid, dword
 	ext proto setitimer, dword, qword, qword        ; edi = which timer, rsi = *itimerval new, rdx = *itimerval old
 	ext proto setlocale, dword, qword               ; edi = flags; rsi = *locale
 	ext proto setpriority, dword, dword, dword
+	ext proto setsockopt, dword, dword, dword, qword, dword	; socket, level, option, *value, size
 	ext proto setuid, dword
 	ext proto signal, dword, qword                  ; edi = sig, rsi = *handler
 	ext proto sleep, dword                          ; edi = seconds to sleep
@@ -310,7 +412,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto tmpfile, none                         ; rax = returns a file pointer to temporary file
 	ext proto unlink, qword                         ; rdi = char path filename to be removed
 	ext proto unlockpt, dword                       ; edi = int file descriptor
-	ext proto usleep, dword                         ; edi = microsseconds to sleep
+	ext proto usleep, qword                         ; edi = microsseconds to sleep
 	ext proto write, dword, qword, qword            ; edi = int file desc, rsi = buffer, edx = size
 
 	;:::::::::::::::::::::::::::::::::::::
