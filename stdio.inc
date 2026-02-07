@@ -21,40 +21,40 @@ if ~ defined __STDIO_INC_INCLUDED__
     define CLOCK_SGI_CYCLE          10
     define CLOCK_TAI                11
     
-	define	EPERM		 1	; Operation not permitted */
-	define	ENOENT		 2	; No such file or directory */
-	define	ESRCH		 3	; No such process */
-	define	EINTR		 4	; Interrupted system call */
-	define	EIO		 	 5	; I/O error */
-	define	ENXIO		 6	; No such device or address */
-	define	E2BIG		 7	; Argument list too long */
-	define	ENOEXEC		 8	; Exec format error */
-	define	EBADF		 9	; Bad file number */
-	define	ECHILD		10	; No child processes */
-	define	EAGAIN		11	; Try again */
-	define	ENOMEM		12	; Out of memory */
-	define	EACCES		13	; Permission denied */
-	define	EFAULT		14	; Bad address */
-	define	ENOTBLK		15	; Block device required */
-	define	EBUSY		16	; Device or resource busy */
-	define	EEXIST		17	; File exists */
-	define	EXDEV		18	; Cross-device link */
-	define	ENODEV		19	; No such device */
-	define	ENOTDIR		20	; Not a directory */
-	define	EISDIR		21	; Is a directory */
-	define	EINVAL		22	; Invalid argument */
-	define	ENFILE		23	; File table overflow */
-	define	EMFILE		24	; Too many open files */
-	define	ENOTTY		25	; Not a typewriter */
-	define	ETXTBSY		26	; Text file busy */
-	define	EFBIG		27	; File too large */
-	define	ENOSPC		28	; No space left on device */
-	define	ESPIPE		29	; Illegal seek */
-	define	EROFS		30	; Read-only file system */
-	define	EMLINK		31	; Too many links */
-	define	EPIPE		32	; Broken pipe */
-	define	EDOM		33	; Math argument out of domain of func */
-	define	ERANGE		34	; Math result not representable */
+	define	EPERM		 1	; Operation not permitted
+	define	ENOENT		 2	; No such file or directory
+	define	ESRCH		 3	; No such process
+	define	EINTR		 4	; Interrupted system call
+	define	EIO		 	 5	; I/O error
+	define	ENXIO		 6	; No such device or address
+	define	E2BIG		 7	; Argument list too long
+	define	ENOEXEC		 8	; Exec format error
+	define	EBADF		 9	; Bad file number
+	define	ECHILD		10	; No child processes
+	define	EAGAIN		11	; Try again
+	define	ENOMEM		12	; Out of memory
+	define	EACCES		13	; Permission denied
+	define	EFAULT		14	; Bad address
+	define	ENOTBLK		15	; Block device required
+	define	EBUSY		16	; Device or resource busy
+	define	EEXIST		17	; File exists
+	define	EXDEV		18	; Cross-device link
+	define	ENODEV		19	; No such device
+	define	ENOTDIR		20	; Not a directory
+	define	EISDIR		21	; Is a directory
+	define	EINVAL		22	; Invalid argument
+	define	ENFILE		23	; File table overflow
+	define	EMFILE		24	; Too many open files
+	define	ENOTTY		25	; Not a typewriter
+	define	ETXTBSY		26	; Text file busy
+	define	EFBIG		27	; File too large
+	define	ENOSPC		28	; No space left on device
+	define	ESPIPE		29	; Illegal seek
+	define	EROFS		30	; Read-only file system
+	define	EMLINK		31	; Too many links
+	define	EPIPE		32	; Broken pipe
+	define	EDOM		33	; Math argument out of domain of func
+	define	ERANGE		34	; Math result not representable
 
 	define	EDEADLK		35	; Resource deadlock would occur 
 	define	ENAMETOOLONG	36	; File name too long 
@@ -211,7 +211,91 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define ICMP_PKT_FILTERED	13	; Packet filtered 
 	define ICMP_PREC_VIOLATION	14	; Precedence violation 
 	define ICMP_PREC_CUTOFF		15	; Precedence cut off
-	
+
+	define ICMPV6_ROUTER_PREF_LOW		0x3
+	define ICMPV6_ROUTER_PREF_MEDIUM	0x0
+	define ICMPV6_ROUTER_PREF_HIGH		0x1
+	define ICMPV6_ROUTER_PREF_INVALID	0x2
+
+	define ICMPV6_DEST_UNREACH		1
+	define ICMPV6_PKT_TOOBIG		2
+	define ICMPV6_TIME_EXCEED		3
+	define ICMPV6_PARAMPROB			4
+
+	define ICMPV6_ERRMSG_MAX		127
+
+	define ICMPV6_INFOMSG_MASK		0x80
+
+	define ICMPV6_ECHO_REQUEST		128
+	define ICMPV6_ECHO_REPLY		129
+	define ICMPV6_MGM_QUERY			130
+	define ICMPV6_MGM_REPORT       	131
+	define ICMPV6_MGM_REDUCTION    	132
+
+	define ICMPV6_NI_QUERY			139
+	define ICMPV6_NI_REPLY			140
+
+	define ICMPV6_MLD2_REPORT		143
+
+	define ICMPV6_DHAAD_REQUEST		144
+	define ICMPV6_DHAAD_REPLY		145
+	define ICMPV6_MOBILE_PREFIX_SOL	146
+	define ICMPV6_MOBILE_PREFIX_ADV	147
+
+	define ICMPV6_MRDISC_ADV		151
+	define ICMPV6_MRDISC_SOL		152
+
+	define ICMPV6_MSG_MAX			255
+
+	;	Codes for Destination Unreachable
+
+	define ICMPV6_NOROUTE			0
+	define ICMPV6_ADM_PROHIBITED	1
+	define ICMPV6_NOT_NEIGHBOUR		2
+	define ICMPV6_ADDR_UNREACH		3
+	define ICMPV6_PORT_UNREACH		4
+	define ICMPV6_POLICY_FAIL		5
+	define ICMPV6_REJECT_ROUTE		6
+
+	;
+	;	Codes for Time Exceeded
+
+	define ICMPV6_EXC_HOPLIMIT		0
+	define ICMPV6_EXC_FRAGTIME		1
+
+	;
+	;	Codes for Parameter Problem
+
+	define ICMPV6_HDR_FIELD			0
+	define ICMPV6_UNK_NEXTHDR		1
+	define ICMPV6_UNK_OPTION		2
+	define ICMPV6_HDR_INCOMP		3
+
+	; Codes for EXT_ECHO (PROBE)
+	define ICMPV6_EXT_ECHO_REQUEST	160
+	define ICMPV6_EXT_ECHO_REPLY	161
+	;
+	;	constants for (set|get)sockopt
+
+	define ICMPV6_FILTER			1
+
+	;
+	;	ICMPV6 filter
+
+	define ICMPV6_FILTER_BLOCK			1
+	define ICMPV6_FILTER_PASS			2
+	define ICMPV6_FILTER_BLOCKOTHERS	3
+	define ICMPV6_FILTER_PASSONLY		4
+
+	;	Definitions for MLDv2
+
+	define MLD2_MODE_IS_INCLUDE		1
+	define MLD2_MODE_IS_EXCLUDE		2
+	define MLD2_CHANGE_TO_INCLUDE	3
+	define MLD2_CHANGE_TO_EXCLUDE	4
+	define MLD2_ALLOW_NEW_SOURCES	5
+	define MLD2_BLOCK_OLD_SOURCES	6
+
 	define IP_TOS					1
 	define IP_TTL					2
 	define IP_HDRINCL				3
@@ -278,6 +362,12 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define	MSG_FASTOPEN	0x20000000 ; Send data in TCP SYN.  
 	define	MSG_CMSG_CLOEXEC 0x40000000	; Set close_on_exit for file
 
+	define NI_NUMERICHOST	1	; Don't try to look up hostname.
+	define NI_NUMERICSERV	2	; Don't convert port number to name.
+	define NI_NOFQDN		4	; Only return nodename portion.
+	define NI_NAMEREQD		8	; Don't return numeric addresses.
+	define NI_DGRAM			16	; Look up UDP service rather than TCP.
+
 	define NULL            0
 
 	define O_CLOEXEC       2000000o
@@ -304,6 +394,31 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define PRIO_MAX        20
 	define PRIO_HIGHEST    PRIO_MIN
 	define PRIO_LOWEST     PRIO_MAX
+
+
+	define PTHREAD_PRIO_NONE		0
+	define PTHREAD_PRIO_INHERIT		1
+	define PTHREAD_PRIO_PROTECT		2
+	
+	define PTHREAD_INHERIT_SCHED	0
+	define PTHREAD_EXPLICIT_SCHED	1
+	
+	define THREAD_SCOPE_SYSTEM		0
+	define  PTHREAD_SCOPE_PROCESS	1
+	
+	define PTHREAD_PROCESS_PRIVATE	0
+	define PTHREAD_PROCESS_SHARED	1
+	
+	define PTHREAD_CANCEL_ENABLE	0
+	define PTHREAD_CANCEL_DISABLE	1
+	
+	define PTHREAD_CANCEL_DEFERRED		0
+	define PTHREAD_CANCEL_ASYNCHRONOUS	1
+	
+	define PTHREAD_CANCELED			-1
+	
+	define PTHREAD_ONCE_INIT		0
+
 
 	define S_IRWXU  00700o  ; user (file owner) has read, write, and execute permission
 	define S_IRUSR  00400o  ; user has read permission
@@ -425,6 +540,10 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto closedir, qword                       ; rdi = directory descriptor
 	ext proto ctime, qword                          ; rdi = *TIMEP structure; rax = *strtime
 	ext proto dprintf, dword, qword, vararg         ; edi = fd, rsi, *format, ...
+	ext proto dlclose, qword
+	ext proto dlerror, none
+	ext proto dlopen, qword, dword
+	ext proto dlsym, qword, qword
 	ext proto dup, dword                            ; edi = int file descriptor
 	ext proto dup2, dword, dword                    ; esi = new file descriptor
 	ext proto dup3, dword, dword, dword             ; edx = flags
@@ -480,6 +599,8 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto ioctl, dword, vararg                  ; edi = int file descriptor
 	ext proto inet_aton, qword, qword				; rdi = *cp, rsi = *in_addr
 	ext proto inet_ntoa, dword						; edi = in_addr
+	ext proto inet_ntop, dword, qword, qword, dword	; af, src, dst, size
+	ext proto inet_pton, dword, qword, qword		; af, src, dst
 	ext proto localtime, qword                      ; rdi = *POSIX TIME variable
 	ext proto malloc, qword                        ; rdi = number of bytes to allocate
 	ext proto mkdir, qword, dword
@@ -492,6 +613,19 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto poll, qword, qword, dword				; * pollfd, num x pollfd, timeout ms
 	ext proto posix_openpt, dword                   ; edi = flags. eax = pts lowest number available
 	ext proto printf, qword, vararg
+	ext proto pthread_attr_destroy, qword
+	ext proto pthread_attr_init, qword
+	ext proto pthread_cancel, qword
+	ext proto _pthread_cleanup_pop, qword, dword, alias pthread_cleanup_pop            ; unverified! CAUTION
+	ext proto _pthread_cleanup_push, qword, qword, qword, alias pthread_cleanup_push   ; unverified! CAUTION
+	ext proto pthread_create, qword, qword, qword, qword
+	ext noreturn proto pthread_exit, qword
+	ext proto pthread_join, qword, qword
+	ext proto pthread_self, none
+	ext proto pthread_setcancelstate, dword, qword
+	ext proto pthread_setcanceltype, dword, qword
+	ext proto pthread_test_cancel, none
+	ext proto pthread_yield, none
 	ext proto ptsname, dword                        ; edi = int file descriptor. rax = str PTS name
 	ext proto putchar, dword
 	ext proto puts, qword
@@ -500,7 +634,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto readdir, qword
 	ext proto realloc, qword, qword
 	ext proto reallocarray, qword, dword, dword
-	ext proto recvfrom, dword, qword, qword, dword, qword, dword
+	ext proto recvfrom, dword, qword, qword, dword, qword, qword
 	ext proto recvmsg, dword, qword, dword
 	ext proto remove, qword                         ; rdi = *filepath
 	ext proto rewind, qword
@@ -513,6 +647,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto sendmsg, dword, qword, dword
 	ext proto sendto, dword, qword, qword, dword, qword, dword
 	ext proto setegid, dword
+	ext proto setenv, qword, qword, dword
 	ext proto seteuid, dword
 	ext proto setitimer, dword, qword, qword        ; edi = which timer, rsi = *itimerval new, rdx = *itimerval old
 	ext proto setlocale, dword, qword               ; edi = flags; rsi = *locale
@@ -526,6 +661,9 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto sprintf, qword, qword, vararg         ; rdi = *buffer; rsi = *format; ...
 	ext proto stat, qword, qword
 	ext proto strcmp, qword, qword
+	ext proto strerror, dword
+	ext proto strerrordesc_np, dword
+	ext proto strerrorname_np, dword
 	ext proto strftime, qword, dword, qword, qword  ; *buffer; max-size; *format; *TM structure
 	ext proto strtod, qword, qword                  ; see below ¹
 	ext proto strtol, qword, qword, dword           ; *nptr, *endptr (or NULL), base ²
@@ -539,8 +677,13 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto tcgetattr, dword, qword               ; FILENO, *TERMIOS structure
 	ext proto tcsetattr, dword, dword, qword        ; FILENO, when, *TERMIOS structure
 	ext proto thrd_create, qword, qword, qword
+	ext proto thrd_current, none
 	ext proto thrd_detach, qword
+	ext proto thrd_equal, qword, qword
+	ext noreturn proto thrd_exit, dword
 	ext proto thrd_join, qword, qword
+	ext proto thrd_sleep, qword, qword
+	ext proto thrd_yield, none
 	ext proto time, qword                           ; rdi = *time_t (may be null); rax = Posix Time (Epoch based)
 	ext proto tmpfile, none                         ; rax = returns a file pointer to temporary file
 	ext proto unlink, qword                         ; rdi = char path filename to be removed

@@ -38,6 +38,26 @@ if ~ defined __GTK3_INC_INCLUDED__
     define G_CONNECT_DEFAULT 0
     define G_CONNECT_AFTER 1
     define G_CONNECT_SWAPPED 2
+    
+    define G_TYPE_FUNDAMENTAL_SHIFT 2
+    
+    define G_TYPE_INVALID           (0 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_NONE              (1 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_INTERFACE         (2 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_CHAR              (3 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_UCHAR             (4 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_BOOLEAN           (5 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_INT               (6 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_UINT              (7 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_LONG              (8 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_ULONG             (9 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_INT64             (10 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_UINT64            (11 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_ENUM              (12 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_FLAGS             (13 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_FLOAT             (14 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_DOUBLE            (15 shl G_TYPE_FUNDAMENTAL_SHIFT)
+    define G_TYPE_STRING            (16 shl G_TYPE_FUNDAMENTAL_SHIFT)
 
     define GDK_EXPOSURE_MASK            2
     define GDK_POINTER_MOTION_MASK      4
@@ -89,6 +109,14 @@ if ~ defined __GTK3_INC_INCLUDED__
     define GTK_ALIGN_END                   2
     define GTK_ALIGN_CENTER                3
     define GTK_ALIGN_BASELINE              4
+    
+    define GTK_ICON_SIZE_INVALID        0
+    define GTK_ICON_SIZE_MENU           1
+    define GTK_ICON_SIZE_SMALL_TOOLBAR  2
+    define GTK_ICON_SIZE_LARGE_TOOLBAR  3
+    define GTK_ICON_SIZE_BUTTON         4
+    define GTK_ICON_SIZE_DND            5
+    define GTK_ICON_SIZE_DIALOG         6
 
     define GTK_ORIENTATION_HORIZONTAL      0
     define GTK_ORIENTATION_VERTICAL        1
@@ -132,6 +160,11 @@ if ~ defined __GTK3_INC_INCLUDED__
 
     define GTK_LEVEL_BAR_MODE_CONTINUOUS   0
     define GTK_LEVEL_BAR_MODE_DISCRETE     1
+    
+    define GTK_SELECTION_NONE               0
+    define GTK_SELECTION_SINGLE             1
+    define GTK_SELECTION_BROWSE             2
+    define GTK_SELECTION_MULTIPLE           3
 
     define GTK_STATE_FLAG_NORMAL           0
     define GTK_STATE_FLAG_ACTIVE           1
@@ -150,35 +183,57 @@ if ~ defined __GTK3_INC_INCLUDED__
 
     define GTK_STYLE_PROVIDER_PRIORITY_USER        800
     define GTK_STYLE_PROVIDER_PRIORITY_FALLBACK    1
+    
+    define GTK_TREE_VIEW_GRID_LINES_NONE            0
+    define GTK_TREE_VIEW_GRID_LINES_HORIZONTAL      1
+    define GTK_TREE_VIEW_GRID_LINES_VERTICAL        2
+    DEFINE GTK_TREE_VIEW_GRID_LINES_BOTH            3
+    
+    define GTK_WINDOW_TOPLEVEL              0
+    define GTK_WINDOW_POPUP                 1
+    
+    PANGO_WEIGHT_THIN           = 100
+    PANGO_WEIGHT_ULTRALIGHT     = 200
+    PANGO_WEIGHT_LIGHT          = 300
+    PANGO_WEIGHT_SEMILIGHT      = 350
+    PANGO_WEIGHT_BOOK           = 380
+    PANGO_WEIGHT_NORMAL         = 400
+    PANGO_WEIGHT_MEDIUM         = 500
+    PANGO_WEIGHT_SEMIBOLD       = 600
+    PANGO_WEIGHT_BOLD           = 700
+    PANGO_WEIGHT_ULTRABOLD      = 800
+    PANGO_WEIGHT_HEAVY          = 900
+    PANGO_WEIGHT_ULTRAHEAVY     = 1000
 
-    struc GDKEVENTWINDOWSTATE
-            label . : .size - $
-            .type             rd 1
-                            rd 1
-            .window           rq 1
-            .send_event       rb 1
-                            rb 3
-            .changed_mask     rd 1
-            .new_window_state rd 1
-            .size:
-    end struc
-
-    struc GDKRGBA
-            label . : .size - $
-            .red            rq 1
-            .green          rq 1
-            .blue           rq 1
-            .alpha          rq 1
-            .size:
-    end struc
-
-    virtual at 0
-    GDKEVENTWINDOWSTATE GDKEVENTWINDOWSTATE
-    end virtual
-
-    virtual at 0
-    GDKRGBA GDKRGBA
-    end virtual
+    ; NOTE: to be removed (I prefer keep structures out of reusable headers).
+    ; struc GDKEVENTWINDOWSTATE
+    ;         label . : .size - $
+    ;         .type             rd 1
+    ;                         rd 1
+    ;         .window           rq 1
+    ;         .send_event       rb 1
+    ;                         rb 3
+    ;         .changed_mask     rd 1
+    ;         .new_window_state rd 1
+    ;         .size:
+    ; end struc
+    ; 
+    ; struc GDKRGBA
+    ;         label . : .size - $
+    ;         .red            rq 1
+    ;         .green          rq 1
+    ;         .blue           rq 1
+    ;         .alpha          rq 1
+    ;         .size:
+    ; end struc
+    ; 
+    ; virtual at 0
+    ; GDKEVENTWINDOWSTATE GDKEVENTWINDOWSTATE
+    ; end virtual
+    ; 
+    ; virtual at 0
+    ; GDKRGBA GDKRGBA
+    ; end virtual
 
     ext proto g_application_run, qword, dword, qword
     ext proto g_clear_error, qword
@@ -186,10 +241,13 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto g_idle_add_full, dword, qword, qword, qword
     ext proto g_log, dword, dword, vararg
     ext proto g_log_set_writer_func, qword, qword, qword
+    ext proto g_object_ref, qword
+    ext proto g_object_set, qword, qword, vararg
     ext proto g_object_unref, qword
     ext proto g_print, qword, vararg
     ext proto g_printerr, qword, vararg
     ext proto g_signal_connect_data, qword, qword, qword, qword, dword, dword
+    ext proto g_snprintf, qword, qword, qword, vararg
     ext noreturn proto g_thread_exit, qword
     ext proto g_thread_get_initialized, none
     ext proto g_thread_get_name, qword
@@ -221,9 +279,13 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_builder_connect_signals, qword, qword
     ext proto gtk_builder_get_object, qword, qword
     ext proto gtk_builder_new, none
+    ext proto gtk_builder_new_from_file, qword
     ext proto gtk_button_new_with_label, qword
     ext proto gtk_button_set_focus_on_click, qword, byte
     ext proto gtk_button_set_image, qword, qword
+    ext proto gtk_button_set_label, qword, qword
+    ext proto gtk_cell_renderer_pixbuf_new, none
+    ext proto gtk_cell_renderer_text_new, none
     ext proto gtk_check_button_new, none
     ext proto gtk_check_button_new_with_label, qword
     ext proto gtk_check_button_new_with_mnemonic, qword
@@ -249,6 +311,10 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_dialog_new_with_buttons, qword, qword, dword, vararg
     ext proto gtk_dialog_run, qword
     ext proto gtk_drawing_area_new, none
+    ext proto gtk_entry_get_text, qword
+    ext proto gtk_entry_get_text_length, qword
+    ext proto gtk_entry_set_placeholder_text, qword, qword
+    ext proto gtk_entry_set_text, qword, qword
     ext proto gtk_grid_attach, qword, qword, dword, dword, dword, dword
     ext proto gtk_grid_insert_column, qword, dword
     ext proto gtk_grid_insert_row, qword, dword
@@ -290,6 +356,11 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_level_bar_set_min_value, qword, double
     ext proto gtk_level_bar_set_mode, qword, dword
     ext proto gtk_level_bar_set_value, qword, double
+    ext proto gtk_list_store_append, qword, qword
+    ext proto gtk_list_store_clear, qword
+    ext proto gtk_list_store_new, dword, vararg
+    ext proto gtk_list_store_remove, qword, qword
+    ext proto gtk_list_store_set, qword, qword, vararg
     ext proto gtk_main, none
     ext noreturn proto gtk_main_do_event, qword
     ext proto gtk_main_iteration, none
@@ -304,6 +375,10 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_spin_button_set_increments, qword, double, double
     ext proto gtk_spin_button_set_range, qword, double, double
     ext proto gtk_spin_button_set_value, qword, double
+    ext proto gtk_stack_get_child_by_name, qword, qword
+    ext proto gtk_stack_set_visible_child, qword, qword
+    ext proto gtk_stack_set_visible_child_full, qword, qword, dword
+    ext proto gtk_stack_set_visible_child_name, qword, qword
     ext proto gtk_statusbar_get_context_id, qword, qword
     ext proto gtk_statusbar_get_message_area, qword
     ext proto gtk_statusbar_new, none
@@ -314,11 +389,30 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_style_context_add_provider_for_screen, qword, qword, dword
     ext proto gtk_style_context_get_background_color, qword, dword, qword
     ext proto gtk_style_context_get_color, qword, dword, qword
+    ext proto gtk_tree_model_get, qword, qword, vararg
+    ext proto gtk_tree_store_append, qword, qword, qword
+    ext proto gtk_tree_store_new, dword, vararg
+    ext proto gtk_tree_store_set, qword, qword, vararg
+    ext proto gtk_tree_view_column_add_attribute, qword, qword, qword, dword
+    ext proto gtk_tree_view_append_column, qword, qword
+    ext proto gtk_tree_view_column_new, none
+    ext proto gtk_tree_view_column_pack_start, qword, qword, dword
+    ext proto gtk_tree_view_column_set_cell_data_func, qword, qword, qword, qword, qword
+    ext proto gtk_tree_view_column_set_title, qword, qword
+    ext proto gtk_tree_view_expand_all, qword
+    ext proto gtk_tree_view_get_model, qword
+    ext proto gtk_tree_view_get_selection, qword
+    ext proto gtk_tree_view_insert_column_with_attributes, qword, dword, qword, qword, vararg
+    ext proto gtk_tree_view_new, none
+    ext proto gtk_tree_view_new_with_model, qword
+    ext proto gtk_tree_selection_set_mode, qword, dword
+    ext proto gtk_tree_view_set_grid_lines, qword, dword
+    ext proto gtk_tree_view_set_model, qword, qword
     ext proto gtk_toggle_button_get_active, qword
     ext proto gtk_toggle_button_get_inconsistent, qword
     ext proto gtk_toggle_button_get_mode, qword
-    ext proto gtk_toggle_button_set_active, qword, byte
-    ext proto gtk_toggle_button_set_inconsistent, qword, byte
+    ext proto gtk_toggle_button_set_active, qword, dword
+    ext proto gtk_toggle_button_set_inconsistent, qword, dword
     ext proto gtk_toggle_button_set_mode, qword, byte
     ext proto gtk_toggle_button_toggled, qword      ; according to GTK team, don't use this.
     ext proto gtk_widget_add_events, qword, dword
@@ -330,7 +424,7 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_widget_queue_draw_area, qword, dword, dword, dword, dword
     ext proto gtk_widget_set_events, qword, dword
     ext proto gtk_widget_set_halign, qword, dword
-    ext proto gtk_widget_set_hexpand, qword, byte
+    ext proto gtk_widget_set_hexpand, qword, dword
     ext proto gtk_widget_set_margin_bottom, qword, dword
     ext proto gtk_widget_set_margin_end, qword, dword
     ext proto gtk_widget_set_margin_start, qword, dword
@@ -338,12 +432,12 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_widget_set_name, qword, qword
     ext proto gtk_widget_set_opacity, qword, double
     ext proto gtk_widget_set_parent, qword, qword
-    ext proto gtk_widget_set_sensitive, qword, byte
+    ext proto gtk_widget_set_sensitive, qword, dword
     ext proto gtk_widget_set_size_request, qword, dword, dword
     ext proto gtk_widget_set_tooltip_text, qword, qword
     ext proto gtk_widget_set_valign, qword, dword
-    ext proto gtk_widget_set_vexpand, qword, byte
-    ext proto gtk_widget_set_visible, qword, byte
+    ext proto gtk_widget_set_vexpand, qword, dword
+    ext proto gtk_widget_set_visible, qword, dword
     ext proto gtk_window_close, qword
     ext proto gtk_window_get_title, qword
     ext proto gtk_window_new, dword
