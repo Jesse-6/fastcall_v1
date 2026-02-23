@@ -19,6 +19,10 @@ if ~ defined __GTK3_INC_INCLUDED__
     define G_APPLICATION_DEFAULT_FLAGS 0
     define G_APPLICATION_FLAGS_NONE 0
 
+    define G_CONNECT_DEFAULT 0
+    define G_CONNECT_AFTER 1
+    define G_CONNECT_SWAPPED 2
+
     define G_LOG_FLAG_RECURSION    1
     define G_LOG_FLAG_FATAL        2
     define G_LOG_LEVEL_ERROR       4
@@ -32,15 +36,16 @@ if ~ defined __GTK3_INC_INCLUDED__
     define G_LOG_WRITER_HANDLED    1
     define G_LOG_WRITER_UNHANDLED  0
 
+    define G_NOTIFICATION_PRIORITY_NORMAL   0
+    define G_NOTIFICATION_PRIORITY_LOW      1
+    define G_NOTIFICATION_PRIORITY_HIGH     2
+    define G_NOTIFICATION_PRIORITY_URGENT   3
+
     define G_PRIORITY_DEFAULT_IDLE 200
     define G_PRIORITY_HIGH_IDLE    100
 
-    define G_CONNECT_DEFAULT 0
-    define G_CONNECT_AFTER 1
-    define G_CONNECT_SWAPPED 2
-    
     define G_TYPE_FUNDAMENTAL_SHIFT 2
-    
+
     define G_TYPE_INVALID           (0 shl G_TYPE_FUNDAMENTAL_SHIFT)
     define G_TYPE_NONE              (1 shl G_TYPE_FUNDAMENTAL_SHIFT)
     define G_TYPE_INTERFACE         (2 shl G_TYPE_FUNDAMENTAL_SHIFT)
@@ -109,7 +114,7 @@ if ~ defined __GTK3_INC_INCLUDED__
     define GTK_ALIGN_END                   2
     define GTK_ALIGN_CENTER                3
     define GTK_ALIGN_BASELINE              4
-    
+
     define GTK_ICON_SIZE_INVALID        0
     define GTK_ICON_SIZE_MENU           1
     define GTK_ICON_SIZE_SMALL_TOOLBAR  2
@@ -160,7 +165,7 @@ if ~ defined __GTK3_INC_INCLUDED__
 
     define GTK_LEVEL_BAR_MODE_CONTINUOUS   0
     define GTK_LEVEL_BAR_MODE_DISCRETE     1
-    
+
     define GTK_SELECTION_NONE               0
     define GTK_SELECTION_SINGLE             1
     define GTK_SELECTION_BROWSE             2
@@ -183,15 +188,15 @@ if ~ defined __GTK3_INC_INCLUDED__
 
     define GTK_STYLE_PROVIDER_PRIORITY_USER        800
     define GTK_STYLE_PROVIDER_PRIORITY_FALLBACK    1
-    
+
     define GTK_TREE_VIEW_GRID_LINES_NONE            0
     define GTK_TREE_VIEW_GRID_LINES_HORIZONTAL      1
     define GTK_TREE_VIEW_GRID_LINES_VERTICAL        2
     DEFINE GTK_TREE_VIEW_GRID_LINES_BOTH            3
-    
+
     define GTK_WINDOW_TOPLEVEL              0
     define GTK_WINDOW_POPUP                 1
-    
+
     PANGO_WEIGHT_THIN           = 100
     PANGO_WEIGHT_ULTRALIGHT     = 200
     PANGO_WEIGHT_LIGHT          = 300
@@ -217,7 +222,7 @@ if ~ defined __GTK3_INC_INCLUDED__
     ;         .new_window_state rd 1
     ;         .size:
     ; end struc
-    ; 
+    ;
     ; struc GDKRGBA
     ;         label . : .size - $
     ;         .red            rq 1
@@ -226,28 +231,52 @@ if ~ defined __GTK3_INC_INCLUDED__
     ;         .alpha          rq 1
     ;         .size:
     ; end struc
-    ; 
+    ;
     ; virtual at 0
     ; GDKEVENTWINDOWSTATE GDKEVENTWINDOWSTATE
     ; end virtual
-    ; 
+    ;
     ; virtual at 0
     ; GDKRGBA GDKRGBA
     ; end virtual
 
+    ext proto g_action_map_add_action, qword, qword
+    ext proto g_application_id_is_valid, qword
+    ext proto g_application_get_is_registered, qword
+    ext proto g_application_get_is_remote, qword
+    ext proto g_application_new, qword, dword
     ext proto g_application_run, qword, dword, qword
+    ext proto g_application_send_notification, qword, qword, qword
+    ext proto g_application_withdraw_notification, qword, qword
     ext proto g_clear_error, qword
     ext proto g_free, qword
     ext proto g_idle_add_full, dword, qword, qword, qword
     ext proto g_log, dword, dword, vararg
     ext proto g_log_set_writer_func, qword, qword, qword
+    ext proto g_notification_add_button, qword, qword, qword
+    ext proto g_notification_add_button_with_target, qword, qword, qword, qword, vararg
+    ext proto g_notification_add_button_with_target_value, qword, qword, qword, qword
+    ext proto g_notification_new, qword
+    ext proto g_notification_set_body, qword, qword
+    ext proto g_notification_set_category, qword, qword
+    ext proto g_notification_set_default_action, qword, qword
+    ext proto g_notification_set_default_action_and_target, qword, qword, qword
+    ext proto g_notification_set_default_action_and_target_value, qword, qword, qword
+    ext proto g_notification_set_icon, qword, qword
+    ext proto g_notification_set_priority, qword, dword
+    ext proto g_notification_set_title, qword, qword
+    ext proto g_notification_set_urgent, qword, dword
     ext proto g_object_ref, qword
     ext proto g_object_set, qword, qword, vararg
     ext proto g_object_unref, qword
     ext proto g_print, qword, vararg
     ext proto g_printerr, qword, vararg
     ext proto g_signal_connect_data, qword, qword, qword, qword, dword, dword
+    ext proto g_simple_action_new, qword, qword
     ext proto g_snprintf, qword, qword, qword, vararg
+    ext proto g_themed_icon_new, qword
+    ext proto g_themed_icon_new_from_names, qword, dword
+    ext proto g_themed_icon_new_with_default_fallbacks, qword
     ext noreturn proto g_thread_exit, qword
     ext proto g_thread_get_initialized, none
     ext proto g_thread_get_name, qword
@@ -262,12 +291,37 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto g_usleep, qword
     ext proto gdk_display_get_default, none
     ext proto gdk_event_handler_set, qword, qword, qword
+    ext proto gdk_keyval_from_name, qword
+    ext proto gdk_keyval_is_lower, dword
+    ext proto gdk_keyval_is_upper, dword
+    ext proto gdk_keyval_name, dword
+    ext proto gdk_keyval_to_lower, dword
+    ext proto gdk_keyval_to_unicode, dword
+    ext proto gdk_keyval_to_upper, dword
+    ext proto gdk_pixbuf_new_from_file, qword, qword
     ext proto gdk_screen_get_default, none
     ext proto gdk_screen_is_composited, qword
     ext proto gdk_threads_add_idle_full, dword, qword, qword, qword
     ext proto gdk_threads_enter, none
     ext proto gdk_threads_init, none
     ext proto gdk_threads_leave, none
+    ext proto gdk_unicode_to_keyval, dword
+    ext proto gtk_adjustment_clamp_page, qword, double, double
+    ext proto gtk_adjustment_configure, qword, double, double, double, double, double, double
+    ext proto gtk_adjustment_get_lower, qword
+    ext proto gtk_adjustment_get_minimum_increment, qword
+    ext proto gtk_adjustment_get_page_increment, qword
+    ext proto gtk_adjustment_get_page_size, qword
+    ext proto gtk_adjustment_get_step_increment, qword
+    ext proto gtk_adjustment_get_upper, qword
+    ext proto gtk_adjustment_get_value, qword
+    ext proto gtk_adjustment_new, double, double, double, double, double, double
+    ext proto gtk_adjustment_set_lower, qword, double
+    ext proto gtk_adjustment_set_page_increment, qword, double
+    ext proto gtk_adjustment_set_page_size, qword, double
+    ext proto gtk_adjustment_set_step_increment, qword, double
+    ext proto gtk_adjustment_set_upper, qword, double
+    ext proto gtk_adjustment_set_value, qword, double
     ext proto gtk_application_new, qword, dword
     ext proto gtk_application_window_new, qword
     ext proto gtk_box_new, dword, dword
@@ -280,7 +334,10 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_builder_get_object, qword, qword
     ext proto gtk_builder_new, none
     ext proto gtk_builder_new_from_file, qword
+    ext proto gtk_button_new, none
+    ext proto gtk_button_new_from_icon_name, qword, dword
     ext proto gtk_button_new_with_label, qword
+    ext proto gtk_button_new_with_mnemonic, qword
     ext proto gtk_button_set_focus_on_click, qword, byte
     ext proto gtk_button_set_image, qword, qword
     ext proto gtk_button_set_label, qword, qword
@@ -303,7 +360,7 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_container_add, qword, qword
     ext proto gtk_css_provider_new, none
     ext proto gtk_css_provider_get_named, qword, qword
-    ext proto gtk_css_provider_load_from_data, qword, qword, dword, qword
+    ext proto gtk_css_provider_load_from_data, qword, qword, qword, qword
     ext proto gtk_css_provider_load_from_file, qword, qword, qword
     ext proto gtk_css_provider_load_from_path, qword, qword, qword
     ext proto gtk_css_provider_load_from_resource, qword, qword
@@ -319,6 +376,8 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_grid_insert_column, qword, dword
     ext proto gtk_grid_insert_row, qword, dword
     ext proto gtk_grid_new, none
+    ext proto gtk_grid_remove_column, qword, dword
+    ext proto gtk_grid_remove_row, qword, dword
     ext proto gtk_grid_set_column_homogeneous, qword, dword
     ext proto gtk_grid_set_column_spacing, qword, dword
     ext proto gtk_grid_set_row_homogeneous, qword, dword
@@ -329,13 +388,18 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_icon_theme_get_search_path, qword, qword, qword
     ext proto gtk_icon_theme_has_icon, qword, qword
     ext proto gtk_image_new_from_file, qword
+    ext proto gtk_image_set_from_file, qword, qword
     ext proto gtk_image_set_from_icon_name, qword, qword, dword
+    ext proto gtk_image_set_from_pixbuf, qword, qword
     ext proto gtk_image_set_pixel_size, qword, dword
     ext proto gtk_init, qword, qword
     ext proto gtk_init_check, qword, qword
+    ext proto gtk_label_get_attributes, qword
     ext proto gtk_label_get_text, qword
     ext proto gtk_label_new, qword
     ext proto gtk_label_new_with_mnemonic, qword
+    ext proto gtk_label_set_attributes, qword, qword
+    ext proto gtk_label_set_markup, qword, qword
     ext proto gtk_label_set_single_line_mode, qword, byte
     ext proto gtk_label_set_text, qword, qword
     ext proto gtk_label_set_justify, qword, dword
@@ -370,6 +434,15 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_native_dialog_run, qword
     ext proto gtk_orientable_get_orientation, qword
     ext proto gtk_orientable_set_orientation, qword, dword
+    ext proto gtk_overlay_add_overlay, qword, qword
+    ext proto gtk_overlay_get_overlay_pass_through, qword, qword
+    ext proto gtk_overlay_new, none
+    ext proto gtk_overlay_reorder_overlay, qword, qword, dword
+    ext proto gtk_overlay_set_overlay_pass_through, qword, qword, dword
+    ext proto gtk_scrolled_window_get_hadjustment, qword
+    ext proto gtk_scrolled_window_get_vadjustment, qword
+    ext proto gtk_scrolled_window_new, qword, qword
+    ext proto gtk_spin_button_configure, qword, qword, double, dword
     ext proto gtk_spin_button_get_value, qword
     ext proto gtk_spin_button_get_value_as_int, qword
     ext proto gtk_spin_button_set_increments, qword, double, double
@@ -415,13 +488,16 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_toggle_button_set_inconsistent, qword, dword
     ext proto gtk_toggle_button_set_mode, qword, byte
     ext proto gtk_toggle_button_toggled, qword      ; according to GTK team, don't use this.
+    ext proto gtk_widget_add_accelerator, qword, qword, qword, dword, dword, dword
     ext proto gtk_widget_add_events, qword, dword
     ext proto gtk_widget_destroy, qword
+    ext proto gtk_widget_get_allocated_height, qword
     ext proto gtk_widget_get_style_context, qword
     ext proto gtk_widget_get_opacity, qword
     ext proto gtk_widget_get_parent, qword
     ext proto gtk_widget_queue_draw, qword
     ext proto gtk_widget_queue_draw_area, qword, dword, dword, dword, dword
+    ext proto gtk_widget_remove_accelerator, qword, qword, dword, dword
     ext proto gtk_widget_set_events, qword, dword
     ext proto gtk_widget_set_halign, qword, dword
     ext proto gtk_widget_set_hexpand, qword, dword
@@ -434,6 +510,7 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_widget_set_parent, qword, qword
     ext proto gtk_widget_set_sensitive, qword, dword
     ext proto gtk_widget_set_size_request, qword, dword, dword
+    ext proto gtk_widget_set_tooltip_markup, qword, qword
     ext proto gtk_widget_set_tooltip_text, qword, qword
     ext proto gtk_widget_set_valign, qword, dword
     ext proto gtk_widget_set_vexpand, qword, dword
@@ -443,8 +520,10 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_window_new, dword
     ext noreturn proto gtk_window_present, qword
     ext proto gtk_window_set_application, qword, qword
+    ext proto gtk_window_set_default_icon_from_file, qword, qword
     ext proto gtk_window_set_default_icon_name, qword
     ext proto gtk_window_set_default_size, qword, dword, dword
+    ext proto gtk_window_set_icon_from_file, qword, qword, qword
     ext proto gtk_window_set_icon_name, qword, qword
     ext proto gtk_window_set_resizable, qword, dword
     ext proto gtk_window_set_title, qword, qword

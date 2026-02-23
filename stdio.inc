@@ -532,6 +532,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto asctime, qword                        ; rdi = *TM structure; rax = *strtime
 	ext proto calloc, qword, qword                  ; rdi = n, rsi = size
 	ext proto cfmakeraw, qword                      ; rdi = *TERMIOS filled structure
+	ext proto chdir, qword
 	ext proto clearerr, qword                       ; rdi = * FILE
 	ext proto clock_getres, dword, qword            ; edi = clockid, rsi = * timespec
 	ext proto clock_gettime, dword, qword           ;
@@ -581,6 +582,8 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto getenv, qword                         ; rdi = *environment string
 	ext proto geteuid, none
 	ext proto getgrgid, dword                       ; edi = Group ID
+	ext proto get_current_dir_name, none
+	ext proto getcwd, qword, dword
 	ext proto gethostbyaddr, qword, dword, dword    ; 
 	ext proto gethostbyname, qword
 	ext proto gethostbyname2, qword, dword			; * name, AF
@@ -620,10 +623,12 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto _pthread_cleanup_push, qword, qword, qword, alias pthread_cleanup_push   ; unverified! CAUTION
 	ext proto pthread_create, qword, qword, qword, qword
 	ext noreturn proto pthread_exit, qword
+	ext proto pthread_getname_np, qword, qword, dword
 	ext proto pthread_join, qword, qword
 	ext proto pthread_self, none
 	ext proto pthread_setcancelstate, dword, qword
 	ext proto pthread_setcanceltype, dword, qword
+	ext proto pthread_setname_np, qword, qword
 	ext proto pthread_test_cancel, none
 	ext proto pthread_yield, none
 	ext proto ptsname, dword                        ; edi = int file descriptor. rax = str PTS name
@@ -733,3 +738,6 @@ end if
 ;
 ;:::::::::::::::::::::::::::::::::::::
 ;:::::::::::::::::::::::::::::::::::::
+
+alias pthread_getname, pthread_getname_np
+alias pthread_setname, pthread_setname_np
