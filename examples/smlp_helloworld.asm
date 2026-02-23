@@ -7,14 +7,7 @@ format ELF64 executable 3
 include 'fastcall_v1.inc'
 include 'stdmacros.inc'
 include 'stdio.inc'
-
-library 'libsmlproto.so.0'
-ext proto SMLP_Cleanup, byte            ; returns byte size
-ext proto SMLP_GetIndexedString, dword  ; returns qword size
-ext proto SMLP_GetStringCount, none     ; returns dword size
-ext proto SMLP_InitLanguage, qword, qword, qword, qword ; returns qword size
-ext proto SMLP_ParseEscapedString, qword, qword         ; returns dword size NEW!
-ext proto SMLP_SetExtendedMode, byte    ; return byte size
+include 'smlp.inc'
 
 _rdata  locales:                db 'af_ZA', 0, 0, 0
                                 db 'am_ET', 0, 0, 0
