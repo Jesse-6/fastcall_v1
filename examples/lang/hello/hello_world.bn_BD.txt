@@ -1,0 +1,9 @@
+
+___\t'\33[1;36m%s\33[0m' \33[0;32m-> \33[0m\t'%s'\n
+___ওহে বিশ্ব!
+___This string is just a comment, because it is never used within 'helloworld' code!
+You should notice that the pattern here is: '\n', '_', '_', '_'.
+It contains a newline char at beginning of the pattern, as suggested on this project's page.
+This is how you could do to get every string started in the beginning of the line, and
+still get a fully functional pattern as well.
+Also remember that pattern must be something you will never use within strings!
