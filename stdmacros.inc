@@ -5,7 +5,45 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
     define __STANDARD_MACRO_PACKAGE_INCLUDED__
 
     include 'anon_label.inc'
-    
+
+    ; 'enum' is the recommended way to work with SMLP files and specification,
+    ; because it makes it easy to manage/change/add/remove strings.
+    ; Just manage/change/add/remove the constant as well, at the same position,
+    ; without bothering with which value/index it actually is.
+    ; NOTE: this is similar, although not equal to C 'enum' statement!
+    ;
+    ; Define each constant as a number, ranging from 'start' value
+    ;
+    ; Example:
+    ;
+    ; enum 0,   VALUE0, \
+    ;           VALUE1, \
+    ;           VALUE2, \
+    ;           VALUE3
+    ;
+    ; Expand to:
+    ;
+    ; define VALUE0 0
+    ; define VALUE1 1
+    ; define VALUE2 2
+    ; define VALUE3 3
+    macro enum start, names&
+        if ~ start eqtype 0
+            err "Invalid 'enum' enumeration macro usage", 10
+        end if
+        local count
+        count = start
+        iterate name, names
+            repeat 1, i:count
+                define name i
+                if defined __ENUM_DEBUG__
+                    display "Const: ", `name, " Value: ", `i, 10
+                end if
+            end repeat
+            count = count + 1
+        end iterate
+    end macro
+
     struc (point) entry line&   ; Allow: '_code Start entry endbr64' as entry point
         entry point
         match := instruction, line
