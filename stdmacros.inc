@@ -13,6 +13,7 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
     ; NOTE: this is similar, although not equal to C 'enum' statement!
     ;
     ; Define each constant as a number, ranging from 'start' value
+    ; enum step <value> defines the step increment for each constant
     ;
     ; Example:
     ;
@@ -28,20 +29,30 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
     ; define VALUE2 2
     ; define VALUE3 3
     macro enum start, names&
-        if ~ start eqtype 0
-            err "Invalid 'enum' enumeration macro usage", 10
-        end if
-        local count
-        count = start
-        iterate name, names
-            repeat 1, i:count
-                define name i
-                if defined __ENUM_DEBUG__
-                    display "Const: ", `name, " Value: ", `i, 10
-                end if
-            end repeat
-            count = count + 1
-        end iterate
+        match =step= val, start
+            __ENUM_STEP__ = val
+        else
+            if ~ start eqtype 0
+                err "Invalid 'enum' enumeration macro usage", 10
+            else
+
+            local count
+            count = start
+                iterate name, names
+                    repeat 1, i:count
+                        define name i
+                        if defined __ENUM_DEBUG__
+                            display "Const: ", `name, " Value: ", `i, 10
+                        end if
+                    end repeat
+                    if defined __ENUM_STEP__
+                        count = count + __ENUM_STEP__
+                    else
+                        count = count + 1
+                    end if
+                end iterate
+            end if
+        end match
     end macro
 
     struc (point) entry line&   ; Allow: '_code Start entry endbr64' as entry point
