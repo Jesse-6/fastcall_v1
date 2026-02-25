@@ -35,9 +35,8 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
             if ~ start eqtype 0
                 err "Invalid 'enum' enumeration macro usage", 10
             else
-
-            local count
-            count = start
+                local count
+                count = start
                 iterate name, names
                     repeat 1, i:count
                         define name i
