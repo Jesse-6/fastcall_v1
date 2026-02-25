@@ -108,6 +108,7 @@
             123.4567   -> pass float point parameter as (if prototyped) xmm or memory class
             **location -> gets the pointer at [location], and then pass the data located at this pointer
             "stringz"  -> creates "string",0 as db data, then passes a pointer to string data
+            "string"\n -> creates "string",10,0 as db data, then passes a pointer to its data
             <"string",10,0> creates "string",10,0 as db data and passes its pointer
             π or TT    -> pass π number constant as tword size, memory class parameter
             .          -> empty parameter: This parameter will be skipped, filled with an empty state in the output code

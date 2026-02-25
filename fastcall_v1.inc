@@ -132,6 +132,7 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 	FUNC_PARA_TYPE_FCFLOAT	= 34	; df parameter
 	FUNC_PARA_TYPE_FCDOUBLE = 35	; dp parameter
 	FUNC_PARA_TYPE_PI_NUMBER = 36	; number PI (TT or π parameter)
+	FUNC_PARA_TYPE_STRINGN  = 37    ; New at 2026-02-25: "string"n as a \n terminated string
 	;
 	; ::: "System V ABI parameter classes"
 	SYSTEMV_PARA_CLASS_NONE		= 0
@@ -583,6 +584,14 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 			__type_id_ = FUNC_PARA_TYPE_XSTRING
 			define __type_para_ first,last
 			__type_size_ equ 8
+        else match string=\=n, dest
+            __type_id_ = FUNC_PARA_TYPE_STRINGN
+            define __type_para_ string
+            __type_size_ equ 8
+        else match string= =\=n, dest
+            __type_id_ = FUNC_PARA_TYPE_STRINGN
+            define __type_para_ string
+            __type_size_ equ 8
 		else match=., dest
 			__type_id_ = FUNC_PARA_TYPE_EMPTY
 			define __type_para_ .
@@ -818,6 +827,7 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 	; internal macro to append anonymous data to a virtual section
 	PUT_ANON_DATA_STRING	= 9
 	PUT_ANON_DATA_STRINGZ	= 7
+	PUT_ANON_DATA_STRINGN   = 11
 	__anon_data_count_		= 0
 	macro put_anon_data dtype, data&	; It depends on _code, _radata or _data macros to work
 		if __RDATA_ONLINE__ = 1
@@ -834,6 +844,8 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 						.._anon_data_#i db data, 0
 					else if dtype = PUT_ANON_DATA_STRING	; exact string (no alteration)
 						.._anon_data_#i db data
+                    else if dtype = PUT_ANON_DATA_STRINGN   ; new string with \n char at end
+                        .._anon_data_#i db data, 10, 0      ; "my string"n
 					else if dtype eq dword 					; 32-bit number
 						align 4
 						.._anon_data_#i dd data
@@ -841,7 +853,7 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 						align 8
 						.._anon_data_#i dq data
 					else if dtype eq tword					; 80-bit float number
-						align 16
+						align 8
 						.._anon_data_#i dt data
 					else
 						err "Unsupported anon data type.", 10
@@ -1080,6 +1092,13 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 			else if __type_id_ = FUNC_PARA_TYPE_XSTRING
 				if psize = qword
 					put_anon_data PUT_ANON_DATA_STRING, parameter
+					lea cregq, [_anon_data_curr_]
+				else
+					err "Invalid size for complex string parameter", 10
+				end if
+            else if __type_id_ = FUNC_PARA_TYPE_STRINGN
+				if psize = qword
+					put_anon_data PUT_ANON_DATA_STRINGN, parameter
 					lea cregq, [_anon_data_curr_]
 				else
 					err "Invalid size for complex string parameter", 10
@@ -1393,6 +1412,14 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 			else if __type_id_ = FUNC_PARA_TYPE_XSTRING
 				if psize = qword
 					put_anon_data PUT_ANON_DATA_STRING, parameter
+					lea cregq, [_anon_data_curr_]
+					push cregq
+				else
+					err "Invalid memory class parameter size.", 10
+				end if
+            else if __type_id_ = FUNC_PARA_TYPE_STRINGN
+				if psize = qword
+					put_anon_data PUT_ANON_DATA_STRINGN, parameter
 					lea cregq, [_anon_data_curr_]
 					push cregq
 				else
@@ -1780,7 +1807,7 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 								__type_id_ = FUNC_PARA_TYPE_NUMBER64 | __type_id_ = FUNC_PARA_TYPE_SIGN64 | \
 								__type_id_ = FUNC_PARA_TYPE_STRING | __type_id_ = FUNC_PARA_TYPE_XSTRING | \
 								__type_id_ = FUNC_PARA_TYPE_FCQWORD | __type_id_ = FUNC_PARA_TYPE_EMPTY | \
-								__type_id_ = FUNC_PARA_TYPE_REGMM
+								__type_id_ = FUNC_PARA_TYPE_REGMM | __type_id_ = FUNC_PARA_TYPE_STRINGN
 								if regcount < 6
 									regcount = regcount + 1
 									totalcount = totalcount + 1
