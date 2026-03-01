@@ -10,7 +10,8 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
     ; because it makes it easy to manage/change/add/remove strings.
     ; Just manage/change/add/remove the constant as well, at the same position,
     ; without bothering with which value/index it actually is.
-    ; NOTE: this is similar, although not equal to C 'enum' statement!
+    ; NOTE: This works quite similar to C 'enum' statement, but have a step
+    ; option which allows define step increment
     ;
     ; Define each constant as a number, ranging from 'start' value
     ; enum step <value> defines the step increment for each constant
@@ -38,12 +39,22 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
                 local count
                 count = start
                 iterate name, names
-                    repeat 1, i:count
-                        define name i
+                    rawmatch const == value, name
                         if defined __ENUM_DEBUG__
-                            display "Const: ", `name, " Value: ", `i, 10
+                            repeat 1, i:value
+                                display "Const: ",`const," Value: ",`i,10
+                            end repeat
                         end if
-                    end repeat
+                        define const value
+                        count = value
+                    else
+                        repeat 1, i:count
+                            define name i
+                            if defined __ENUM_DEBUG__
+                                display "Const: ", `name, " Value: ", `i, 10
+                            end if
+                        end repeat
+                    end rawmatch
                     if defined __ENUM_STEP__
                         count = count + __ENUM_STEP__
                     else
@@ -62,7 +73,7 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
             point: line
         end match
     end struc
-
+    ;
     macro Main line&        ; self align Main label to be used with libc.StartMain
         align 4
         match := code, line
