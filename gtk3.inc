@@ -271,7 +271,14 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto g_object_unref, qword
     ext proto g_print, qword, vararg
     ext proto g_printerr, qword, vararg
+    ext proto g_quark_from_static_string, qword
+    ext proto g_quark_from_string, qword
+    ext proto g_quark_to_string, dword
+    ext proto g_quark_try_string, qword
     ext proto g_signal_connect_data, qword, qword, qword, qword, dword, dword
+    ext proto g_signal_lookup, qword, dword
+    ext proto g_signal_stop_emission, qword, dword, dword
+    ext proto g_signal_stop_emission_by_name, qword, qword
     ext proto g_simple_action_new, qword, qword
     ext proto g_snprintf, qword, qword, qword, vararg
     ext proto g_themed_icon_new, qword
@@ -368,6 +375,7 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_dialog_new_with_buttons, qword, qword, dword, vararg
     ext proto gtk_dialog_run, qword
     ext proto gtk_drawing_area_new, none
+    ext proto gtk_editable_insert_text, qword, qword, dword, dword
     ext proto gtk_entry_get_text, qword
     ext proto gtk_entry_get_text_length, qword
     ext proto gtk_entry_set_placeholder_text, qword, qword

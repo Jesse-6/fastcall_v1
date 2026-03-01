@@ -7,7 +7,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define AF_UNIX          1
 	define AF_INET          2
 	define AF_INET6         10
-	
+
     define CLOCK_REALTIME           0
     define CLOCK_MONOTONIC          1
     define CLOCK_PROCESS_CPUTIME_ID 2
@@ -20,7 +20,7 @@ if ~ defined __STDIO_INC_INCLUDED__
     define CLOCK_BOOTTIME_ALARM     9
     define CLOCK_SGI_CYCLE          10
     define CLOCK_TAI                11
-    
+
 	define	EPERM		 1	; Operation not permitted
 	define	ENOENT		 2	; No such file or directory
 	define	ESRCH		 3	; No such process
@@ -56,107 +56,107 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define	EDOM		33	; Math argument out of domain of func
 	define	ERANGE		34	; Math result not representable
 
-	define	EDEADLK		35	; Resource deadlock would occur 
-	define	ENAMETOOLONG	36	; File name too long 
-	define	ENOLCK		37	; No record locks available 
-	define	ENOSYS		38	; Invalid system call number 
-	define	ENOTEMPTY	39	; Directory not empty 
-	define	ELOOP		40	; Too many symbolic links encountered 
-	define	EWOULDBLOCK	EAGAIN	; Operation would block 
-	define	ENOMSG		42	; No message of desired type 
-	define	EIDRM		43	; Identifier removed 
-	define	ECHRNG		44	; Channel number out of range 
-	define	EL2NSYNC	45	; Level 2 not synchronized 
-	define	EL3HLT		46	; Level 3 halted 
-	define	EL3RST		47	; Level 3 reset 
-	define	ELNRNG		48	; Link number out of range 
-	define	EUNATCH		49	; Protocol driver not attached 
-	define	ENOCSI		50	; No CSI structure available 
-	define	EL2HLT		51	; Level 2 halted 
-	define	EBADE		52	; Invalid exchange 
-	define	EBADR		53	; Invalid request descriptor 
-	define	EXFULL		54	; Exchange full 
-	define	ENOANO		55	; No anode 
-	define	EBADRQC		56	; Invalid request code 
-	define	EBADSLT		57	; Invalid slot 
+	define	EDEADLK		35	; Resource deadlock would occur
+	define	ENAMETOOLONG	36	; File name too long
+	define	ENOLCK		37	; No record locks available
+	define	ENOSYS		38	; Invalid system call number
+	define	ENOTEMPTY	39	; Directory not empty
+	define	ELOOP		40	; Too many symbolic links encountered
+	define	EWOULDBLOCK	EAGAIN	; Operation would block
+	define	ENOMSG		42	; No message of desired type
+	define	EIDRM		43	; Identifier removed
+	define	ECHRNG		44	; Channel number out of range
+	define	EL2NSYNC	45	; Level 2 not synchronized
+	define	EL3HLT		46	; Level 3 halted
+	define	EL3RST		47	; Level 3 reset
+	define	ELNRNG		48	; Link number out of range
+	define	EUNATCH		49	; Protocol driver not attached
+	define	ENOCSI		50	; No CSI structure available
+	define	EL2HLT		51	; Level 2 halted
+	define	EBADE		52	; Invalid exchange
+	define	EBADR		53	; Invalid request descriptor
+	define	EXFULL		54	; Exchange full
+	define	ENOANO		55	; No anode
+	define	EBADRQC		56	; Invalid request code
+	define	EBADSLT		57	; Invalid slot
 	define	EDEADLOCK	EDEADLK
-	define	EBFONT		59	; Bad font file format 
-	define	ENOSTR		60	; Device not a stream 
-	define	ENODATA		61	; No data available 
-	define	ETIME		62	; Timer expired 
-	define	ENOSR		63	; Out of streams resources 
-	define	ENONET		64	; Machine is not on the network 
-	define	ENOPKG		65	; Package not installed 
-	define	EREMOTE		66	; Object is remote 
-	define	ENOLINK		67	; Link has been severed 
-	define	EADV		68	; Advertise error 
-	define	ESRMNT		69	; Srmount error 
-	define	ECOMM		70	; Communication error on send 
-	define	EPROTO		71	; Protocol error 
-	define	EMULTIHOP	72	; Multihop attempted 
-	define	EDOTDOT		73	; RFS specific error 
-	define	EBADMSG		74	; Not a data message 
-	define	EOVERFLOW	75	; Value too large for defined data type 
-	define	ENOTUNIQ	76	; Name not unique on network 
-	define	EBADFD		77	; File descriptor in bad state 
-	define	EREMCHG		78	; Remote address changed 
-	define	ELIBACC		79	; Can not access a needed shared library 
-	define	ELIBBAD		80	; Accessing a corrupted shared library 
-	define	ELIBSCN		81	; .lib section in a.out corrupted 
-	define	ELIBMAX		82	; Attempting to link in too many shared libraries 
-	define	ELIBEXEC	83	; Cannot exec a shared library directly 
-	define	EILSEQ		84	; Illegal byte sequence 
-	define	ERESTART	85	; Interrupted system call should be restarted 
-	define	ESTRPIPE	86	; Streams pipe error 
-	define	EUSERS		87	; Too many users 
-	define	ENOTSOCK	88	; Socket operation on non-socket 
-	define	EDESTADDRREQ	89	; Destination address required 
-	define	EMSGSIZE	90	; Message too long 
-	define	EPROTOTYPE	91	; Protocol wrong type for socket 
-	define	ENOPROTOOPT	92	; Protocol not available 
-	define	EPROTONOSUPPORT	93	; Protocol not supported 
-	define	ESOCKTNOSUPPORT	94	; Socket type not supported 
-	define	EOPNOTSUPP	95	; Operation not supported on transport endpoint 
-	define	EPFNOSUPPORT	96	; Protocol family not supported 
-	define	EAFNOSUPPORT	97	; Address family not supported by protocol 
-	define	EADDRINUSE	98	; Address already in use 
-	define	EADDRNOTAVAIL	99	; Cannot assign requested address 
-	define	ENETDOWN	100	; Network is down 
-	define	ENETUNREACH	101	; Network is unreachable 
-	define	ENETRESET	102	; Network dropped connection because of reset 
-	define	ECONNABORTED	103	; Software caused connection abort 
-	define	ECONNRESET	104	; Connection reset by peer 
-	define	ENOBUFS		105	; No buffer space available 
-	define	EISCONN		106	; Transport endpoint is already connected 
-	define	ENOTCONN	107	; Transport endpoint is not connected 
-	define	ESHUTDOWN	108	; Cannot send after transport endpoint shutdown 
-	define	ETOOMANYREFS	109	; Too many references: cannot splice 
-	define	ETIMEDOUT	110	; Connection timed out 
-	define	ECONNREFUSED	111	; Connection refused 
-	define	EHOSTDOWN	112	; Host is down 
-	define	EHOSTUNREACH	113	; No route to host 
-	define	EALREADY	114	; Operation already in progress 
-	define	EINPROGRESS	115	; Operation now in progress 
-	define	ESTALE		116	; Stale file handle 
-	define	EUCLEAN		117	; Structure needs cleaning 
-	define	ENOTNAM		118	; Not a XENIX named type file 
-	define	ENAVAIL		119	; No XENIX semaphores available 
-	define	EISNAM		120	; Is a named type file 
-	define	EREMOTEIO	121	; Remote I/O error 
-	define	EDQUOT		122	; Quota exceeded 
-	define	ENOMEDIUM	123	; No medium found 
-	define	EMEDIUMTYPE	124	; Wrong medium type 
-	define	ECANCELED	125	; Operation Canceled 
-	define	ENOKEY		126	; Required key not available 
-	define	EKEYEXPIRED	127	; Key has expired 
-	define	EKEYREVOKED	128	; Key has been revoked 
-	define	EKEYREJECTED	129	; Key was rejected by service 
+	define	EBFONT		59	; Bad font file format
+	define	ENOSTR		60	; Device not a stream
+	define	ENODATA		61	; No data available
+	define	ETIME		62	; Timer expired
+	define	ENOSR		63	; Out of streams resources
+	define	ENONET		64	; Machine is not on the network
+	define	ENOPKG		65	; Package not installed
+	define	EREMOTE		66	; Object is remote
+	define	ENOLINK		67	; Link has been severed
+	define	EADV		68	; Advertise error
+	define	ESRMNT		69	; Srmount error
+	define	ECOMM		70	; Communication error on send
+	define	EPROTO		71	; Protocol error
+	define	EMULTIHOP	72	; Multihop attempted
+	define	EDOTDOT		73	; RFS specific error
+	define	EBADMSG		74	; Not a data message
+	define	EOVERFLOW	75	; Value too large for defined data type
+	define	ENOTUNIQ	76	; Name not unique on network
+	define	EBADFD		77	; File descriptor in bad state
+	define	EREMCHG		78	; Remote address changed
+	define	ELIBACC		79	; Can not access a needed shared library
+	define	ELIBBAD		80	; Accessing a corrupted shared library
+	define	ELIBSCN		81	; .lib section in a.out corrupted
+	define	ELIBMAX		82	; Attempting to link in too many shared libraries
+	define	ELIBEXEC	83	; Cannot exec a shared library directly
+	define	EILSEQ		84	; Illegal byte sequence
+	define	ERESTART	85	; Interrupted system call should be restarted
+	define	ESTRPIPE	86	; Streams pipe error
+	define	EUSERS		87	; Too many users
+	define	ENOTSOCK	88	; Socket operation on non-socket
+	define	EDESTADDRREQ	89	; Destination address required
+	define	EMSGSIZE	90	; Message too long
+	define	EPROTOTYPE	91	; Protocol wrong type for socket
+	define	ENOPROTOOPT	92	; Protocol not available
+	define	EPROTONOSUPPORT	93	; Protocol not supported
+	define	ESOCKTNOSUPPORT	94	; Socket type not supported
+	define	EOPNOTSUPP	95	; Operation not supported on transport endpoint
+	define	EPFNOSUPPORT	96	; Protocol family not supported
+	define	EAFNOSUPPORT	97	; Address family not supported by protocol
+	define	EADDRINUSE	98	; Address already in use
+	define	EADDRNOTAVAIL	99	; Cannot assign requested address
+	define	ENETDOWN	100	; Network is down
+	define	ENETUNREACH	101	; Network is unreachable
+	define	ENETRESET	102	; Network dropped connection because of reset
+	define	ECONNABORTED	103	; Software caused connection abort
+	define	ECONNRESET	104	; Connection reset by peer
+	define	ENOBUFS		105	; No buffer space available
+	define	EISCONN		106	; Transport endpoint is already connected
+	define	ENOTCONN	107	; Transport endpoint is not connected
+	define	ESHUTDOWN	108	; Cannot send after transport endpoint shutdown
+	define	ETOOMANYREFS	109	; Too many references: cannot splice
+	define	ETIMEDOUT	110	; Connection timed out
+	define	ECONNREFUSED	111	; Connection refused
+	define	EHOSTDOWN	112	; Host is down
+	define	EHOSTUNREACH	113	; No route to host
+	define	EALREADY	114	; Operation already in progress
+	define	EINPROGRESS	115	; Operation now in progress
+	define	ESTALE		116	; Stale file handle
+	define	EUCLEAN		117	; Structure needs cleaning
+	define	ENOTNAM		118	; Not a XENIX named type file
+	define	ENAVAIL		119	; No XENIX semaphores available
+	define	EISNAM		120	; Is a named type file
+	define	EREMOTEIO	121	; Remote I/O error
+	define	EDQUOT		122	; Quota exceeded
+	define	ENOMEDIUM	123	; No medium found
+	define	EMEDIUMTYPE	124	; Wrong medium type
+	define	ECANCELED	125	; Operation Canceled
+	define	ENOKEY		126	; Required key not available
+	define	EKEYEXPIRED	127	; Key has expired
+	define	EKEYREVOKED	128	; Key has been revoked
+	define	EKEYREJECTED	129	; Key was rejected by service
 
-	; for robust mutexes 
-	define	EOWNERDEAD	130	; Owner died 
-	define	ENOTRECOVERABLE	131	; State not recoverable 
-	define ERFKILL		132	; Operation not possible due to RF-kill 
-	define EHWPOISON	133	; Memory page has hardware error 
+	; for robust mutexes
+	define	EOWNERDEAD	130	; Owner died
+	define	ENOTRECOVERABLE	131	; State not recoverable
+	define ERFKILL		132	; Operation not possible due to RF-kill
+	define EHWPOISON	133	; Memory page has hardware error
 
 	define ECHO            0x00008
 	define ECHOE           0x00010
@@ -208,8 +208,8 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define ICMP_HOST_ANO		10
 	define ICMP_NET_UNR_TOS		11
 	define ICMP_HOST_UNR_TOS	12
-	define ICMP_PKT_FILTERED	13	; Packet filtered 
-	define ICMP_PREC_VIOLATION	14	; Precedence violation 
+	define ICMP_PKT_FILTERED	13	; Packet filtered
+	define ICMP_PREC_VIOLATION	14	; Precedence violation
 	define ICMP_PREC_CUTOFF		15	; Precedence cut off
 
 	define ICMPV6_ROUTER_PREF_LOW		0x3
@@ -337,29 +337,29 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define ITIMER_PROF     2
 
 	define LC_ALL          6
-	
-	define	MSG_OOB			0x01	; Process out-of-band data.  
-	define	MSG_PEEK		0x02	; Peek at incoming messages.  
-	define	MSG_DONTROUTE	0x04	; Don't use local routing.  
+
+	define	MSG_OOB			0x01	; Process out-of-band data.
+	define	MSG_PEEK		0x02	; Peek at incoming messages.
+	define	MSG_DONTROUTE	0x04	; Don't use local routing.
 	define	MSG_TRYHARD		MSG_DONTROUTE
-	define	MSG_CTRUNC		0x08	; Control data lost before delivery.  
-	define	MSG_PROXY		0x10	; Supply or ask second address.  
+	define	MSG_CTRUNC		0x08	; Control data lost before delivery.
+	define	MSG_PROXY		0x10	; Supply or ask second address.
 	define	MSG_TRUNC		0x20
-	define	MSG_DONTWAIT	0x40 ; Nonblocking IO.  
-	define	MSG_EOR			0x80 ; End of record.  
-	define	MSG_WAITALL		0x100 ; Wait for a full request.  
+	define	MSG_DONTWAIT	0x40 ; Nonblocking IO.
+	define	MSG_EOR			0x80 ; End of record.
+	define	MSG_WAITALL		0x100 ; Wait for a full request.
 	define	MSG_FIN			0x200
 	define	MSG_SYN			0x400
-	define	MSG_CONFIRM		0x800 ; Confirm path validity.  
+	define	MSG_CONFIRM		0x800 ; Confirm path validity.
 	define	MSG_RST			0x1000
-	define	MSG_ERRQUEUE	0x2000 ; Fetch message from error queue.  
-	define	MSG_NOSIGNAL	0x4000 ; Do not generate SIGPIPE.  
-	define	MSG_MORE		0x8000  ; Sender will send more.  
+	define	MSG_ERRQUEUE	0x2000 ; Fetch message from error queue.
+	define	MSG_NOSIGNAL	0x4000 ; Do not generate SIGPIPE.
+	define	MSG_MORE		0x8000  ; Sender will send more.
 	define	MSG_WAITFORONE	0x10000 ; Wait for at least one packet to return.
-	define	MSG_BATCH		0x40000 ; sendmmsg: more messages coming.  
-	define	MSG_SOCK_DEVMEM	0x2000000 ; Receive devmem skbs as cmsg.  
-	define	MSG_ZEROCOPY	0x4000000 ; Use user data in kernel path.  
-	define	MSG_FASTOPEN	0x20000000 ; Send data in TCP SYN.  
+	define	MSG_BATCH		0x40000 ; sendmmsg: more messages coming.
+	define	MSG_SOCK_DEVMEM	0x2000000 ; Receive devmem skbs as cmsg.
+	define	MSG_ZEROCOPY	0x4000000 ; Use user data in kernel path.
+	define	MSG_FASTOPEN	0x20000000 ; Send data in TCP SYN.
 	define	MSG_CMSG_CLOEXEC 0x40000000	; Set close_on_exit for file
 
 	define NI_NUMERICHOST	1	; Don't try to look up hostname.
@@ -383,7 +383,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define O_TMPFILE       (20000000o + O_DIRECTORY)
 	define O_TRUNC         1000o
 	define O_WRONLY        1o
-	
+
 	define POLLIN			0001h
 	define POLLERR			0008h
 
@@ -399,24 +399,24 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define PTHREAD_PRIO_NONE		0
 	define PTHREAD_PRIO_INHERIT		1
 	define PTHREAD_PRIO_PROTECT		2
-	
+
 	define PTHREAD_INHERIT_SCHED	0
 	define PTHREAD_EXPLICIT_SCHED	1
-	
+
 	define THREAD_SCOPE_SYSTEM		0
 	define  PTHREAD_SCOPE_PROCESS	1
-	
+
 	define PTHREAD_PROCESS_PRIVATE	0
 	define PTHREAD_PROCESS_SHARED	1
-	
+
 	define PTHREAD_CANCEL_ENABLE	0
 	define PTHREAD_CANCEL_DISABLE	1
-	
+
 	define PTHREAD_CANCEL_DEFERRED		0
 	define PTHREAD_CANCEL_ASYNCHRONOUS	1
-	
+
 	define PTHREAD_CANCELED			-1
-	
+
 	define PTHREAD_ONCE_INIT		0
 
 
@@ -486,7 +486,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define SO_EE_ORIGIN_ZEROCOPY	5
 	define SO_EE_ORIGIN_TXTIME		6
 	define SO_EE_ORIGIN_TIMESTAMPING SO_EE_ORIGIN_TXSTATUS
-	
+
 	define SO_RCVTIMEO      20
 	define SO_SNDTIMEO      21
 	define SO_TIMESTAMP_OLD 29
@@ -494,7 +494,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define SOCK_STREAM      1
 	define SOCK_DGRAM       2
 	define SOCK_RAW         3
-	
+
 	define SOL_IP           0
 	define SOL_SOCKET       1
 	define SOL_TCP          6
@@ -584,7 +584,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto getgrgid, dword                       ; edi = Group ID
 	ext proto get_current_dir_name, none
 	ext proto getcwd, qword, dword
-	ext proto gethostbyaddr, qword, dword, dword    ; 
+	ext proto gethostbyaddr, qword, dword, dword    ;
 	ext proto gethostbyname, qword
 	ext proto gethostbyname2, qword, dword			; * name, AF
 	ext proto getitimer, dword, qword               ; edi = which timer, rsi = *itimerval current settings
@@ -648,6 +648,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto sched_getscheduler, dword
 	ext proto sched_setaffinity, dword, dword, qword
 	ext proto sched_setscheduler, dword, dword, qword
+	ext proto sched_yield, none
 	ext proto select, dword, qword, qword, qword, qword
 	ext proto sendmsg, dword, qword, dword
 	ext proto sendto, dword, qword, qword, dword, qword, dword
@@ -733,7 +734,7 @@ else
 end if
 
 ; Just use:
-; 
+;
 ;     libc.StartMain(&MyMainProc);
 ;
 ;:::::::::::::::::::::::::::::::::::::

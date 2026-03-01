@@ -314,215 +314,223 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 	__V_SECTION_OPEN__ = 0
 
 	macro _rdata line&  ; Read only initialized data segment
-	if __ext_dcount_ > 0 | __ext_icount_ > 0 & ~ (__RDATA_ONLINE__ or __DATA_ONLINE__ \
-		or __CODE_ONLINE__ or __BSS_ONLINE__)
-		extern2_
-	end if
-	if __RDATA_ONLINE__ = 0
-		if __V_SECTION_OPEN__
-		esc end virtual
+		if __ext_dcount_ > 0 | __ext_icount_ > 0 & ~ (__RDATA_ONLINE__ or __DATA_ONLINE__ \
+			or __CODE_ONLINE__ or __BSS_ONLINE__)
+			extern2_
 		end if
-		segment readable
-		__RDATA_ONLINE__ = 1
-		virtual
-		__rdata_ptr:: ; Anonymous data from higher macros
-		end virtual
-		postpone
-		virtual __rdata_ptr
+		if __RDATA_ONLINE__ = 0
 			if __V_SECTION_OPEN__
-			esc end virtual
+				esc end virtual
 			end if
-			load __rdata_ptr.contents : $ - $$ from $$
-			__V_SECTION_OPEN__ = 0
-		end virtual
-		end postpone
-		virtual __rdata_ptr
-		match =align?= any, line
-			line
+			segment readable
+			__RDATA_ONLINE__ = 1
+			virtual
+				__rdata_ptr:: ; Anonymous data from higher macros
+			end virtual
+			postpone
+				virtual __rdata_ptr
+					if __V_SECTION_OPEN__
+						esc end virtual
+					end if
+					load __rdata_ptr.contents : $ - $$ from $$
+					__V_SECTION_OPEN__ = 0
+				end virtual
+			end postpone
+			virtual __rdata_ptr
+				match =align?= any, line
+					line
+				else
+					align 64, '*'
+					line
+				end match
+			end virtual
+			db __rdata_ptr.contents
+			esc virtual __rdata_ptr
+			__V_SECTION_OPEN__ = 1
 		else
-			align 64, '*'
-			line
-		end match
-		end virtual
-		db __rdata_ptr.contents
-		esc virtual __rdata_ptr
-		__V_SECTION_OPEN__ = 1
-	else
-		if __V_SECTION_OPEN__
-		esc end virtual
+			if __V_SECTION_OPEN__
+				esc end virtual
+			end if
+			esc virtual __rdata_ptr
+				line
+			__V_SECTION_OPEN__ = 1
 		end if
-		esc virtual __rdata_ptr
-		line
-		__V_SECTION_OPEN__ = 1
-	end if
 	end macro
 
 	macro _data line&   ; Read/write initialized data segment
-	if __ext_dcount_ > 0 | __ext_icount_ > 0 & ~ (__RDATA_ONLINE__ or __DATA_ONLINE__ \
-		or __CODE_ONLINE__ or __BSS_ONLINE__)
-		extern2_
-	end if
-	if __DATA_ONLINE__ = 0
-		if __V_SECTION_OPEN__
-		esc end virtual
+		if __ext_dcount_ > 0 | __ext_icount_ > 0 & ~ (__RDATA_ONLINE__ or __DATA_ONLINE__ \
+			or __CODE_ONLINE__ or __BSS_ONLINE__)
+			extern2_
 		end if
-		segment readable writeable
-		__DATA_ONLINE__ = 1
-		virtual
-		__data_ptr::
-		end virtual
-		postpone
-		if __V_SECTION_OPEN__
-			esc end virtual
-		end if
-		virtual __data_ptr
-			load __data_ptr.contents : $ - $$ from $$
-		end virtual
-		__V_SECTION_OPEN__ = 0
-		end postpone
-		virtual __data_ptr
-		match =align?= any, line
-			line
+		if __DATA_ONLINE__ = 0
+			if __V_SECTION_OPEN__
+				esc end virtual
+			end if
+			segment readable writeable
+			__DATA_ONLINE__ = 1
+			virtual
+				__data_ptr::
+			end virtual
+			postpone
+				if __V_SECTION_OPEN__
+					esc end virtual
+				end if
+				virtual __data_ptr
+					load __data_ptr.contents : $ - $$ from $$
+				end virtual
+				__V_SECTION_OPEN__ = 0
+			end postpone
+			virtual __data_ptr
+				match =align?= any, line
+					line
+				else
+					align 64, '*'
+					line
+				end match
+			end virtual
+			db __data_ptr.contents
+			esc virtual __data_ptr
+			__V_SECTION_OPEN__ = 1
 		else
-			align 64, '*'
-			line
-		end match
-		end virtual
-		db __data_ptr.contents
-		esc virtual __data_ptr
-		__V_SECTION_OPEN__ = 1
-	else
-		if __V_SECTION_OPEN__
-		esc end virtual
+			if __V_SECTION_OPEN__
+				esc end virtual
+			end if
+			esc virtual __data_ptr
+				line
+			__V_SECTION_OPEN__ = 1
 		end if
-		esc virtual __data_ptr
-		line
-		__V_SECTION_OPEN__ = 1
-	end if
 	end macro
 
-	macro _bss line&	;WARNING: Alpha stage. ; Uninitialized data segment
-	if __ext_dcount_ > 0 | __ext_icount_ > 0 & ~ (__RDATA_ONLINE__ or __DATA_ONLINE__ \
-		or __CODE_ONLINE__ or __BSS_ONLINE__)
-		extern2_
-	end if
-	if __BSS_ONLINE__ = 0
-		if __CODE_ONLINE__
-		err "_bss section macro must be placed before any _code statement!", 10
+	macro _bss line&	; NOTE: Beta stage: now it can be reused!
+		if __ext_dcount_ > 0 | __ext_icount_ > 0 & ~ (__RDATA_ONLINE__ or __DATA_ONLINE__ \
+			or __CODE_ONLINE__ or __BSS_ONLINE__)
+			extern2_
 		end if
-		if __V_SECTION_OPEN__
-		esc end virtual
-		end if
-		segment readable writeable
-		__BSS_ONLINE__ = 1
-		; virtual
-		;   __bss_ptr::
-		; end virtual
-		postpone
-		if __V_SECTION_OPEN__
-			esc end virtual
-		end if
-		__V_SECTION_OPEN__ = 0
-		end postpone
-		; esc virtual __bss_ptr
-		match =align?= any, line
-		line
+		if __BSS_ONLINE__ = 0
+			if __CODE_ONLINE__
+				err "_bss section macro must be placed before any _code statement!", 10
+			end if
+			if __V_SECTION_OPEN__
+				esc end virtual
+			end if
+			__V_SECTION_OPEN__ = 0
+			segment readable writeable
+			__BSS_ONLINE__ = 1
+			postpone
+				if __V_SECTION_OPEN__
+					esc end virtual
+				end if
+				__V_SECTION_OPEN__ = 0
+				virtual __bss_ptr
+					__BSS_SIZE_ALLOCATE__ = $-$@
+					; repeat 1, sz:$-$@
+					; 	display "BSS size allocation: ",`sz,10
+					; end repeat
+				end virtual
+			end postpone
+			match =align?= any, line
+				line
+				virtual at $ as 'bss_ptr'
+					__bss_ptr::
+				end virtual
+				emit __BSS_SIZE_ALLOCATE__, ?
+				esc virtual __bss_ptr
+				__V_SECTION_OPEN__ = 1
+			else
+				align 64
+				virtual at $ as 'bss_ptr'
+					__bss_ptr::
+				end virtual
+				emit __BSS_SIZE_ALLOCATE__, ?
+				esc virtual __bss_ptr
+					line
+				__V_SECTION_OPEN__ = 1
+			end match
 		else
-		align 64
-		line
-		end match
-		__V_SECTION_OPEN__ = 0
-	else
-		if __V_SECTION_OPEN__
-		esc end virtual
+			if __V_SECTION_OPEN__
+				esc end virtual
+			end if
+			esc virtual __bss_ptr
+				line
+			__V_SECTION_OPEN__ = 1
 		end if
-		err "_bss is alpha stage: so far, only one _bss macro is allowed.", 10
-		; esc virtual __bss_ptr
-		; line
-		; __V_SECTION_OPEN__ = 0
-	end if
 	end macro
 
 	macro _code line&   ; Code segment
-	if __ext_dcount_ > 0 | __ext_icount_ > 0 & ~ (__RDATA_ONLINE__ or __DATA_ONLINE__ \
-		or __CODE_ONLINE__ or __BSS_ONLINE__)
-		extern2_
-	end if
-	if __CODE_ONLINE__ = 0
-		if __V_SECTION_OPEN__
-		esc end virtual
+		if __ext_dcount_ > 0 | __ext_icount_ > 0 & ~ (__RDATA_ONLINE__ or __DATA_ONLINE__ \
+			or __CODE_ONLINE__ or __BSS_ONLINE__)
+			extern2_
 		end if
-		match =rwx?= any, line
-		segment readable writeable executable
-		else match =rwx?, line
-		segment readable writeable executable
-		else
-		segment readable executable
-		end match
-		__CODE_ONLINE__ = 1
-		virtual
-		__code_ptr::	; This is for outputing anonymous data in the same section
-		end virtual
-		postpone
-		if __V_SECTION_OPEN__
-			esc end virtual
-		end if
-		virtual __code_ptr
-			load __code_ptr.contents : $ - $$ from $$
+		if __CODE_ONLINE__ = 0
+			if __V_SECTION_OPEN__
+				esc end virtual
+			end if
+			match =rwx?= any, line
+				segment readable writeable executable
+			else match =rwx?, line
+				segment readable writeable executable
+			else
+				segment readable executable
+			end match
+			__CODE_ONLINE__ = 1
+			virtual
+				__code_ptr::	; This is for outputing anonymous data in the same section
+			end virtual
+			postpone
+				if __V_SECTION_OPEN__
+					esc end virtual
+				end if
+				virtual __code_ptr
+					load __code_ptr.contents : $ - $$ from $$
+					__V_SECTION_OPEN__ = 0
+				end virtual
+			end postpone
+			match =align?= any, line
+				line
+			end match
+			db __code_ptr.contents	; If there's only a _code section, anonymous data will be placed
+									; before the code in the same section.
+			match =rwx?= any, line
+				match =align?= value, any
+					any
+				else
+					align 4, 90h
+					any
+				end match
+			else match =rwx?, line
+				align 4, 90h
+			else
+				match =align?= any, line
+					line
+				else
+					align 4, 90h
+					line
+				end match
+			end match
 			__V_SECTION_OPEN__ = 0
-		end virtual
-		end postpone
-		match =align?= any, line
-		line
-		end match
-		db __code_ptr.contents	; If there's only a _code section, anonymous data will be placed
-		; esc virtual __code_ptr	; before the code in the same section.
-		match =rwx?= any, line
-		match =align?= value, any
-			any
 		else
-			align 4, 90h
-		end match
-		else match =rwx?, line
-		align 4, 90h
-		else
-		match =align?= any, line
+			if __V_SECTION_OPEN__
+				esc end virtual
+			end if
 			line
-		else
-			align 4, 90h
-			line
-		end match
-		end match
-		__V_SECTION_OPEN__ = 0
-	else
-		if __V_SECTION_OPEN__
-		esc end virtual
+			__V_SECTION_OPEN__ = 0
 		end if
-		; esc virtual __code_ptr
-		line
-		__V_SECTION_OPEN__ = 0
-	end if
 	end macro
 	;
 	; WARNING!
-	; Reuse of _code, _data and _rdata is now possible, but, if you are going to use it,
-	; _data and _rdata must have been stated prior to the first _code statement!
-	; The first _data, _rdata and _code creates the output area for the next _data and
-	; _rdata uses. _code is the default output area when it is first created for the
-	; rest of the code.
-	; _bss does not support reuse unfortunately, due to virtual directive not handling
-	; uninitialized data. And it needs unconditionaly to the stated before _code to
-	; work properly!
+	; Reuse of _code, _data, _bss and _rdata is possible, but, if you are going to use it,
+	; _bss, _data and _rdata must have been stated prior to the first _code statement!
+	; The first _bss, _data, _rdata and _code creates the output area for the next _data,
+	; _bss, and _rdata uses. _code is the default output area when it is first created
+	; for the rest of the code.
 	;
 	; As a safety rule:
-	;  - _rdata and _data are virtualized segments all time, that resolves at
+	;  - _bss, _rdata and _data are virtualized segments all time, that resolves at
 	;      compile (postpone) time;
-	;  - _code and _bss are real output segment areas;
-	;  - reuse of _code only closes previously opened virtual data or rdata
+	;  - _code is real output segment area;
+	;  - reuse of _code only closes previously opened virtual bss, data or rdata
 	;      area, and returns to _code real area.
 	;
-	; NOTE: for non reusable mode, _data, _rdata and _code can be placed anywhere
-	;         in the code, but _bss must be placed before _code.
 	;
 	;
 

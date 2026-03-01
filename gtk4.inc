@@ -41,8 +41,10 @@ if ~ defined __GTK4_INC_INCLUDED__
 	ext proto g_log_set_writer_func, qword, qword, qword
 	ext proto g_object_unref, qword
 	ext proto g_log, qword, dword, qword, vararg
-	ext proto g_print, vararg
+	ext proto g_print, qword, vararg
+	ext proto g_printerr, qword, vararg
 	ext proto g_signal_connect_data, qword, qword, qword, qword, dword, dword
+	ext proto g_signal_handler_disconnect, qword, qword
 	ext proto gdk_display_get_default, none
 	ext proto gtk_application_new, qword, dword
 	ext proto gtk_application_window_new, qword
