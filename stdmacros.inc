@@ -40,12 +40,12 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
                 count = start
                 iterate name, names
                     rawmatch const == value, name
-                        if defined __ENUM_DEBUG__
-                            repeat 1, i:value
+                        repeat 1, i:value
+                            define const i
+                            if defined __ENUM_DEBUG__
                                 display "Const: ",`const," Value: ",`i,10
-                            end repeat
-                        end if
-                        define const value
+                            end if
+                        end repeat
                         count = value
                     else
                         repeat 1, i:count
