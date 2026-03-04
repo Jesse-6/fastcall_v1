@@ -11,10 +11,19 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
     ; Just manage/change/add/remove the constant as well, at the same position,
     ; without bothering with which value/index it actually is.
     ; NOTE: This works quite similar to C 'enum' statement, but have a step
-    ; option which allows define step increment
+    ; option which allows define step increment, and also allows to setup start
+    ; value at its first parameter
     ;
     ; Define each constant as a number, ranging from 'start' value
     ; enum step <value> defines the step increment for each constant
+    ;
+    ; enum step also accepts shl <value> so it can define bit constants:
+    ;
+    ; enum step shl 1
+    ; enum 1,   N_E0,\  ; = 1 = 00000001b
+    ;           N_E1,\  ; = 2 = 00000010b
+    ;           N_E2,\  ; = 4 = 00000100b
+    ;           N_E3    ; = 8 = 00001000b
     ;
     ; Example:
     ;
@@ -23,7 +32,7 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
     ;           VALUE2, \
     ;           VALUE3
     ;
-    ; Expand to:
+    ; Expands to:
     ;
     ; define VALUE0 0
     ; define VALUE1 1
@@ -31,7 +40,7 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
     ; define VALUE3 3
     macro enum start, names&
         match =step= val, start
-            __ENUM_STEP__ = val
+            define __ENUM_STEP__ val
         else
             if ~ start eqtype 0
                 err "Invalid 'enum' enumeration macro usage", 10
@@ -39,7 +48,9 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
                 local count
                 count = start
                 iterate name, names
-                    rawmatch const == value, name
+                    local proxy
+                    define proxy name
+                    match const == value, proxy
                         repeat 1, i:value
                             define const i
                             if defined __ENUM_DEBUG__
@@ -54,12 +65,16 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
                                 display "Const: ", `name, " Value: ", `i, 10
                             end if
                         end repeat
-                    end rawmatch
-                    if defined __ENUM_STEP__
-                        count = count + __ENUM_STEP__
+                    end match
+                    match =shl?= val, __ENUM_STEP__
+                        count = count shl val
                     else
-                        count = count + 1
-                    end if
+                        if defined __ENUM_STEP__
+                            count = count + __ENUM_STEP__
+                        else
+                            count = count + 1
+                        end if
+                    end match
                 end iterate
             end if
         end match
