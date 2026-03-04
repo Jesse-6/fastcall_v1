@@ -430,7 +430,7 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 			end postpone
 			match =align?= any, line
 				line
-				virtual at $ as 'bss_ptr'
+				virtual at $
 					__bss_ptr::
 				end virtual
 				emit __BSS_SIZE_ALLOCATE__, ?
@@ -438,7 +438,7 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 				__V_SECTION_OPEN__ = 1
 			else
 				align 64
-				virtual at $ as 'bss_ptr'
+				virtual at $
 					__bss_ptr::
 				end virtual
 				emit __BSS_SIZE_ALLOCATE__, ?
@@ -592,14 +592,42 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 			__type_id_ = FUNC_PARA_TYPE_XSTRING
 			define __type_para_ first,last
 			__type_size_ equ 8
-        else match string=\=n, dest
-            __type_id_ = FUNC_PARA_TYPE_STRINGN
-            define __type_para_ string
-            __type_size_ equ 8
-        else match string= =\=n, dest
-            __type_id_ = FUNC_PARA_TYPE_STRINGN
-            define __type_para_ string
-            __type_size_ equ 8
+		else match =\=n str1 =\=n str2 =\=n, dest
+			__type_id_ = FUNC_PARA_TYPE_STRINGN
+			define __type_para_ dest
+			__type_size_ equ 8
+		else match =\=n str1 =\=n str2, dest
+			__type_id_ = FUNC_PARA_TYPE_STRINGN
+			define __type_para_ dest
+			__type_size_ equ 8
+		else match str1 =\=n str2 =\=n, dest
+			__type_id_ = FUNC_PARA_TYPE_STRINGN
+			define __type_para_ dest
+			__type_size_ equ 8
+		else match =\=n string =\=n, dest
+			__type_id_ = FUNC_PARA_TYPE_STRINGN
+			define __type_para_ dest
+			__type_size_ equ 8
+		else match str1 =\=n str2, dest
+			__type_id_ = FUNC_PARA_TYPE_STRINGN
+			define __type_para_ dest
+			__type_size_ equ 8
+		else match =\=n =\=n string, dest
+			__type_id_ = FUNC_PARA_TYPE_STRINGN
+			define __type_para_ dest
+			__type_size_ equ 8
+		else match string =\=n =\=n, dest
+			__type_id_ = FUNC_PARA_TYPE_STRINGN
+			define __type_para_ dest
+			__type_size_ equ 8
+		else match =\=n string, dest
+			__type_id_ = FUNC_PARA_TYPE_STRINGN
+			define __type_para_ dest
+			__type_size_ equ 8
+		else match string =\=n, dest
+			__type_id_ = FUNC_PARA_TYPE_STRINGN
+			define __type_para_ dest
+			__type_size_ equ 8
 		else match=., dest
 			__type_id_ = FUNC_PARA_TYPE_EMPTY
 			define __type_para_ .
@@ -852,8 +880,26 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 						.._anon_data_#i db data, 0
 					else if dtype = PUT_ANON_DATA_STRING	; exact string (no alteration)
 						.._anon_data_#i db data
-                    else if dtype = PUT_ANON_DATA_STRINGN   ; new string with \n char at end
-                        .._anon_data_#i db data, 10, 0      ; "my string"n
+                    else if dtype = PUT_ANON_DATA_STRINGN   ; new string with \n char
+						match =\=n str1 =\=n str2 =\=n, data
+							.._anon_data_#i db 10, str1, 10, str2, 10, 0
+						else match =\=n str1 =\=n str2, data
+							.._anon_data_#i db 10, str1, 10, str2, 0
+						else match =\=n str1 =\=n, data
+							.._anon_data_#i db 10, str1, 10, 0
+						else match str1 =\=n str2 =\=n, data
+							.._anon_data_#i db str1, 10, str2, 10, 0
+						else match =\=n =\=n string, data
+							.._anon_data_#i db 10, 10, string, 0
+						else match string =\=n =\=n, data
+							.._anon_data_#i db string, 10, 10, 0
+						else match str1 =\=n str2, data
+							.._anon_data_#i db str1, 10, str2, 0
+						else match =\=n string, data
+							.._anon_data_#i db 10, string, 0
+						else match string =\=n, data
+							.._anon_data_#i db string, 10, 0
+						end match
 					else if dtype eq dword 					; 32-bit number
 						align 4
 						.._anon_data_#i dd data
@@ -2421,7 +2467,7 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 				end match
 			end macro
 		end if
-		if ~ func__.#ugly.par0.mode	; aliased internal functions is freed from the same as label macro name!
+		if ~ func__.#ugly.par0.mode	; aliased internal function is freed from the same as label macro name!
 			purge ugly
 		end if
 	end macro
