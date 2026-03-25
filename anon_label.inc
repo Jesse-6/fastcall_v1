@@ -153,20 +153,20 @@ if ~ defined __ANON_LABEL_INCLUDED__
   ;   @@  jmp     @b3 : E: jumps to B
 
   macro @INIT name,prefix
-  macro name tail&
+    macro name tail&
       match label, prefix#f?
-      label#: tail
-      prefix#b? equ prefix#f?
+        label#: tail
+        prefix#b? equ prefix#f?
       end match
       local anonymous
       prefix#f? equ anonymous
-  end macro
-  define prefix#f?
-  name
+    end macro
+    define prefix#f?
+    name
   end macro
 
   repeat 16
-  @INIT @#%,@#%
+    @INIT @#%,@#%
   end repeat
 
   purge @INIT
