@@ -113,85 +113,85 @@ if ~ defined __ANON_LABEL_INCLUDED__
     end repeat
     __lbl_count_ = __lbl_count_ + 1
   end macro
+  ;
+  ; :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+  ; :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+  ; ::: @n anonymous label macro:
+  ;     For convenience, I also included a slightly modified version
+  ;     of Tomasz Grysztar's @@ macro, that already coexist in perfect
+  ;     harmony with the above @@ macro. Indeed, both can be used in
+  ;     parallel, and doesn't affect each other.
+  ;     It works identical to fasm2 original version, but:
+  ;      - it is a placeholder macro, just like the @@ above, no need
+  ;        to '@1:', just '@1' for the label;
+  ;      - if lets @@, @b and @f to be handled by the above macro;
+  ;      - assuming 'n' as number, @n ranges from 1 to 16
+  ;
+  ;   As stated by Tomasz at his version:
+  ;   @1              ; A:
+  ;       je      @1f ; jumps to C
+  ;       jg      @2f ; jumps to B
+  ;       loop    @1b ; jmps to A
+  ;   @2  ; do stuff  ; B:
+  ;       loop @2b    ; jmps to B
+  ;   @1  nop         ; C:
+  ;
+  ;   One brave enough to use both macros should know:
+  ;
+  ;   (assuming x as number from 1 to 16):
+  ;
+  ;   - @bx and @fx refers to my original version;
+  ;   - @xb and @xf refers to this variant version.
+  ;
+  ;   Example:
+  ;
+  ;   @4  jmp     @f2 ; A: jumps to C
+  ;   @@  jmp     @4f ; B: jumps to D
+  ;   @@  jmp     @4b ; C: jumps to A
+  ;   @4  jmp     @b  ; D: jumps to C
+  ;   @@  jmp     @b3 : E: jumps to B
+
+  macro @INIT name,prefix
+  macro name tail&
+      match label, prefix#f?
+      label#: tail
+      prefix#b? equ prefix#f?
+      end match
+      local anonymous
+      prefix#f? equ anonymous
+  end macro
+  define prefix#f?
+  name
+  end macro
+
+  repeat 16
+  @INIT @#%,@#%
+  end repeat
+
+  purge @INIT
+  ;
+  ; ATTENTION!
+  ; This one has the following caveat:
+  ;
+  ; @1    jmp    @1f  ; A: jumps to A
+  ; @1    jmp    @1b  ; B: jumps to A
+  ;
+  ; With the "classical" (for this macro kit) version:
+  ;
+  ; @@    jmp    @f   ; A: jumps to B
+  ; @@    jmp    @b   ; B: jumps to B
+  ;
+  ; As a recommendation, one can just avoid the first two uses, to
+  ; avoid misunderstandings within code. When not in the same line,
+  ; both works equally:
+  ;
+  ; @1                ; A
+  ;       jmp    @1f  ; jumps to B
+  ; @1                ; B
+  ;       jmp    @1b  ; jumps to B
+  ;
+  ; :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 else
   err "Duplicated inclusion of 'anon_label.inc' file.", 10
 end if
-;
-; :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-; :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-; ::: @n anonymous label macro:
-;     For convenience, I also included a slightly modified version
-;     of Tomasz Grysztar's @@ macro, that already coexist in perfect
-;     harmony with the above @@ macro. Indeed, both can be used in
-;     parallel, and doesn't affect each other.
-;     It works identical to fasm2 original version, but:
-;      - it is a placeholder macro, just like the @@ above, no need
-;        to '@1:', just '@1' for the label;
-;      - if lets @@, @b and @f to be handled by the above macro;
-;      - assuming 'n' as number, @n ranges from 1 to 16
-;
-;   As stated by Tomasz at his version:
-;   @1              ; A:
-;       je      @1f ; jumps to C
-;       jg      @2f ; jumps to B
-;       loop    @1b ; jmps to A
-;   @2  ; do stuff  ; B:
-;       loop @2b    ; jmps to B
-;   @1  nop         ; C:
-;
-;   One brave enough to use both macros should know:
-;
-;   (assuming x as number from 1 to 16):
-;
-;   - @bx and @fx refers to my original version;
-;   - @xb and @xf refers to this variant version.
-;
-;   Example:
-;
-;   @4  jmp     @f2 ; A: jumps to C
-;   @@  jmp     @4f ; B: jumps to D
-;   @@  jmp     @4b ; C: jumps to A
-;   @4  jmp     @b  ; D: jumps to C
-;   @@  jmp     @b3 : E: jumps to B
-
-macro @INIT name,prefix
-    macro name tail&
-        match label, prefix#f?
-            label#: tail
-            prefix#b? equ prefix#f?
-        end match
-        local anonymous
-        prefix#f? equ anonymous
-    end macro
-    define prefix#f?
-    name
-end macro
-
-repeat 16
-    @INIT @#%,@#%
-end repeat
-
-purge @INIT
-;
-; ATTENTION!
-; This one has the following caveat:
-;
-; @1    jmp    @1f  ; A: jumps to A
-; @1    jmp    @1b  ; B: jumps to A
-;
-; With the "classical" (for this macro kit) version:
-;
-; @@    jmp    @f   ; A: jumps to B
-; @@    jmp    @b   ; B: jumps to B
-;
-; As a recommendation, one can just avoid the first two uses, to
-; avoid misunderstandings within code. When not in the same line,
-; both works equally:
-;
-; @1                ; A
-;       jmp    @1f  ; jumps to B
-; @1                ; B
-;       jmp    @1b  ; jumps to B
-;
-; :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
