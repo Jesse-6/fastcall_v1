@@ -443,6 +443,10 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define SEEK_DATA       3
 	define SEEK_HOLE       4
 
+	define SIG_ERR         -1
+	define SIG_DFL         0
+	define SIG_IGN         1
+
 	define SIGHUP          1
 	define SIGINT          2
 	define SIGQUIT         3
@@ -612,6 +616,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto nanosleep, qword, qword
 	ext proto open, qword, dword, dword     ; rdi = pathname, esi = flags, edx = mode
 	ext proto opendir, qword                        ; rdi = *dirpath
+	ext proto on_exit, qword, qword                 ; rdi = *function, rsi = *arg
 	ext proto perror, qword                         ; rdi = *string before error string (can be NULL)
 	ext proto poll, qword, qword, dword				; * pollfd, num x pollfd, timeout ms
 	ext proto posix_openpt, dword                   ; edi = flags. eax = pts lowest number available

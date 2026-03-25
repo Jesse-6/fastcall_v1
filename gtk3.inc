@@ -44,6 +44,20 @@ if ~ defined __GTK3_INC_INCLUDED__
     define G_PRIORITY_DEFAULT_IDLE 200
     define G_PRIORITY_HIGH_IDLE    100
 
+    define G_SPAWN_DEFAULT                  0
+    define G_SPAWN_LEAVE_DESCRIPTORS_OPEN   1
+    define G_SPAWN_DO_NOT_REAP_CHILD        2
+    define G_SPAWN_SEARCH_PATH              4
+    define G_SPAWN_STDOUT_TO_DEV_NULL       8
+    define G_SPAWN_STDERR_TO_DEV_NULL       16
+    define G_SPAWN_CHILD_INHERITS_STDIN     32
+    define G_SPAWN_FILE_AND_ARGV_ZERO       64
+    define G_SPAWN_SEARCH_PATH_FROM_ENVP    128
+    define G_SPAWN_CLOEXEC_PIPES            256
+    define G_SPAWN_CHILD_INHERITS_STDOUT    512
+    define G_SPAWN_CHILD_INHERITS_STDERR    1024
+    define G_SPAWN_STDIN_FROM_DEV_NULL      2048
+
     define G_TYPE_FUNDAMENTAL_SHIFT 2
 
     define G_TYPE_INVALID           (0 shl G_TYPE_FUNDAMENTAL_SHIFT)
@@ -108,6 +122,10 @@ if ~ defined __GTK3_INC_INCLUDED__
     define GDK_WINDOW_STATE_BOTTOM_RESIZABLE 16384
     define GDK_WINDOW_STATE_LEFT_TILED       32768
     define GDK_WINDOW_STATE_LEFT_RESIZABLE   65536
+
+    define GTK_ACCEL_VISIBLE            1
+    define GTK_ACCEL_LOCKED             2
+    define GTK_ACCEL_MASK               7
 
     define GTK_ALIGN_FILL                  0
     define GTK_ALIGN_START                 1
@@ -248,6 +266,8 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto g_application_run, qword, dword, qword
     ext proto g_application_send_notification, qword, qword, qword
     ext proto g_application_withdraw_notification, qword, qword
+    ext proto g_child_watch_add, dword, qword, qword
+    ext proto g_child_watch_add_full, dword, dword, qword, qword, qword
     ext proto g_clear_error, qword
     ext proto g_free, qword
     ext proto g_idle_add_full, dword, qword, qword, qword
@@ -280,6 +300,13 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto g_signal_stop_emission, qword, dword, dword
     ext proto g_signal_stop_emission_by_name, qword, qword
     ext proto g_simple_action_new, qword, qword
+    ext proto g_spawn_async, qword, qword, qword, dword, qword, qword, qword, qword
+    ext proto g_spawn_async_with_pipes, qword, qword, qword, dword, qword, qword, qword, qword, qword, qword, qword
+    ext proto g_spawn_async_with_pipes_and_fds, qword, qword, qword, dword, qword, qword, dword, dword, dword, \
+        qword, qword, dword, qword, qword, qword, qword, qword
+    ext proto g_spawn_check_wait_status, dword, qword
+    ext proto g_spawn_close_pid, dword
+    ext proto g_spawn_command_line_async, qword, qword
     ext proto g_snprintf, qword, qword, qword, vararg
     ext proto g_themed_icon_new, qword
     ext proto g_themed_icon_new_from_names, qword, dword
@@ -313,6 +340,7 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gdk_threads_init, none
     ext proto gdk_threads_leave, none
     ext proto gdk_unicode_to_keyval, dword
+    ext proto gtk_accel_group_new, none
     ext proto gtk_adjustment_clamp_page, qword, double, double
     ext proto gtk_adjustment_configure, qword, double, double, double, double, double, double
     ext proto gtk_adjustment_get_lower, qword
@@ -523,6 +551,7 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto gtk_widget_set_valign, qword, dword
     ext proto gtk_widget_set_vexpand, qword, dword
     ext proto gtk_widget_set_visible, qword, dword
+    ext proto gtk_window_add_accel_group, qword, qword
     ext proto gtk_window_close, qword
     ext proto gtk_window_get_title, qword
     ext proto gtk_window_new, dword
