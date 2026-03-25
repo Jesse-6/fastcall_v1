@@ -132,7 +132,8 @@ end if
 ;      - assuming 'n' as number, @n ranges from 1 to 16
 ;
 ;   As stated by Tomasz at his version:
-;   @1  je      @1f ; A: jumps to C
+;   @1              ; A:
+;       je      @1f ; jumps to C
 ;       jg      @2f ; jumps to B
 ;       loop    @1b ; jmps to A
 ;   @2  ; do stuff  ; B:
