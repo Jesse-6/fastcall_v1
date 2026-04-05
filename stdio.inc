@@ -544,16 +544,20 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto close, dword                          ; edi = int file descriptor
 	ext proto closedir, qword                       ; rdi = directory descriptor
 	ext proto ctime, qword                          ; rdi = *TIMEP structure; rax = *strtime
-	ext proto dprintf, dword, qword, vararg         ; edi = fd, rsi, *format, ...
 	ext proto dlclose, qword
 	ext proto dlerror, none
 	ext proto dlopen, qword, dword
 	ext proto dlsym, qword, qword
+	ext proto dprintf, dword, qword, vararg         ; edi = fd, rsi, *format, ...
 	ext proto dup, dword                            ; edi = int file descriptor
 	ext proto dup2, dword, dword                    ; esi = new file descriptor
 	ext proto dup3, dword, dword, dword             ; edx = flags
+	ext proto execl, qword, qword, vararg           ; rdi = *path, rsi = *arg, ... = args, NULL
+	ext proto execle, qword, qword, vararg          ; Same as execl(), plus (after NULL): *envp[]
+	ext proto execlp, qword, qword, vararg          ; rdi = * str file, rsi *arg
 	ext proto execve, qword, qword, qword           ; rdi = *path, rsi = **arg, rdx = **envp
-	ext proto execvpe, qword, qword, qword          ; same as above
+	ext proto execvp, qword, qword                  ;
+	ext proto execvpe, qword, qword, qword          ; same as execve()
 	ext noreturn proto exit, dword                  ; edi = exit code
 	ext proto fclose, qword                         ; rdi = file descriptor
 	ext proto fcntl, dword, dword, vararg           ; edi = int file desc, esi = command, ...
@@ -700,6 +704,9 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto unlink, qword                         ; rdi = char path filename to be removed
 	ext proto unlockpt, dword                       ; edi = int file descriptor
 	ext proto usleep, qword                         ; edi = microsseconds to sleep
+	ext proto vdprintf, dword, qword, qword
+	ext proto vfprintf, qword, qword, qword
+	ext proto vprintf, qword, qword
 	ext proto write, dword, qword, qword            ; edi = int file desc, rsi = buffer, edx = size
 
 	;:::::::::::::::::::::::::::::::::::::
