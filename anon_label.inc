@@ -125,7 +125,7 @@ if ~ defined __ANON_LABEL_INCLUDED__
   ;     It works identical to fasm2 original version, but:
   ;      - it is a placeholder macro, just like the @@ above, no need
   ;        to '@1:', just '@1' for the label;
-  ;      - it lets @@, @b and @f to be handled by the above macro;
+  ;      - if lets @@, @b and @f to be handled by the above macro;
   ;      - assuming 'n' as number, @n ranges from 1 to 16
   ;
   ;   As stated by Tomasz at his version:
@@ -153,20 +153,20 @@ if ~ defined __ANON_LABEL_INCLUDED__
   ;   @@  jmp     @b3 : E: jumps to B
 
   macro @INIT name,prefix
-    macro name tail&
+  macro name tail&
       match label, prefix#f?
-        label#: tail
-        prefix#b? equ prefix#f?
+      label#: tail
+      prefix#b? equ prefix#f?
       end match
       local anonymous
       prefix#f? equ anonymous
-    end macro
-    define prefix#f?
-    name
+  end macro
+  define prefix#f?
+  name
   end macro
 
   repeat 16
-    @INIT @#%,@#%
+  @INIT @#%,@#%
   end repeat
 
   purge @INIT

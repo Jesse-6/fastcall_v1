@@ -1,7 +1,7 @@
 if ~ defined __GTK4_INC_INCLUDED__
 	define __GTK4_INC_INCLUDED__
 	define __GTK4_INC_INCLUDED__
-	
+
 	library 'libgtk-4.so.1'
 	library 'libpangocairo-1.0.so.0'
 	library 'libpango-1.0.so.0'
@@ -14,17 +14,17 @@ if ~ defined __GTK4_INC_INCLUDED__
 	library 'libgio-2.0.so.0'
 	library 'libgobject-2.0.so.0'
 	library 'libglib-2.0.so.0'
-	
+
 	define		G_APPLICATION_DEFAULT_FLAGS		0
 	define		G_APPLICATION_FLAGS_NONE		0
 
 	define		G_CONNECT_DEFAULT				0
 	define		G_CONNECT_AFTER					1
 	define		G_CONNECT_SWAPPED				2
-	
+
 	define		G_LOG_FLAG_RECURSION			1
 	define		G_LOG_FLAG_FATAL				2
-	
+
 	define		G_LOG_LEVEL_ERROR				4
 	define		G_LOG_LEVEL_CRITICAL			8
 	define		G_LOG_LEVEL_WARNING				16
@@ -33,11 +33,22 @@ if ~ defined __GTK4_INC_INCLUDED__
 	define		G_LOG_LEVEL_DEBUG				128
 	define		G_LOG_LEVEL_MASK				-4
 
+
+	define		G_PRIORITY_DEFAULT				0
+	define		G_PRIORITY_DEFAULT_IDLE			200
+	define		G_PRIORITY_HIGH					-100
+	define		G_PRIORITY_HIGH_IDLE			100
+	define		G_PRIORITY_LOW					300
+
 	define		GTK_ALIGN_CENTER				3
 	define		GTK_ORIENTATION_HORIZONTAL		0
 	define		GTK_ORIENTATION_VERTICAL		1
-	
+
+	define		GTK_LEVEL_BAR_MODE_CONTINUOUS	0
+	define		GTK_LEVEL_BAR_MODE_DISCRETE		1
+
 	ext proto g_application_run, qword, dword, qword
+	ext proto g_idle_add_full, dword, qword, qword, qword
 	ext proto g_log_set_writer_func, qword, qword, qword
 	ext proto g_object_unref, qword
 	ext proto g_log, qword, dword, qword, vararg
@@ -66,14 +77,30 @@ if ~ defined __GTK4_INC_INCLUDED__
 	ext proto gtk_icon_theme_get_for_display, qword
 	ext proto gtk_icon_theme_get_search_path, qword
 	ext proto gtk_icon_theme_has_icon, qword, qword
+	ext proto gtk_init, none
+	ext proto gtk_init_check, none
 	ext proto gtk_label_new, qword
 	ext proto gtk_label_set_text, qword, qword
 	ext proto gtk_label_set_xalign, qword, float32
 	ext proto gtk_label_set_yalign, qword, float32
-	ext proto gtk_init, none
-	ext proto gtk_init_check, none
+	ext proto gtk_level_bar_add_offset_value, qword, qword, double
+	ext proto gtk_level_bar_new, none
+	ext proto gtk_level_bar_new_for_interval, double, double
+	ext proto gtk_level_bar_set_inverted, qword, dword
+	ext proto gtk_level_bar_set_max_value, qword, double
+	ext proto gtk_level_bar_set_min_value, qword, double
+	ext proto gtk_level_bar_set_mode, qword, dword
+	ext proto gtk_level_bar_set_value, qword, double
+	ext proto gtk_orientable_set_orientation, qword, dword
+	ext proto gtk_scrolled_window_new, none
+	ext proto gtk_scrolled_window_set_child, qword, qword
 	ext proto gtk_widget_set_halign, qword, dword
+	ext proto gtk_widget_set_hexpand, qword, dword
+	ext proto gtk_widget_set_parent, qword, qword
+	ext proto gtk_widget_set_tooltip_markup, qword, qword
+	ext proto gtk_widget_set_tooltip_text, qword, qword
 	ext proto gtk_widget_set_valign, qword, dword
+	ext proto gtk_widget_set_vexpand, qword, dword
 	ext proto gtk_widget_set_visible, qword, dword
 	ext proto gtk_window_close, qword
 	ext proto gtk_window_destroy, qword
@@ -90,7 +117,7 @@ if ~ defined __GTK4_INC_INCLUDED__
 	; ext noreturn proto gtk_widget_show_all, qword
 	ext noreturn proto gtk_widget_hide, qword
 	ext noreturn proto gtk_widget_show, qword
-	
+
 
 	macro g_signal_connect params&
 		match (param), params
@@ -109,7 +136,7 @@ if ~ defined __GTK4_INC_INCLUDED__
 			g_signal_connect_data(param, 0, G_CONNECT_SWAPPED);
 		end match
 	end macro
-	
+
 else
 	err "Duplicated inclusion of 'gtk4.inc' file.", 10
 end if

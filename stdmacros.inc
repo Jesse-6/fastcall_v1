@@ -120,6 +120,81 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
             end match
         end virtual
     end macro
+
+; ======================================================================
+; ======================================================================
+; Bellow are some extension macros, that might help in specific cases
+
+    ; Aligned data data types
+    ;
+    ; Use xb, xw, xd, xq, xt, xo, xy, xz to gerenate byte, word, dword, qword, tword,
+    ; xword, yword and/or zword data types, which spawn with address aligned to its size.
+    ;
+    ; Accept *num (where num is the quantity) to reserve num variables (like rb, rd, rddq, etc.)
+    ;
+    ; var_dword xd 8000h    ; create dword variable 'var_dword' which is aligned to a dword boundary
+    ;                       ; with 8000h value on it
+    ; var_xmm   xo *16      ; allocate 16 variables of 16-byte (ddq) size, aligned to 16-byte address
+    ;                       ; pointer
+    ;
+    if ~ defined __ALIGN_DATA_DISABLE__
+        iterate <nam,typ,rtyp,val>, xb,db,rb,1, xw,dw,rw,2, xd,dd,rd,4, xq,dq,rq,8, \
+            xt,dt,rt,8, xo,ddq,rdq,16, xy,dqq,rqq,32, xz,ddqq,rdqq,64
+            struc nam? data*&
+                align val
+                match =* rsv, data
+                    . rtyp rsv
+                else
+                    . typ data
+                end match
+            end struc
+            macro nam? data*&
+                align val
+                match =* rsv, data
+                    rtyp rsv
+                else
+                    typ data
+                end match
+            end macro
+        end iterate
+    end if
+
+
+    ; Single line data macro: a convenience macro, to spawn one line with data that
+    ; goes under respective section.
+    ; Allows to declare data similar to C style, which may help maintain data near
+    ; to the code that uses that data.
+    ;
+    ; NOTE: requires previous declaration of '_rdata', '_data' and/or '_bss' to work!
+    ;
+    ; _code Start entry:    nop                 ; Code section code
+    ;
+    ;                       @bss buff rb 4096   ; Create 'buff' variable at 'bss' section
+    ;
+    ;                       lea     rdi, [buff] ; This goes into 'code' section,
+    ;                       mov     esi, 4095   ; following that previous 'nop'
+    ;                       call    PLT.getcwd  ; instruction
+    ;                       ; ...
+    ;
+    if ~ defined __SINGLE_LINE_DATA_DISABLE__
+        if defined __FASTCALL_v1_INCLUDED__ ; It needs fastcall_v1.inc to work!
+            macro @data line*&
+                _data line
+                _code
+            end macro
+
+            macro @rdata line*&
+                _rdata line
+                _code
+            end macro
+
+            macro @bss line*&
+                _bss line
+                _code
+            end macro
+        end if
+    end if
+
 else
     err "Duplicate inclusion of 'stdmacros.inc' file"
 end if

@@ -534,6 +534,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto __errno_location, none, alias errno   ; rax = errno ptr
 	ext proto __h_errno_location, none, alias h_errno
 	ext proto asctime, qword                        ; rdi = *TM structure; rax = *strtime
+	ext proto asctime_r, qword, qword               ; *tm, *buf[26]
 	ext proto calloc, qword, qword                  ; rdi = n, rsi = size
 	ext proto cfmakeraw, qword                      ; rdi = *TERMIOS filled structure
 	ext proto chdir, qword
@@ -544,6 +545,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto close, dword                          ; edi = int file descriptor
 	ext proto closedir, qword                       ; rdi = directory descriptor
 	ext proto ctime, qword                          ; rdi = *TIMEP structure; rax = *strtime
+	ext proto ctime_r, qword, qword                 ; *timep, *buf[26]
 	ext proto dlclose, qword
 	ext proto dlerror, none
 	ext proto dlopen, qword, dword
@@ -613,6 +615,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto inet_ntop, dword, qword, qword, dword	; af, src, dst, size
 	ext proto inet_pton, dword, qword, qword		; af, src, dst
 	ext proto localtime, qword                      ; rdi = *POSIX TIME variable
+	ext proto localtime_r, qword, qword				; *timep, *result
 	ext proto malloc, qword                        ; rdi = number of bytes to allocate
 	ext proto mkdir, qword, dword
 	ext proto mkfifo, qword, dword                  ; rdi = *pathname, esi = mode
@@ -652,6 +655,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto recvmsg, dword, qword, dword
 	ext proto remove, qword                         ; rdi = *filepath
 	ext proto rewind, qword
+	ext proto rmdir, qword
 	ext proto scanf, qword, vararg
 	ext proto sched_getaffinity, dword, dword, qword
 	ext proto sched_getscheduler, dword

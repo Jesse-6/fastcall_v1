@@ -433,7 +433,9 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 				virtual at $
 					__bss_ptr::
 				end virtual
-				emit __BSS_SIZE_ALLOCATE__, ?
+				if __BSS_SIZE_ALLOCATE__ <> 0
+					emit __BSS_SIZE_ALLOCATE__, ?
+				end if
 				esc virtual __bss_ptr
 				__V_SECTION_OPEN__ = 1
 			else
@@ -441,7 +443,9 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 				virtual at $
 					__bss_ptr::
 				end virtual
-				emit __BSS_SIZE_ALLOCATE__, ?
+				if __BSS_SIZE_ALLOCATE__ <> 0
+					emit __BSS_SIZE_ALLOCATE__, ?
+				end if
 				esc virtual __bss_ptr
 					line
 				__V_SECTION_OPEN__ = 1

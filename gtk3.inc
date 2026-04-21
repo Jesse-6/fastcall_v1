@@ -296,6 +296,8 @@ if ~ defined __GTK3_INC_INCLUDED__
     ext proto g_quark_to_string, dword
     ext proto g_quark_try_string, qword
     ext proto g_signal_connect_data, qword, qword, qword, qword, dword, dword
+    ext proto g_signal_handler_disconnect, qword, qword
+    ext proto g_signal_handlers_disconnect_matched, qword, dword, dword, dword, qword, qword, qword
     ext proto g_signal_lookup, qword, dword
     ext proto g_signal_stop_emission, qword, dword, dword
     ext proto g_signal_stop_emission_by_name, qword, qword
