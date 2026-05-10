@@ -3,6 +3,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define __STDIO_INC_INCLUDED__
 
 	library 'libc.so.6'
+	library 'libpthread.so.0'
 
 	define AF_UNIX          1
 	define AF_INET          2
@@ -535,6 +536,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto __h_errno_location, none, alias h_errno
 	ext proto asctime, qword                        ; rdi = *TM structure; rax = *strtime
 	ext proto asctime_r, qword, qword               ; *tm, *buf[26]
+	ext proto asprintf, qword, qword, vararg        ; **strp, *fmt, ...
 	ext proto calloc, qword, qword                  ; rdi = n, rsi = size
 	ext proto cfmakeraw, qword                      ; rdi = *TERMIOS filled structure
 	ext proto chdir, qword
@@ -708,6 +710,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto unlink, qword                         ; rdi = char path filename to be removed
 	ext proto unlockpt, dword                       ; edi = int file descriptor
 	ext proto usleep, qword                         ; edi = microsseconds to sleep
+	ext proto vasprintf, qword, qword, qword        ; **strp, *fmt, va_list
 	ext proto vdprintf, dword, qword, qword
 	ext proto vfprintf, qword, qword, qword
 	ext proto vprintf, qword, qword

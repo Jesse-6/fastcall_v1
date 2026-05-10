@@ -10,7 +10,9 @@ if ~ defined __GTK3_INC_INCLUDED__
     library 'libharfbuzz.so.0'
     library 'libatk-1.0.so.0'
     library 'libcairo-gobject.so.2'
-    library 'libcairo.so.2'
+    if ~ defined __CAIRO_INC_INCLUDED__
+        library 'libcairo.so.2'
+    end if
     library 'libgdk_pixbuf-2.0.so.0'
     library 'libgio-2.0.so.0'
     library 'libgobject-2.0.so.0'
