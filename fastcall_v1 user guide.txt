@@ -163,6 +163,8 @@
             library -> defines the external libraries needed for the application, in quoted strings each;
                     Can be used multiple times.
 
+            libpath -> adds a single, custom path to load libraries from (system library path will continue to function normally, will only add a custom path. Path should be passed in quoted string.
+
             ext      -> proto prefix, indicates that this function should be prepared to be used from 'extern';
             noreturn -> proto prefix, prototypes the function as jmp function instead of call function;
             indirect -> proto prefix, prototypes function to be called indirectly (i.e., call [function]);

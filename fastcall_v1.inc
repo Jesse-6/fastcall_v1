@@ -170,6 +170,7 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 		DT_REL	   = 17
 		DT_RELSZ   = 18
 		DT_RELENT  = 19
+		DT_RUNPATH = 29
 
 		STB_LOCAL  = 0
 		STB_GLOBAL = 1
@@ -251,6 +252,9 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 			irpv library, needed@dynamic
 				dq DT_NEEDED,strtab.needed#%-strtab
 			end irpv
+			if defined __LIB_RUNPATH__
+				dq DT_RUNPATH,strtab.runpath-strtab
+			end if
 			dq DT_STRTAB,strtab-ELF.DYNAMIC
 			dq DT_STRSZ,strsz
 			dq DT_SYMTAB,symtab-ELF.DYNAMIC
@@ -287,6 +291,11 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 			irpv library, needed@dynamic
 				strtab.needed#% db library,0
 			end irpv
+			if defined __LIB_RUNPATH__
+				match path, __LIB_RUNPATH__
+					strtab.runpath db path,0
+				end match
+			end if
 			strsz = $-strtab
 			ptrtab:
 			align 8, 255
@@ -2338,6 +2347,22 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 				define needed@dynamic library
 			end irp
 		end namespace
+	end macro
+
+	; External macro to add a custom library path to load libraries from
+	;
+	;   libpath.add './local/lib'
+	;
+	__RUNPATH_COUNT__ = 0
+	macro libpath? &path
+		__RUNPATH_COUNT__ = __RUNPATH_COUNT__ + 1
+		if __RUNPATH_COUNT__ > 1
+			err "Only one custom library path is valid"
+		else
+			namespace __imp
+				define __LIB_RUNPATH__ path
+			end namespace
+		end if
 	end macro
 
 	; internal macro to parse all imported data and functions

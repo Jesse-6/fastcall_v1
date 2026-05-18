@@ -3,7 +3,9 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define __STDIO_INC_INCLUDED__
 
 	library 'libc.so.6'
-	library 'libpthread.so.0'
+	if defined __INCLUDE_LIBPTHREAD__	; older distros might need this to work!
+		library 'libpthread.so.0'
+	end if
 
 	define AF_UNIX          1
 	define AF_INET          2
