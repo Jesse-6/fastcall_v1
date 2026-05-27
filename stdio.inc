@@ -174,6 +174,8 @@ if ~ defined __STDIO_INC_INCLUDED__
 
 	define FALSE           0
 
+	define F_GETFL         3
+	define F_SETFL         4
 	define F_GETLK         5
 	define F_SETLK         6
 	define F_SETLKW        7
@@ -530,6 +532,25 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define TIOCGWINSZ      0x5413
 
 	define TRUE            1
+
+	; TERMIOS .cc chars
+	define VINTR		0
+	define VQUIT        1
+	define VERASE       2
+	define VKILL        3
+	define VEOF         4
+	define VTIME        5
+	define VMIN         6
+	define VSWTC        7
+	define VSTART       8
+	define VSTOP        9
+	define VSUSP        10
+	define VEOL         11
+	define VREPRINT     12
+	define VDISCARD     13
+	define VWERASE      14
+	define VLNEXT       15
+	define VEOL2        16
 
 	ext data stdin, stdout, stderr
 
