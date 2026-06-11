@@ -2,9 +2,11 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define __STDIO_INC_INCLUDED__
 	define __STDIO_INC_INCLUDED__
 
-	library 'libc.so.6'
-	if defined __INCLUDE_LIBPTHREAD__	; older distros might need this to work!
-		library 'libpthread.so.0'
+	if ~ defined __USE_FASTCALL_v2__
+		library 'libc.so.6'
+		if defined __INCLUDE_LIBPTHREAD__	; older distros might need this to work!
+			library 'libpthread.so.0'
+		end if
 	end if
 
 	define AF_UNIX          1
@@ -557,6 +559,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto __cxa_atexit, qword, alias atexit
 	ext proto __errno_location, none, alias errno   ; rax = errno ptr
 	ext proto __h_errno_location, none, alias h_errno
+	ext proto alarm, dword                          ; edi = seconds
 	ext proto asctime, qword                        ; rdi = *TM structure; rax = *strtime
 	ext proto asctime_r, qword, qword               ; *tm, *buf[26]
 	ext proto asprintf, qword, qword, vararg        ; **strp, *fmt, ...

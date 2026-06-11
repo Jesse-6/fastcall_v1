@@ -1,0 +1,1 @@
+Example library in a custom path for locallib example application

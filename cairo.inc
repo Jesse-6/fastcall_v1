@@ -3,10 +3,12 @@ if ~ defined __CAIRO_INC_INCLUDED__
     define __CAIRO_INC_INCLUDED__
     define __CAIRO_INC_INCLUDED__
 
-    if defined __GTK3_INC_INCLUDED__
-    else if defined __GTK4_INC_INCLUDED__
-    else
-        library 'libcairo.so'
+    if ~ defined __USE_FASTCALL_v2__
+        if defined __GTK3_INC_INCLUDED__
+        else if defined __GTK4_INC_INCLUDED__
+        else
+            library 'libcairo.so'
+        end if
     end if
 
     define CAIRO_FORMAT_ARGB32 0

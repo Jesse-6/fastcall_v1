@@ -8,7 +8,9 @@ if ~ defined __LIB_NOTIFY_INCLUDED__
     define __LIB_NOTIFY_INCLUDED__
     define __LIB_NOTIFY_INCLUDED__
 
-    library 'libnotify.so.4.0.0'
+    if ~ defined __USE_FASTCALL_v2__
+        library 'libnotify.so.4.0.0'
+    end if
 
     define NOTIFY_CLOSED_REASON_UNSET       -1
     define NOTIFY_CLOSED_REASON_EXPIRED     1

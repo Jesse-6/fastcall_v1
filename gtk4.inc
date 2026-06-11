@@ -2,20 +2,22 @@ if ~ defined __GTK4_INC_INCLUDED__
 	define __GTK4_INC_INCLUDED__
 	define __GTK4_INC_INCLUDED__
 
-	library 'libgtk-4.so.1'
-	library 'libpangocairo-1.0.so.0'
-	library 'libpango-1.0.so.0'
-	library 'libharfbuzz.so.0'
-	library 'libgdk_pixbuf-2.0.so.0'
-	library 'libcairo-gobject.so.2'
-	if ~ defined __CAIRO_INC_INCLUDED__
-		library 'libcairo.so.2'
+	if ~ defined __USE_FASTCALL_v2__
+		library 'libgtk-4.so.1'
+		library 'libpangocairo-1.0.so.0'
+		library 'libpango-1.0.so.0'
+		library 'libharfbuzz.so.0'
+		library 'libgdk_pixbuf-2.0.so.0'
+		library 'libcairo-gobject.so.2'
+		if ~ defined __CAIRO_INC_INCLUDED__
+			library 'libcairo.so.2'
+		end if
+		library 'libvulkan.so.1'
+		library 'libgraphene-1.0.so.0'
+		library 'libgio-2.0.so.0'
+		library 'libgobject-2.0.so.0'
+		library 'libglib-2.0.so.0'
 	end if
-	library 'libvulkan.so.1'
-	library 'libgraphene-1.0.so.0'
-	library 'libgio-2.0.so.0'
-	library 'libgobject-2.0.so.0'
-	library 'libglib-2.0.so.0'
 
 	define		G_APPLICATION_DEFAULT_FLAGS		0
 	define		G_APPLICATION_FLAGS_NONE		0

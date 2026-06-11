@@ -6,7 +6,9 @@ if ~ defined __SMLP_FILE_INCLUDED__
     define __SMLP_FILE_INCLUDED__
     define __SMLP_FILE_INCLUDED__
 
-    library 'libsmlproto.so.0'
+    if ~ defined __USE_FASTCALL_v2__
+        library 'libsmlproto.so.0'
+    end if
 
     ext proto SMLP_Cleanup, byte
     ext proto SMLP_GetIndexedString, dword

@@ -1,4 +1,4 @@
-# fastcall_v1
+# fastcall
 
 System V ABI fastcall macro toolkit (64-bit) - for fasm2 assembler
 

@@ -2351,7 +2351,7 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 
 	; External macro to add a custom library path to load libraries from
 	;
-	;   libpath.add './local/lib'
+	;   libpath './local/lib'
 	;
 	__RUNPATH_COUNT__ = 0
 	macro libpath? &path

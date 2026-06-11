@@ -2,7 +2,9 @@ if ~ defined __LIBGMP_INC_INCLUDED__
 	define __LIBGMP_INC_INCLUDED__
 	define __LIBGMP_INC_INCLUDED__
 
-    library 'libgmp.so.10'
+    if ~ defined __USE_FASTCALL_v2__
+        library 'libgmp.so.10'
+    end if
 
     ; Labeled macroinstructions for variables
     struc mpz_t
