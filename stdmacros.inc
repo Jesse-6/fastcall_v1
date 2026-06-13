@@ -94,7 +94,7 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
             point: line
         end match
     end struc
-    ;
+
     macro Main line&        ; self align Main label to be used with libc.StartMain
         align 4
         match := code, line

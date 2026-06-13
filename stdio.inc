@@ -345,6 +345,26 @@ if ~ defined __STDIO_INC_INCLUDED__
 
 	define LC_ALL          6
 
+	; Sharing types (must choose one and only one of these)
+	define MAP_SHARED			0x01	; Share changes
+	define MAP_PRIVATE			0x02	; Changes are private
+	define MAP_SHARED_VALIDATE	0x03	; Share changes and validate extension flags
+	define MAP_DROPPABLE		0x08	; Zero memory under memory pressure
+	define MAP_TYPE				0x0F	; Mask for type of mapping
+
+	; Other flags
+	define MAP_FIXED			0x10	; Interpret addr exactly
+	define MAP_FILE				0x00
+	define MAP_ANONYMOUS		0x20	; Don't use a file
+	define MAP_ANON				MAP_ANONYMOUS
+
+	define PROT_READ			0x1		; Page can be read
+	define PROT_WRITE			0x2		; Page can be written
+	define PROT_EXEC			0x4		; Page can be executed
+	define PROT_NONE			0x0		; Page can not be accessed
+	define PROT_GROWSDOWN		0x01000000	; Extend change to start of growsdown vma (mprotect only)
+	define PROT_GROWSUP			0x02000000	; Extend change to start of growsup vma (mprotect only)
+
 	define	MSG_OOB			0x01	; Process out-of-band data.
 	define	MSG_PEEK		0x02	; Peek at incoming messages.
 	define	MSG_DONTROUTE	0x04	; Don't use local routing.
@@ -554,7 +574,11 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define VLNEXT       15
 	define VEOL2        16
 
-	ext data stdin, stdout, stderr
+	if defined __USE_FASTCALL_v2__
+		ext data stdin:qword, stdout:qword, stderr:qword
+	else
+		ext data stdin, stdout, stderr
+	end if
 
 	ext proto __cxa_atexit, qword, alias atexit
 	ext proto __errno_location, none, alias errno   ; rax = errno ptr
@@ -648,6 +672,9 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto mkdir, qword, dword
 	ext proto mkfifo, qword, dword                  ; rdi = *pathname, esi = mode
 	ext proto mkstemp, qword                        ; rdi = template name; returns eax = int file descriptor
+	ext proto mprotect, qword, qword, dword						; addr, len, prot
+	ext proto mmap, qword, qword, dword, dword, dword, qword	; addr, len, prot, flags, fd, offset
+	ext proto munmap, qword, qword								; addr, len
 	ext proto nanosleep, qword, qword
 	ext proto open, qword, dword, dword     ; rdi = pathname, esi = flags, edx = mode
 	ext proto opendir, qword                        ; rdi = *dirpath
@@ -659,8 +686,8 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto pthread_attr_destroy, qword
 	ext proto pthread_attr_init, qword
 	ext proto pthread_cancel, qword
-	ext proto _pthread_cleanup_pop, qword, dword, alias pthread_cleanup_pop            ; unverified! CAUTION
-	ext proto _pthread_cleanup_push, qword, qword, qword, alias pthread_cleanup_push   ; unverified! CAUTION
+	ext proto _pthread_cleanup_pop, qword, dword, alias pthread_cleanup_pop
+	ext proto _pthread_cleanup_push, qword, qword, qword, alias pthread_cleanup_push
 	ext proto pthread_create, qword, qword, qword, qword
 	ext noreturn proto pthread_exit, qword
 	ext proto pthread_getname_np, qword, qword, dword

@@ -2025,31 +2025,31 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 			proto function, specs
 			define func__.#function.par0.extern 1
 			if used PLT?.function
-				extrn function
+				extrn function:8
 			else if used GOT?.function
-				extrn function
+				extrn function:8
 			else if used function
-				extrn function
+				extrn function:8
 			end if
 		else match =noreturn? =proto? function=, specs, line
 			proto function, specs
 			define func__.#function.par0.extern 1
 			define func__.#function.par0.jmp 1
 			if used PLT?.function
-				extrn function
+				extrn function:8
 			else if used GOT?.function
-				extrn function
+				extrn function:8
 			else if used function
-				extrn function
+				extrn function:8
 			end if
 		else match =indirect? =proto? function=, specs, line
 			proto function, specs
 			define func__.#function.par0.extern 1
 			define func__.#function.par0.mode 1
 			if used GOT?.function
-				extrn function
+				extrn function:8
 			else if used function
-				extrn function
+				extrn function:8
 			end if
 		else match =noreturn? =indirect? =proto? function=, specs, line
 			proto function, specs
@@ -2057,9 +2057,9 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 			define func__.#function.par0.jmp 1
 			define func__.#function.par0.mode 1
 			if used GOT?.function
-				extrn function
+				extrn function:8
 			else if used function
-				extrn function
+				extrn function:8
 			end if
 		else match =indirect? =noreturn? =proto? function=, specs, line
 			proto function, specs
@@ -2067,20 +2067,28 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 			define func__.#function.par0.jmp 1
 			define func__.#function.par0.mode 1
 			if used GOT?.function
-				extrn function
+				extrn function:8
 			else if used function
-				extrn function
+				extrn function:8
 			end if
 		else match =data?= impdata, line
 			local temp
 			define temp line
 			match =data? list, temp
 				iterate symbol, list
-					if used symbol
-						extrn symbol
-					else if used GOT?.symbol
-						extrn symbol
-					end if
+					match sym:size, symbol
+						if used sym
+							extrn sym:size
+						else if used GOT?.sym
+							extrn sym:size
+						end if
+					else
+						if used symbol
+							extrn symbol
+						else if used GOT?.symbol
+							extrn symbol
+						end if
+					end match
 				end iterate
 			else
 				err "Invalid extern argument. Usage: ext data symbol1, symbol2, ...", 10
