@@ -94,8 +94,8 @@ _code   callback_at_exit:   endbr64
 ; Compiling:
 ;
 ; > fasm2 libexample.asm
-; > ld -shared -lc -o libexample.so libexample.o
+; > ld.lld -L /usr/lib -s --shared -lc -o libexample.so libexample.o
 ; > rm libexample.o
-; > strip --strip-unneeded libexample.so
+; > strip -R .comment libexample.so
 ;
-; Now use '-L. -rpath=. -lexample' on 'ld' linker command line to locally link this library into your applications.
+; Now use '-L. --rpath=. -lexample' on 'lld' linker command line to locally link this library into your applications.

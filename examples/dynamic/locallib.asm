@@ -4,9 +4,6 @@ include 'fastcall.inc'
 include 'stdmacros.inc'
 include 'stdio.inc'
 
-; libpath 'lib'           ; custom library path relative to this application's current folder
-; library 'libneptune.so' ; library at the above relative path
-;
 ; libneptune exported functions
 ext proto GetLastError, none
 ext proto Neptune.Init, none
@@ -29,3 +26,14 @@ _code   Start entry:        dprintf(STDERR_FILENO, "Starting Neptune library fro
                             PutString(\n "Message from Neptune library!", STDOUT_FILENO);
                             Sleep(2600);
                             Return(ebx);
+
+; To build project:
+;
+; > fasm2 locallib.asm
+; > ld.lld -L /usr/lib -L lib --rpath=lib -s -e Start -pie -lc -lneptune --dynamic-linker=/lib64/ld-linux-x86-64.so.2 -o locallib locallib.o
+; > strip -R .comment locallib
+;
+; And then, run it:
+;
+; > ./locallib
+;

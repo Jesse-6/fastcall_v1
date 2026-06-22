@@ -82,9 +82,7 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 			end postpone
 			virtual __rdata_ptr
 				match =align?= any, line
-					line
 				else
-					align 64, '*'
 					line
 				end match
 			end virtual
@@ -126,9 +124,7 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 			end postpone
 			virtual __data_ptr
 				match =align?= any, line
-					line
 				else
-					align 64, '*'
 					line
 				end match
 			end virtual
@@ -160,6 +156,9 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 				section '.bss' writeable align 64
 			end match
 			__BSS_ONLINE__ = 1
+			virtual at $
+				__bss_ptr::
+			end virtual
 			postpone
 				if __V_SECTION_OPEN__
 					esc end virtual
@@ -169,28 +168,17 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 					__BSS_SIZE_ALLOCATE__ = $-$@
 				end virtual
 			end postpone
-			match =align?= any, line
-				line
-				virtual at $
-					__bss_ptr::
-				end virtual
-				if __BSS_SIZE_ALLOCATE__ <> 0
-					emit __BSS_SIZE_ALLOCATE__, ?
-				end if
-				esc virtual __bss_ptr
-				__V_SECTION_OPEN__ = 1
-			else
-				align 64
-				virtual at $
-					__bss_ptr::
-				end virtual
-				if __BSS_SIZE_ALLOCATE__ <> 0
-					emit __BSS_SIZE_ALLOCATE__, ?
-				end if
-				esc virtual __bss_ptr
+			virtual __bss_ptr
+				match =align? any, line
+				else
 					line
-				__V_SECTION_OPEN__ = 1
-			end match
+				end match
+			end virtual
+			if __BSS_SIZE_ALLOCATE__ <> 0
+				emit __BSS_SIZE_ALLOCATE__, ?
+			end if
+			esc virtual __bss_ptr
+			__V_SECTION_OPEN__ = 1
 		else
 			if __V_SECTION_OPEN__
 				esc end virtual
@@ -207,11 +195,13 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 				esc end virtual
 			end if
 			match =rwx?= any, line
-				section '.text' writeable executable
-				err "Writable code section is not working, yet.",10
+				match =align? val, any
+					section '.text' writeable executable align val
+				else
+					section '.text' writeable executable align 16
+				end match
 			else match =rwx?, line
-				section '.text' writeable executable
-				err "Writable code section is not working, yet.",10
+				section '.text' writeable executable align 16
 			else
 				match =align?= any, line
 					section '.text' executable align any
@@ -232,27 +222,17 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 					__V_SECTION_OPEN__ = 0
 				end virtual
 			end postpone
-			match =align?= any, line
-				line
-			end match
 			db __code_ptr.contents	; If there's only a _code section, anonymous data will be placed
 									; before the code in the same section.
-			match =rwx?= any, line
-				match =align?= value, any
-					any
+			align 4, 90h
+			match =align? val, line
+			else match =rwx? code, line
+				match =align? val, line
 				else
-					align 4, 90h
-					any
+					code
 				end match
-			else match =rwx?, line
-				align 4, 90h
 			else
-				match =align?= any, line
-					line
-				else
-					align 4, 90h
-					line
-				end match
+				line
 			end match
 			__V_SECTION_OPEN__ = 0
 		else
@@ -277,6 +257,51 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 	macro @rdata line*&
 		_rdata line
 		_code
+	end macro
+
+	; Macro 'extrn' based on the original Tomasz Grysztar's fasm2 header elf64.inc macro:
+	; Slightly modified here, to also pass size attribute to GOT.label
+	;
+	purge extrn?
+
+	macro extrn? declaration*
+		namespace ELF
+			local sym,gsym,psym
+			element sym : relocatable * (-1) + SYMBOL_INDEX
+			element gsym : GOT + SYMBOL_INDEX
+			element psym : PLT + SYMBOL_INDEX
+			match str =as? name:size, declaration
+				label name:size at sym
+				label GOT.name:size at gsym
+				label PLT.name at psym
+				SYMBOL_NAME = string str
+				SYMBOL_SIZE = size
+			else match name:size, declaration
+				label name:size at sym
+				label GOT.name:size at gsym
+				label PLT.name at psym
+				SYMBOL_NAME = `name
+				SYMBOL_SIZE = size
+			else match str =as? name, declaration
+				label name at sym
+				label GOT.name:8 at gsym
+				label PLT.name at psym
+				SYMBOL_NAME = string str
+				SYMBOL_SIZE = 0
+			else
+				label declaration at sym
+				label GOT.declaration:8 at gsym
+				label PLT.declaration at psym
+				SYMBOL_NAME = `declaration
+				SYMBOL_SIZE = 0
+			end match
+			store STRING_POSITION at symbol_table : Elf64_Sym.st_name + SYMBOL_INDEX * sizeof Elf64_Sym
+			store SYMBOL_NAME : lengthof SYMBOL_NAME at string_table:STRING_POSITION
+			STRING_POSITION = STRING_POSITION + lengthof SYMBOL_NAME + 1
+			store SYMBOL_SIZE at symbol_table : Elf64_Sym.st_size + SYMBOL_INDEX * sizeof Elf64_Sym
+			store STT_NOTYPE + STB_GLOBAL shl 4 at symbol_table : Elf64_Sym.st_info + SYMBOL_INDEX * sizeof Elf64_Sym
+			SYMBOL_INDEX = SYMBOL_INDEX + 1
+		end namespace
 	end macro
 
 	macro get_q_register register*
@@ -1931,7 +1956,7 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 					emms
 				end if
 				if defined func__.#func.par0.extern
-					jmp qword [GOT.func]
+					jmp [GOT.func]
 				else
 					if func__.#func.par0.aliased
 						jmp [func]
@@ -1951,7 +1976,7 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 					emms
 				end if
 				if defined func__.#func.par0.extern
-					call qword [GOT.func]
+					call [GOT.func]
 				else
 					if func__.#func.par0.aliased
 						call [func]

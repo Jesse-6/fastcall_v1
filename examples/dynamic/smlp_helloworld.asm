@@ -1,5 +1,6 @@
 ; Hello World multi language example using libsmlproto and its SMLP specification.
 ; Available at: https://github.com/Jesse-6/libsmlproto
+; Install it into your system prior to run this demo!
 ;
 
 format ELF64

@@ -60,6 +60,6 @@ _code
                                 sub     rcx, [e_offset]         ; Number of cycles
                                 add     rsp, 16                 ; release allocated stack
 
-                                printf(<"Done in %li cycles. Frame offset: %lu cycles.",10,0>, rcx, *e_offset);
+                                printf("Done in %li cycles. Frame offset: %lu cycles."\n, rcx, *e_offset);
                                 intexit(0);
 

@@ -4,18 +4,21 @@
 #
 # WARNING: 'project' must be the source name without '.asm' extension! Or the file will be deleted!
 
-ldlibs="-lc"
-ldentry=Start
+# NOTE: install 'lld' LLVM linker to use this script! Is a much better linker than 'ld', because it does not censors
+# your decision on how a section should be. Also deliver smaller executables than GNU 'ld'. Also runs fast.
+
+lldlibs="-lc"
+lldentry=Start
 if [ -f "$1.subver" ]; then
         echo -ne $(($(<$1.subver)+1)) > $1.subver
 else
         echo -ne 1 > $1.subver
 fi
 fasm2 -n $1.asm
-ld -o $1 $1.o -e $ldentry -pie $ldlibs --gc-sections --dynamic-linker=/lib64/ld-linux-x86-64.so.2
+ld.lld -L /usr/lib -s -o $1 $1.o -e $lldentry -pie $lldlibs --dynamic-linker=/lib64/ld-linux-x86-64.so.2
 echo "+1 LastError: $? `date`" >> $1.built
 rm $1.o
-strip --strip-unneeded $1
+strip -R .comment $1
 if [ -n "$2" ]; then
         if [ $2 == '-x'  ]; then
                 ./$1

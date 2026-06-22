@@ -1,5 +1,5 @@
 ; Self modifying code section example: it kind of replaces the missing '_code rwx' functionality,
-; apparently unavailable to dynamic ELF '.text' section.
+; unavailable to dynamic ELF '.text' section when using GNU 'ld' as linker.
 ; After succeeded mprotect() call, this '.text' section behaves the same as '_code rwx'.
 
 format ELF64
