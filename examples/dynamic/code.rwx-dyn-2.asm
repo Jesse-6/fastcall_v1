@@ -2,10 +2,10 @@
 ; '.text' section. It must be linked using either 'lld' or 'mold', because GNU 'ld'
 ; linker apply some kind of censorship regarding '.text' named section.
 ; Also naming code section other than '.text', messes up with a lot of things when
-; using GBU 'ld' linker, render a binary that has a RWX section, but is completely
+; using GNU 'ld' linker, render a binary that has a RWX section, but is completely
 ; broken/unusable.
 ;
-; NOTE: 'lld' or 'mold' aren't standard on Linus O.S.es. They must be installed
+; NOTE: 'lld' or 'mold' aren't standard on Linux O.S.es. They must be installed
 ; prior to its utilization. Any of these is good enough, but 'lld' delivers an
 ; even smaller binary than 'mold'.
 ;
