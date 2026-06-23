@@ -80,7 +80,7 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
         end match
     end macro
 
-    struc (point) entry line&   ; Allow: '_code Start entry endbr64' as entry point
+    struc (point) entry &line&   ; Allow: '_code Start entry endbr64' as entry point
         if defined __FASTCALL_v1_INCLUDED__
             entry point
         else if defined __FASTCALL_v2_INCLUDED__
@@ -90,6 +90,8 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
         end if
         match := instruction, line
             point: instruction
+        else match :, line
+            point:
         else
             point: line
         end match

@@ -19,8 +19,7 @@ include 'fastcall.inc'
 include 'stdmacros.inc'
 include 'stdio.inc'
 
-_code rwx   Start entry:        ; Issue at: 'https://board.flatassembler.net/topic.php?p=248646#248646'
-                                signal(SIGINT, &.break);    ; Issue is '.sublabel' cannot be used in the same line as 'label:'
+_code rwx   Start entry:        signal(SIGINT, &.break);
 
                                 fprintf(*stdout, "This program modifies a counter present in a code section!"\n);
 
@@ -44,3 +43,8 @@ _code rwx   Start entry:        ; Issue at: 'https://board.flatassembler.net/top
             align 16
             count               dq 0
             flags               db 1111_1110b
+
+; NOTE: The issue at: 'https://board.flatassembler.net/topic.php?p=248646#248646' has been quickly fixed, so,
+; I reupload this example as a clarification to this question.
+; Also, some minor tweaks on macro codes in this package were necessary to fix the issue related to these macros.
+;

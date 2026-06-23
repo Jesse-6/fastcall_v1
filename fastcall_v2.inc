@@ -57,7 +57,7 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 	__BSS_ONLINE__ = 0
 	__V_SECTION_OPEN__ = 0
 
-	macro _rdata line&  ; Read only initialized data segment
+	macro _rdata &line&  ; Read only initialized data segment
 		if __RDATA_ONLINE__ = 0
 			if __V_SECTION_OPEN__
 				esc end virtual
@@ -99,7 +99,7 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 		end if
 	end macro
 
-	macro _data line&   ; Read/write initialized data segment
+	macro _data &line&   ; Read/write initialized data segment
 		if __DATA_ONLINE__ = 0
 			if __V_SECTION_OPEN__
 				esc end virtual
@@ -141,7 +141,7 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 		end if
 	end macro
 
-	macro _bss line&	; NOTE: Beta stage: now it can be reused!
+	macro _bss &line&	; NOTE: Beta stage: now it can be reused!
 		if __BSS_ONLINE__ = 0
 			if __CODE_ONLINE__
 				err "_bss section macro must be placed before any _code statement!", 10
@@ -189,7 +189,7 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 		end if
 	end macro
 
-	macro _code line&   ; Code segment
+	macro _code &line&   ; Code segment
 		if __CODE_ONLINE__ = 0
 			if __V_SECTION_OPEN__
 				esc end virtual
@@ -231,6 +231,7 @@ if ~ defined __FASTCALL_v2_INCLUDED__
 				else
 					code
 				end match
+			else match =rwx?, line
 			else
 				line
 			end match

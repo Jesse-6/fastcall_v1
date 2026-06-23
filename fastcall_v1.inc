@@ -322,7 +322,7 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 	__BSS_ONLINE__ = 0
 	__V_SECTION_OPEN__ = 0
 
-	macro _rdata line&  ; Read only initialized data segment
+	macro _rdata &line&  ; Read only initialized data segment
 		if __ext_dcount_ > 0 | __ext_icount_ > 0 & ~ (__RDATA_ONLINE__ or __DATA_ONLINE__ \
 			or __CODE_ONLINE__ or __BSS_ONLINE__)
 			extern2_
@@ -366,7 +366,7 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 		end if
 	end macro
 
-	macro _data line&   ; Read/write initialized data segment
+	macro _data &line&   ; Read/write initialized data segment
 		if __ext_dcount_ > 0 | __ext_icount_ > 0 & ~ (__RDATA_ONLINE__ or __DATA_ONLINE__ \
 			or __CODE_ONLINE__ or __BSS_ONLINE__)
 			extern2_
@@ -410,7 +410,7 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 		end if
 	end macro
 
-	macro _bss line&	; NOTE: Beta stage: now it can be reused!
+	macro _bss &line&	; NOTE: Beta stage: now it can be reused!
 		if __ext_dcount_ > 0 | __ext_icount_ > 0 & ~ (__RDATA_ONLINE__ or __DATA_ONLINE__ \
 			or __CODE_ONLINE__ or __BSS_ONLINE__)
 			extern2_
@@ -469,7 +469,7 @@ if ~ defined __FASTCALL_v1_INCLUDED__
 		end if
 	end macro
 
-	macro _code line&   ; Code segment
+	macro _code &line&   ; Code segment
 		if __ext_dcount_ > 0 | __ext_icount_ > 0 & ~ (__RDATA_ONLINE__ or __DATA_ONLINE__ \
 			or __CODE_ONLINE__ or __BSS_ONLINE__)
 			extern2_
