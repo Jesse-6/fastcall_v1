@@ -83,7 +83,7 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
     __ENTRY_COUNT__ = 0
     struc (point) entry &line&   ; Allow: '_code Start entry endbr64' as entry point
         if __ENTRY_COUNT__
-            err "more than one entry point is now allowed"
+            err "more than one entry point is not allowed"
         else
             if defined __FASTCALL_v1_INCLUDED__
                 entry point
