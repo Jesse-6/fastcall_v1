@@ -8,14 +8,13 @@
 # your decision on how a section should be. Also deliver smaller executables than GNU 'ld'. Also runs fast.
 
 lldlibs="-lc"
-lldentry=Start
 if [ -f "$1.subver" ]; then
         echo -ne $(($(<$1.subver)+1)) > $1.subver
 else
         echo -ne 1 > $1.subver
 fi
 fasm2 -n $1.asm
-ld.lld -L /usr/lib -s -o $1 $1.o -e $lldentry -pie $lldlibs --dynamic-linker=/lib64/ld-linux-x86-64.so.2
+ld.lld -L /usr/lib -s -o $1 $1.o -pie $lldlibs --dynamic-linker=/lib64/ld-linux-x86-64.so.2
 echo "+1 LastError: $? `date`" >> $1.built
 rm $1.o
 strip -R .comment $1

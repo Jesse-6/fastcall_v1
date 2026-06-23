@@ -52,7 +52,7 @@ _code   Start entry:        libc.StartMain(&Main);
 ; How to compile:
 ;
 ; > fasm2 test.libexample.asm
-; > ld.lld -L /usr/lib -L. --rpath=. -s -e Start -lc -lexample -pie --dynamic-linker=/lib64/ld-linux-x86-64.so.2 -o test.libexample test.libexample.o
+; > ld.lld -L /usr/lib -L. --rpath=. -s -lc -lexample -pie --dynamic-linker=/lib64/ld-linux-x86-64.so.2 -o test.libexample test.libexample.o
 ; > rm test.libexample.o
 ; > strip -R .comment test.libexample
 ;

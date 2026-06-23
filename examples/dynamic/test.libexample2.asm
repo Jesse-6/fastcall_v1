@@ -26,7 +26,7 @@ _code   Start entry:        callback_at_exit(&ExitCB);
 ; How to compile:
 ;
 ; > fasm2 test.libexample2.asm
-; > ld.lld -L. --rpath=. -e Start -lexample -pie --dynamic-linker=/lib64/ld-linux-x86-64.so.2 -o test.libexample2 test.libexample2.o
+; > ld.lld -L. --rpath=. -lexample -pie --dynamic-linker=/lib64/ld-linux-x86-64.so.2 -o test.libexample2 test.libexample2.o
 ; > rm test.libexample2.o
 ; > strip -R .comment test.libexample2
 ;

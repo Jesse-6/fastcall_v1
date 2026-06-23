@@ -30,7 +30,7 @@ _code   Start entry:        dprintf(STDERR_FILENO, "Starting Neptune library fro
 ; To build project:
 ;
 ; > fasm2 locallib.asm
-; > ld.lld -L /usr/lib -L lib --rpath=lib -s -e Start -pie -lc -lneptune --dynamic-linker=/lib64/ld-linux-x86-64.so.2 -o locallib locallib.o
+; > ld.lld -L /usr/lib -L lib --rpath=lib -s -pie -lc -lneptune --dynamic-linker=/lib64/ld-linux-x86-64.so.2 -o locallib locallib.o
 ; > strip -R .comment locallib
 ;
 ; And then, run it:

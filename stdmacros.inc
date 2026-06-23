@@ -80,21 +80,27 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
         end match
     end macro
 
+    __ENTRY_COUNT__ = 0
     struc (point) entry &line&   ; Allow: '_code Start entry endbr64' as entry point
-        if defined __FASTCALL_v1_INCLUDED__
-            entry point
-        else if defined __FASTCALL_v2_INCLUDED__
-            public point
+        if __ENTRY_COUNT__
+            err "more than one entry point is now allowed"
         else
-            entry point
+            if defined __FASTCALL_v1_INCLUDED__
+                entry point
+            else if defined __FASTCALL_v2_INCLUDED__
+                public point as '_start' ; don't need to specify '-e <entryname>' to linker anymore
+            else
+                entry point
+            end if
+            match := instruction, line
+                point: instruction
+            else match :, line
+                point:
+            else
+                point: line
+            end match
+            __ENTRY_COUNT__ = __ENTRY_COUNT__ + 1
         end if
-        match := instruction, line
-            point: instruction
-        else match :, line
-            point:
-        else
-            point: line
-        end match
     end struc
 
     macro Main line&        ; self align Main label to be used with libc.StartMain
