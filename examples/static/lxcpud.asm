@@ -1,21 +1,17 @@
 include 'lxcpud.inc'
 
-_data
-        banner                  db 'Starting lxcpud daemon version '
-        version                 db '0.0 build: '
+_data   banner:                 db 'Starting lxcpud daemon version '
+        version:                db '0.0 build: '
                                 db '0-fasm2'
                                 db 10, 0
-        cfgFile                 db 'cpudaemon.data', 0
-        cpufreqPath             db '/sys/devices/system/cpu/cpu%u/cpufreq/%s', 0
-        num2str                 db '%u', 0
+        cfgFile:                db 'cpudaemon.data', 0
+        cpufreqPath:            db '/sys/devices/system/cpu/cpu%u/cpufreq/%s', 0
+        num2str:                db '%u', 0
 
-_bss
-        fdata                   STAT
-        tmpBuff                 rb 1024
+_bss    fdata                   STAT
+        tmpBuff:                rb 1024
 
-_code
-        Start:                  endbr64
-                                cmp     [rsp], dword 2
+_code   Start:                  cmp     [rsp], dword 2
                                 jne     @f
                                 mov     r10, [rsp+16]
                                 test    r10, r10
@@ -28,15 +24,15 @@ _code
                                 and     rdx, rax
                                 cmp     rdx, rcx
                                 je      @f2
-                        @@      fputs(<"Hello, I'm a daemon!",10,0>, **stderr);
+                        @@      fputs("Hello, I'm a daemon!"\n, **stderr);
                                 exit(1);
                                 
-                        @@      fputs(&banner, **stdout);
-                                open(&cfgFile, O_RDONLY,.);
+                        @@      fputs(banner, **stdout);
+                                open(cfgFile, O_RDONLY,.);
                                 test    eax, eax
                                 js      .errdaemon1
                                 mov     ebp, eax
-                                fstat(eax, &fdata);
+                                fstat(eax, fdata);
                                 test    eax, eax
                                 jz      @f
                 .errdaemon2:    close(ebp);
@@ -45,7 +41,7 @@ _code
                                 cmp     rbx, MAX_FILE_SIZE
                                 jbe     @f
                 .errdaemon3:    close(ebp);
-                                fputs(<"Invalid data file.",10,0>, **stderr);
+                                fputs("Invalid data file."\n, **stderr);
                                 exit(1);
                         @@      mov     r14, rbx
                                 malloc(rbx);
@@ -98,37 +94,37 @@ _code
                                 mov     r12d, edx
                                 xor     r13d, r13d
                                 
-                        @@@     snprintf(&tmpBuff, 1024, &cpufreqPath, r13d, "scaling_max_freq");
-                                open(&tmpBuff, O_WRONLY,.);
+                        @@@     snprintf(tmpBuff, 1024, cpufreqPath, r13d, "scaling_max_freq");
+                                open(tmpBuff, O_WRONLY,.);
                                 test    eax, eax
                                 js      @f7
                                 push    rbx
                                 push    r13
                                 mov     r13d, eax
-                                snprintf(&tmpBuff+512, 512, &num2str, dd [r15+rbx+CPUDATA.clkMax]);
+                                snprintf(tmpBuff+512, 512, num2str, [r15+rbx+CPUDATA.clkMax]);
                                 lea     r11, [tmpBuff+512]
                                 mov     [r11+rax], word 0Ah
-                                write(r13d, &tmpBuff+512, dd &eax+2);
+                                write(r13d, tmpBuff+512, eax+2);
                                 close(r13d);
                                 
-                                snprintf(&tmpBuff, 1024, &cpufreqPath, dd [rsp], \
+                                snprintf(tmpBuff, 1024, cpufreqPath, dd [rsp], \
                                         "scaling_min_freq");
-                                open(&tmpBuff, O_WRONLY,.);
+                                open(tmpBuff, O_WRONLY,.);
                                 test    eax, eax
                                 js      @f6
                                 mov     r13d, eax
-                                snprintf(&tmpBuff+512, 512, &num2str, \
-                                        dd [r15+rbx+CPUDATA.clkMin]);
+                                snprintf(tmpBuff+512, 512, num2str, \
+                                        [r15+rbx+CPUDATA.clkMin]);
                                 lea     r11, [tmpBuff+512]
                                 mov     [r11+rax], word 0Ah
-                                write(r13d, &tmpBuff+512, dd &eax+2);
+                                write(r13d, tmpBuff+512, eax+2);
                                 close(r13d);
                                 
                                 test    [r15+rbx+CPUDATA.flags], byte 1b
                                 jz      @f3
-                                snprintf(&tmpBuff, 1024, &cpufreqPath, \
+                                snprintf(tmpBuff, 1024, cpufreqPath, \
                                         dd [rsp], "scaling_governor");
-                                open(&tmpBuff, O_WRONLY,.);
+                                open(tmpBuff, O_WRONLY,.);
                                 test    eax, eax
                                 js      @f6
                                 mov     r13d, eax
@@ -146,14 +142,14 @@ _code
                         @@      xchg    ah, al
                                 stosw
                                 inc     edx
-                                write(r13d, &tmpBuff+512, edx);
+                                write(r13d, tmpBuff+512, edx);
                                 close(r13d);
                                 
                         @@      test    [r15+rbx+CPUDATA.flags], byte 10b
                                 jz      @f3
-                                snprintf(&tmpBuff, 1024, &cpufreqPath, dd [rsp], \
+                                snprintf(tmpBuff, 1024, cpufreqPath, dd [rsp], \
                                         "energy_performance_preference");
-                                open(&tmpBuff, O_WRONLY,.);
+                                open(tmpBuff, O_WRONLY,.);
                                 test    eax, eax
                                 js      @f3
                                 mov     r13d, eax
@@ -171,7 +167,7 @@ _code
                         @@      xchg    ah, al
                                 stosw
                                 inc     edx
-                                write(r13d, &tmpBuff+512, edx);
+                                write(r13d, tmpBuff+512, edx);
                                 close(r13d);
                                 
                         @@      nop
@@ -189,10 +185,10 @@ _code
                                 test    eax, eax
                                 js      .errdaemon1
                                 mov     r14d, eax
-                                fputs(<"Service lxcpud is done. All successfully.",10,0>, **stdout);
+                                fputs("Service lxcpud is done. All successfully."\n, **stdout);
                                 exit(r14d);
                                 
                 .errdaemon1:    errno();
                                 mov     r14d, [rax]
-                                perror("Service lxcpud unsuccessfull");
+                                perror("Service lxcpud unsuccessful");
                                 exit(r14d);

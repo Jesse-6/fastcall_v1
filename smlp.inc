@@ -7,7 +7,9 @@ if ~ defined __SMLP_FILE_INCLUDED__
     define __SMLP_FILE_INCLUDED__
 
     if ~ defined __USE_FASTCALL_v2__
-        library 'libsmlproto.so.0'
+        if ~ defined __ELF_MODE_DYNAMIC__
+            library 'libsmlproto.so.0'
+        end if
     end if
 
     ext proto SMLP_Cleanup, byte

@@ -1,9 +1,10 @@
 format ELF64
-public Start
+
+public Start as '_start'
 
 use AMD64, CET_IBT
 
-include 'fastcall.inc'
+include 'fastcall3.inc'
 
 ; include 'stdio.inc'
 ; include 'gtk3.inc'
@@ -43,7 +44,7 @@ _bss
 
 _code
         Start:          endbr64
-                        __libc_start_main(&lcMain, [rsp+8], &rsp+16, NULL, NULL, rdx, rsp);
+                        __libc_start_main(lcMain, [rsp+8], rsp+16, NULL, NULL, rdx, rsp);
 
         lcMain:         endbr64
                         push    rbp
@@ -56,9 +57,9 @@ _code
                         gtk_application_new("org.gtk3.fasmg.x64.gtkwindow", \
                                 G_APPLICATION_DEFAULT_FLAGS);
                         mov     [app], rax
-                        g_signal_connect(rax, "activate", &Activate, NULL);
-                        g_application_run(*app, r15d, r14);
-                        g_object_unref(*app);
+                        g_signal_connect(rax, "activate", Activate, NULL);
+                        g_application_run(app, r15d, r14);
+                        g_object_unref(app);
                         pop     r14
                         pop     r15
                         pop     rbp
@@ -67,14 +68,16 @@ _code
 
         Activate:       endbr64
                         push    rbp
-                        g_print(<"It worked!",10,0>);
-                        gtk_application_window_new(*app);
+                        g_print("It worked!"\n);
+                        gtk_application_window_new(app);
                         mov     [window], rax
                         gtk_window_set_title(rax, "Made with (fasm2 headers with) famsg!");
-                        gtk_window_set_default_size(*window, 530, 300);
-                        gtk_widget_set_opacity(*window, 0.93265);
-                        gtk_widget_get_opacity(*window);
-                        g_print(<"Opacity: %lf",10,0>, xmm0);
-                        gtk_widget_show_all(*window);
+                        gtk_window_set_default_size(window, 530, 300);
+                        gtk_widget_set_opacity(window, 0.93265);
+                        gtk_widget_get_opacity(window);
+                        g_print("Opacity: %lf"\n, xmm0);
+                        gtk_widget_show_all(window);
                         pop     rbp
                         ret
+
+; To compile: > ./build GTK3 gtktest

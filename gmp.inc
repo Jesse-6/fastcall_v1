@@ -3,34 +3,35 @@ if ~ defined __LIBGMP_INC_INCLUDED__
 	define __LIBGMP_INC_INCLUDED__
 
     if ~ defined __USE_FASTCALL_v2__
-        library 'libgmp.so.10'
+        if ~ defined __ELF_MODE_DYNAMIC__
+            library 'libgmp.so.10'
+        end if
     end if
 
-    ; Labeled macroinstructions for variables
-    struc mpz_t
-        label . : 16
-        emit 16, ?
-    end struc
+    ; Structures for variables
+    if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
+        err  "libgmp header needs stdmacro macros package to work properly"
+    else
+        struct mpz_t    ; By using v3 struct, all these data types become by reference
+            emit 16, ?  ; variables, which is the standard way to interface with libgmp.
+        end struct      ; Which means that they are recognized as pointer types by default.
 
-    struc mpq_t
-        label . : 32
-        emit 32, ?
-    end struc
+        struct mpq_t
+            emit 32, ?
+        end struct
 
-    struc mpf_t
-        label . : 24
-        emit 24, ?
-    end struc
+        struct mpf_t
+            emit 24, ?
+        end struct
 
-    struc gmp_randstate_t
-        label . : 32
-        emit 32, ?
-    end struc
+        struct gmp_randstate_t
+            emit 32, ?
+        end struct
 
-    struc gmp_randalg_t
-        label . : 4
-        emit 4, ?
-    end struc
+        struct gmp_randalg_t
+            emit 4, ?
+        end struct
+    end if
 
     ; Initialization Functions
     ext proto __gmpz_init, qword, alias mpz_init

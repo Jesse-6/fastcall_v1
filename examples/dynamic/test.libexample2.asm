@@ -2,15 +2,14 @@
 ; Also (directly) libc-less binary ;)
 format ELF64
 
-include 'fastcall.inc'
-include 'stdmacros.inc'
+include 'fastcall3.inc'
 
 ; libexample functions
 ext proto callback_at_exit, qword
 ext proto console_write, qword
 ext noreturn proto exit_group, dword    ; jmp prototype
 
-_code   Start entry:        callback_at_exit(&ExitCB);
+_code   Start entry:        callback_at_exit(ExitCB);
                             console_write("Library function called from example application!"\n);
                             exit_group(0);
 
@@ -23,7 +22,9 @@ _code   Start entry:        callback_at_exit(&ExitCB);
                             add         rsp, 8
                             ret
 
-; How to compile:
+; Easily build: > ./build test.libexample2 -L. --rpath=. -lexample
+
+; Step-by-step compile:
 ;
 ; > fasm2 test.libexample2.asm
 ; > ld.lld -L. --rpath=. -lexample -pie --dynamic-linker=/lib64/ld-linux-x86-64.so.2 -o test.libexample2 test.libexample2.o

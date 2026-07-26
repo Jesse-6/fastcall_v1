@@ -1,18 +1,15 @@
 format ELF64
 
-include 'fastcall.inc'
-include 'stdmacros.inc'
+include 'fastcall3.inc'
 
 ext proto printf, qword, vararg
-ext proto sleep, qword
+ext proto sleep, qword              ; unused prototype which will not be accounted at output
 ext noreturn proto exit, dword
 noreturn proto intexit, dword
 
-_bss
-        e_offset                dq ?
+_bss    e_offset                dq ?
 
-_code
-        _intexit:               endbr64
+_code   intexit:                endbr64
                                 nop
                                 nop
                                 nop
@@ -43,10 +40,11 @@ _code
                                 shl     rdx, 32
                                 or      rax, rdx
                                 push    rax
+
                                 ; test code goes here
-                                ;sleep(1);
                                 enter   0, 0
                                 leave
+                                
                                 mfence
                                 rdtsc
                                 shl     rdx, 32
@@ -60,6 +58,7 @@ _code
                                 sub     rcx, [e_offset]         ; Number of cycles
                                 add     rsp, 16                 ; release allocated stack
 
-                                printf("Done in %li cycles. Frame offset: %lu cycles."\n, rcx, *e_offset);
+                                printf("Done in %li cycles. Frame offset: %lu cycles."\n, rcx, e_offset);
                                 intexit(0);
 
+; To compile:  > ./build bmtest

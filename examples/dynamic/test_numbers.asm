@@ -1,23 +1,22 @@
 format ELF64
-public Start
 
-include 'fastcall.inc'
+include 'fastcall3.inc'
 include 'stdio.inc'
 
 PI = 3.14159265358979323846
 
-_code   Start:              endbr64
+_code   Start entry:        endbr64
                             printf(<"Testing signed numbers: %d, %ld, %d, %ld,", \
                                 "  %u, %ld, %d, %ld, %u, %ld, 0x%016lX",10,0>, \
-                                -578906, dq -2147483648, -2147483648, dq -1, 4294967295, \
-                                -4294967295, 0, -4294967296, +2147483647, +2147483648, \
-                                8000#0000#0000#0000h);
-                            printf(<"Value of π on FPU:   %.19Lf.",10,0>, π); ; TT or π is a tword only parameter!
-                            printf(<"π as a 64-bit float: %.19lf.",10,0>, PI);
+                                -578'906, dq -2'147'483'648, -2'147'483'648, dq -1, 4'294'967'295, \
+                                -4'294'967'295, 0, -4'294'967'296, +2'147'483'647, +2'147'483'648, \
+                                8000_0000_0000_0000h);
+                            printf("Value of π on FPU:   %.19Lf."\n, π); ; TT or π is a tword only parameter!
+                            printf("π as a 64-bit float: %.19lf."\n, PI);
                             mov         edx, PI
                             movd        xmm15, edx
                             cvtss2sd    xmm0, xmm15
-                            printf(<"π as a 32-bit float: %.19lf.",10,0>, xmm0);
+                            printf("π as a 32-bit float: %.19lf."\n, xmm0);
                             exit(EXIT_SUCCESS);
 
 ; NOTE
@@ -30,3 +29,5 @@ _code   Start:              endbr64
 ; If you have not defined TT or π, it will always be a tword parameter. So,
 ; for vararg, it is detected as tword type and size by default.
 ;
+
+; To compile: > ./build test_numbers

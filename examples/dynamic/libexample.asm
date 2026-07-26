@@ -2,13 +2,8 @@
 
 format ELF64
 
-
-
-include 'stdmacros.inc'
-include 'fastcall.inc'
+include 'fastcall3.inc'
 include 'stdio.inc'
-
-
 
 public _init    ; Legacy ELF standard function called on library load (always called*)
 public _fini    ; Same as above, but unload, only called when application uses __libc_start_main beforehand
@@ -17,11 +12,7 @@ public callback_at_exit
 public console_write
 public exit_group
 
-
-
 _data   callbackptr         dq 0
-
-
 
 _code   callback_at_exit:   endbr64
                             push        rbp
@@ -89,8 +80,14 @@ _code   callback_at_exit:   endbr64
                             lea         rsp, [rsp+8]
                             ret
 
+; Easily build this library:
+; 
+; > ./build LIB libexample
+;
+;
 
-
+; ### or, the standard doing it by hand way:
+; 
 ; Compiling:
 ;
 ; > fasm2 libexample.asm

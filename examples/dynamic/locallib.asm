@@ -1,7 +1,6 @@
 format ELF64
 
-include 'fastcall.inc'
-include 'stdmacros.inc'
+include 'fastcall3.inc'
 include 'stdio.inc'
 
 ; libneptune exported functions
@@ -18,6 +17,7 @@ _code   Start entry:        dprintf(STDERR_FILENO, "Starting Neptune library fro
 
                             ; All functions below are called from the example library
                             ; at 'lib/' directory
+                            PutString(\n "Hello from custom path example!", STDOUT_FILENO);
                             Neptune.Init();
                             GetLastError();
                             Sleep(1560);
@@ -27,12 +27,19 @@ _code   Start entry:        dprintf(STDERR_FILENO, "Starting Neptune library fro
                             Sleep(2600);
                             Return(ebx);
 
-; To build project:
+; To easily build this project:
+; 
+; > ./build locallib -L lib --rpath=lib -lneptune
+; 
+; 
+
+; Or to build project step by step:
 ;
 ; > fasm2 locallib.asm
 ; > ld.lld -L /usr/lib -L lib --rpath=lib -s -pie -lc -lneptune --dynamic-linker=/lib64/ld-linux-x86-64.so.2 -o locallib locallib.o
 ; > strip -R .comment locallib
 ;
+
 ; And then, run it:
 ;
 ; > ./locallib

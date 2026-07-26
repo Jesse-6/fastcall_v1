@@ -1,12 +1,13 @@
 ; Float point equation demo: fastcall supports float point numbers in equation!
-;  Handling it as a float pointer number/class result at compile time.
+; Handling it as a float pointer number/class result at compile time.
 
 format ELF64
-public Start
+
+public Start as '_start'
 
 use AMD64, CET_IBT
 
-include 'fastcall.inc'
+include 'fastcall3.inc'
 include 'stdio.inc'
 
 _code   Start:              endbr64
@@ -17,3 +18,5 @@ _code   Start:              endbr64
                                 (5 + 2 * (5 + 164) / 2 - 1098), \   ; Integer equation
                                 ('Jessé!!'));                       ; Chars as a number
                             exit(0);
+
+; To compile: > ./build floatequation

@@ -1,7 +1,6 @@
 format ELF64 executable 3 at 100_000h
 
-include 'fastcall.inc'
-include 'stdmacros.inc'
+include 'fastcall3.inc'
 include 'stdio.inc'
 
 libpath 'lib'           ; custom library path relative to this application's current folder

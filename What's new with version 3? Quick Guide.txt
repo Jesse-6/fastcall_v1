@@ -1,0 +1,43 @@
+    What's new at version 3?
+
+     - Problem with internal prototype is gone! So, the '_' thing is not needed (neither supported)
+anymore;
+     - Problem with label recognition and types are gone: now labels has embedded properties and
+are handled differently, depending on their definition type and context;
+     - Labels defined as 'label:' are now 'by reference' labels, being recognized as effective address
+labels by default;
+     - Labels defined as 'label db data' and similar, are now 'by value' labels, being recognized
+as [data] labels by default;
+     - Labels attached to defined structures (as in 'rect POINT', for example) are recognized as
+effective address labels by default;
+     - Statements regarding 'labels:' and 'labels dX data' are also valid within structures, even
+nested ones: being defined '.labels: dX any' as effective address type, and 'labels dX any' as data labels
+by default;
+     - Other labels, such as constants, define's or equ's are literal data labels, as it's always has been;
+     - Expressions involving at least one x86-64 register and signals +, - and/or * are now effective
+address by default;
+     - Other numeric expressions are numbers (handled) as literal data by default;
+     - All legacy type enforcement symbols (*, **, &, (), and []) are now type override symbols, and
+behave exactly as before: so, all default types aforementioned can be overriden by using classical syntax;
+     - Legacy syntax, except '_func:' (as stated), all supported as described;
+     - '*data' syntax type override is marked as deprecated: however, no plans to remove it so far: but
+consider this a recommendation to switch to '[data]' syntax or use the aforementioned label type autodetection
+feature, by specifying only 'data' as a parameter for a previous defined 'data dX any';
+     - All previous parameter types are still supported, and the same;
+     - All macros related to auxiliary 'stdmacros.inc' and 'anon_label.inc' files are updated, and now are
+a permanent part of the fastcall main header package: a disable feature is planned for upcoming versions;
+     - Only one '.inc' file is needed to be included to enjoy this package;
+     - Legacy versions 1 and 2 (with its respective auxiliary files and examples) are now moved to
+'legacy/' folder, and kept available if one find any issues with this new version: but they'll be removed as
+soon as stability is proven at version 3.
+     - The new header is not compatible with previous 'anon_label.inc' and stdmacros.inc' as well
+as 'fastcall.inc' headers: use only (for now) 'fastcall3.inc', as it already has upgraded versions
+of the same macros;
+     - Alongside with lots of features, this new version has been stated to perform up to 30% faster than the
+previous version, I suppose because most of its core functions are now calminstruction statements;
+     - 'struct' statement now create only the structure by default, saving names: one intended to use offsets
+using the structure name (e.g., rax+RECT.y) must pair its structure definition with 'end struct&'
+instead of 'end struct'. Otherwise, only the structure definition exists to be bound to variables.
+
+    See the examples to figure out how (clean and beautiful, and how) the syntax has changed since previous
+versions. They are a good reference, until I write a new manual on this.

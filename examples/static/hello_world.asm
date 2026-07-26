@@ -5,11 +5,10 @@
 
 format ELF64 executable 3 at 100000h
 
-include 'fastcall.inc'
-include 'stdmacros.inc'
+include 'fastcall3.inc'
 include 'stdio.inc'
 
-_code   Start entry:        libc.StartMain(&Main);      ; Just like C programs always does
+_code   Start entry:        libc.StartMain(Main);       ; Just like C programs always does
 
 
 

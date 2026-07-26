@@ -1,7 +1,6 @@
 format ELF64
 
-include 'fastcall.inc'
-include 'stdmacros.inc'
+include 'fastcall3.inc'
 
 ; Prototypes
 ext proto close, dword
@@ -16,7 +15,7 @@ ext proto read, dword, qword, qword
 ext proto snprintf, qword, qword, qword, vararg
 ext proto write, dword, qword, qword
 ext proto __errno_location, none, alias errno
-ext data stdin, stdout, stderr
+ext data stdin:qword, stdout:qword, stderr:qword
 
 struct CPUDATA
   .clkMin       dd ?
@@ -25,7 +24,7 @@ struct CPUDATA
   .off_enProf   dd ?
   .flags        db ?
                 rb 7
-end struct
+end struct&           ; create CPUDATA offset symbol
 
 struct FILEHEADER
   .NumProcs      dd ?
@@ -34,7 +33,7 @@ struct FILEHEADER
   .OffsetGov     dd ?
   .OffsetEnp     dd ?
   .OffsetCPUData dd ?
-end struct
+end struct&           ; create FILEHEADER offset symbol
 
 struct STAT
   .st_dev       dq ?
@@ -52,12 +51,12 @@ struct STAT
   .stmtim       TIMESPEC
   .stctim       TIMESPEC
                 rq 3
-end struct
+end struct            ; default STAT structure definition only: without offset symbol
 
 struct TIMESPEC
   .tv_sec       dq ?
   .tv_nsec      dq ?
-end struct
+end struct            ; same for TIMESPEC
 
 MAX_FILE_SIZE = 65535
 

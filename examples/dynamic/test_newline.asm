@@ -20,29 +20,30 @@
 ;
 format ELF64
 
-include 'fastcall.inc'
-include 'stdmacros.inc'
+include 'fastcall3.inc'
 include 'stdio.inc'
 
 _code   Start entry         endbr64
 
-                            fputs("The most common usage case."\n, [stdout]);
-                            fputs(\n "A not so common format, ", [stdout]);
-                            fputs("and another uncommon one"\n "here.", *stdout);
-                            fputs(\n "But this one should occur quite often."\n, [stdout]);
-                            fputs("And this too..."\n\n, [stdout]);
-                            fputs(\n\n "Although this one not.", [stdout]);
-                            fputs(\n "This one is"\n "quite complex.", [stdout]);
+                            fputs("The most common usage case."\n, stdout);
+                            fputs(\n "A not so common format, ", stdout);
+                            fputs("and another uncommon one"\n "here.", stdout);
+                            fputs(\n "But this one should occur quite often."\n, stdout);
+                            fputs("And this too..."\n\n, stdout);
+                            fputs(\n\n "Although this one not.", stdout);
+                            fputs(\n "This one is"\n "quite complex.", stdout);
                             fputs\
                             (\n "But the most complex possible variation"\n "is this."\n, \
-                                [stdout]);
-                            fputs("A common usage with"\n "two '\n' chars."\n, *stdout);
+                                stdout);
+                            fputs("A common usage with"\n "two '\n' chars."\n, stdout);
                             fputs\
-                            (\n "This is the" \n "safest approach possible", *stdout);
-                            fputs(" as pointed at" \n "comments." \n, [stdout]);
+                            (\n "This is the" \n "safest approach possible", stdout);
+                            fputs(" as pointed at" \n "comments." \n, stdout);
                             fputs(<"For all other uses, ", \
                                 "and for other special characters, ", \
                                 "one should use the classic literal ", \
-                                27,"[33m","<""Anything else", \
-                                """,""format."",10,0>",27,"[0m.",10,0>, *stdout);
+                                27,"[1;38;5;214m","<""Anything else", \
+                                """,""format."",10,0>",27,"[0m.",10,0>, stdout);
                             exit(0);
+
+; To compile: > ./build test_newline

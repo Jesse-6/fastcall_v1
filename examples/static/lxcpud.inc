@@ -1,34 +1,7 @@
 format ELF64 executable 3 at 100000h
 entry Start
 
-; :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-; A simple struct/ends structure macro that allows to use
-;   struct NAME.child as displacement, and also gets size
-;   information based on NAME
-;
-; Example:      mov eax, [rsi+CPUDATA.clkMax]
-;               add r10, sizeof(CPUDATA)
-;
-macro struct? name
-     define __ACTUAL__ name
-     esc struc name
-     label . : .size - .
-end macro
-
-macro ends?!
-     .size:
-     esc end struc
-     virtual at 0
-          match a, __ACTUAL__
-               a a
-          end match
-     end virtual
-end macro
-;
-; :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-include 'fastcall.inc'
-include 'anon_label.inc'
+include 'fastcall3.inc'
 
 library 'libc.so.6'
 
@@ -54,7 +27,7 @@ struct CPUDATA
   .off_enProf   dd ?
   .flags        db ?
                 rb 7
-ends
+end struct&           ; create offset name CPUDATA to be used indepently
 
 struct FILEHEADER
   .NumProcs      dd ?
@@ -63,7 +36,7 @@ struct FILEHEADER
   .OffsetGov     dd ?
   .OffsetEnp     dd ?
   .OffsetCPUData dd ?
-ends
+end struct&           ; create offset name FILEHEADER
 
 struct STAT
   .st_dev       dq ?
@@ -80,12 +53,13 @@ struct STAT
   .statim       TIMESPEC
   .stmtim       TIMESPEC
   .stctim       TIMESPEC
-ends
+                rq 3
+end struct
 
 struct TIMESPEC
   .tv_sec       dq ?
   .tv_nsec      dq ?
-ends
+end struct
 
 MAX_FILE_SIZE = 65535
 

@@ -1,11 +1,10 @@
 format ELF64
 
-include 'stdmacros.inc'
-include 'fastcall.inc'
+include 'fastcall3.inc'
 include 'stdio.inc'
 
 _data                              ;   08   19   2A   3B   4C   5D   6E   7F
-     escapetable:                  db 255, 255, '"', 255, 255, 255, 255, "'" ; 20 - 27
+          escapetable:             db 255, 255, '"', 255, 255, 255, 255, "'" ; 20 - 27
                                    db 255, 255, 255, 255, 255, 255, 255, 255 ; 28 - 2F
                                    db 254, 254, 254, 254, 254, 254, 254, 254 ; 30 - 37
                                    db 255, 255, 255, 255, 255, 255, 255, '?' ; 38 - 3F
@@ -18,8 +17,7 @@ _data                              ;   08   19   2A   3B   4C   5D   6E   7F
                                    db 255, 255, 013, 255, 009, 255, 011, 255 ; 70 - 77
                                    db 253, 255, 255, 255, 255, 255, 255, 255 ; 78 - 7F
 
-_code
-          ParseEscapedString:      endbr64   ; rdi = destination buffer; rsi = source string
+_code     ParseEscapedString:      endbr64   ; rdi = destination buffer; rsi = source string
                                    push      rbx
                                    lea       rbx, [escapetable-20h]
                .nextchar:          lodsb
@@ -121,12 +119,6 @@ _code
           Start entry:             endbr64
                                    cmp       [rsp], dword 2
                                    jne       .err0
-                                   ; mov       rdx, [stdout]
-                                   ; mov       rcx, [stderr]
-                                   ; mov       rdx, [rdx]
-                                   ; mov       rcx, [rcx]
-                                   ; mov       [stdout], rdx
-                                   ; mov       [stderr], rcx
                                    mov       rbp, [rsp+16]  ; argv[1]
                                    mov       rdi, [rsp+16]  ; argv[1]
                                    xor       al, al
@@ -150,3 +142,5 @@ _code
 
                .err1:              perror("Parsing failed");
                .err0:              exit(1);
+
+; To compile: > ./build str_escape

@@ -1,4 +1,4 @@
-; libnotify.so.4.0.0 fasm2 fastcall_v1 header
+; libnotify.so.4.0.0 fasm2 fastcall header
 ;
 ; Library documentation is at: https://gnome.pages.gitlab.gnome.org/libnotify/index.html
 ;
@@ -9,7 +9,9 @@ if ~ defined __LIB_NOTIFY_INCLUDED__
     define __LIB_NOTIFY_INCLUDED__
 
     if ~ defined __USE_FASTCALL_v2__
-        library 'libnotify.so.4.0.0'
+        if ~ defined __ELF_MODE_DYNAMIC__
+            library 'libnotify.so.4.0.0'
+        end if
     end if
 
     define NOTIFY_CLOSED_REASON_UNSET       -1

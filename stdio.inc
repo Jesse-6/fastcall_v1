@@ -3,9 +3,11 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define __STDIO_INC_INCLUDED__
 
 	if ~ defined __USE_FASTCALL_v2__
-		library 'libc.so.6'
-		if defined __INCLUDE_LIBPTHREAD__	; older distros might need this to work!
-			library 'libpthread.so.0'
+		if ~ defined __ELF_MODE_DYNAMIC__
+			library 'libc.so.6'
+			if defined __INCLUDE_LIBPTHREAD__	; older distros might need this to work!
+				library 'libpthread.so.0'
+			end if
 		end if
 	end if
 
@@ -576,6 +578,8 @@ if ~ defined __STDIO_INC_INCLUDED__
 
 	if defined __USE_FASTCALL_v2__
 		ext data stdin:qword, stdout:qword, stderr:qword
+	else if defined __ELF_MODE_DYNAMIC__
+		ext data stdin:qword, stdout:qword, stderr:qword
 	else
 		ext data stdin, stdout, stderr
 	end if
@@ -795,7 +799,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 
 	macro libc.StartMain mainproc
 		match (mainptr), mainproc
-			__libc_start_main(mainptr, [rsp+8], &rsp+16, NULL, NULL, rdx, rsp);
+			__libc_start_main(mainptr, [rsp+8], rsp+16, NULL, NULL, rdx, rsp);
 		else
 			err "Invalid syntax.", 10
 		end match

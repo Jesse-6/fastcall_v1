@@ -1,0 +1,19 @@
+; Float point equation demo: fastcall supports float point numbers in equation!
+;  Handling it as a float pointer number/class result at compile time.
+
+format ELF64
+public Start
+
+use AMD64, CET_IBT
+
+include 'fastcall.inc'
+include 'stdio.inc'
+
+_code   Start:              endbr64
+                            printf(<"Float equation result: %.2lf",10, \
+                                "Integer equation result: %d",10, \
+                                "Chars qword value: 0x%lX",10,0>, \
+                                (5 - 3.14 + (0.33 * 2)), \          ; Float point equation
+                                (5 + 2 * (5 + 164) / 2 - 1098), \   ; Integer equation
+                                ('Jessé!!'));                       ; Chars as a number
+                            exit(0);

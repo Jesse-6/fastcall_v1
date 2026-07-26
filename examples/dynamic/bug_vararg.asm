@@ -1,7 +1,6 @@
 format ELF64
 
-include 'fastcall.inc'
-include 'stdmacros.inc'
+include 'fastcall3.inc'
 
 ext proto sprintf, qword, qword, vararg
 ext proto printf, qword, qword, qword, qword, qword, qword, qword, qword, qword
@@ -13,28 +12,32 @@ _data
         bfloat                  dt 532353.190901
 
 _bss
-        buffer                  rb 1024
+        buffer:                 rb 1024
 
 _code   Start entry:            endbr64
                                 mov         r12, rdx
-                                sprintf(&buffer, "This is a test. %016lX", [r12]);
-                                puts(&buffer);
-                                sprintf(&buffer, "This %s%s%s%s%s%s", "call ", "type ", "has ", \
+                                sprintf(buffer, "This is a test. %016lX", [r12]);
+                                puts(buffer);
+                                sprintf(buffer, "This %s%s%s%s%s%s", "call ", "type ", "has ", \
                                     "no ", "problems ", "anymore.");
-                                puts(&buffer);
+                                puts(buffer);
                                 printf(<"Also this %s%s%s%s%s%s%s%s",10,0>, "fixed ca", "ll type ", "has ", \
                                     "never ", "had ", "problems ", "at ", "all.");
-                                sprintf(&buffer, "A float 64 value: %.4f", dp *float1);
-                                puts(&buffer);
+                                sprintf(buffer, "A float 64 value: %.4f", dp float1);
+                                puts(buffer);
                                 finit
                                 fld         [float1]
                                 fld         [bfloat]
                                 fldpi
                                 fld1
-                                sprintf(&buffer, "2 float 80 values: %.1Lf %.4Lf", st0, st3);
-                                puts(&buffer);
-                                sprintf(&buffer, "A float 80 value: %.6Lf", dt 8008001.111666);
-                                puts(&buffer);
-                                sprintf(&buffer, "π value: %.18Lf.", TT);
-                                puts(&buffer);
+                                sprintf(buffer, "2 float 80 values: %.1Lf %.4Lf", st0, st3);
+                                puts(buffer);
+                                sprintf(buffer, "A float 80 value: %.6Lf", dt 8008001.111666);
+                                puts(buffer);
+                                sprintf(buffer, "π value: %.18Lf.", TT);
+                                puts(buffer);
+                                sprintf(buffer, "This is also π number value: %.18Lf.", π);
+                                puts(buffer);
                                 exit(0);
+
+; To compile: ./build bug_vararg

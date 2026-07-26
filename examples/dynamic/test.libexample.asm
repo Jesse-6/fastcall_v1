@@ -3,8 +3,7 @@
 
 format ELF64
 
-include 'fastcall.inc'
-include 'stdmacros.inc'
+include 'fastcall3.inc'
 
 ; libexample functions
 ext proto callback_at_exit, qword
@@ -19,7 +18,7 @@ ext noreturn indirect proto __libc_start_main, qword, dword, qword, qword, qword
 
 macro libc.StartMain mainproc
     match (mainptr), mainproc
-        __libc_start_main(mainptr, [rsp+8], &rsp+16, NULL, NULL, rdx, rsp);
+        __libc_start_main(mainptr, [rsp+8], rsp+16, NULL, NULL, rdx, rsp);
     else
         err "Invalid syntax.", 10
     end match
@@ -27,12 +26,12 @@ end macro
 
 
 
-_code   Start entry:        libc.StartMain(&Main);
+_code   Start entry:        libc.StartMain(Main);
 
 
         Main:               sub         rsp, 8
 
-                            callback_at_exit(&ExitCB);
+                            callback_at_exit(ExitCB);
                             console_write("Hello from example library!"\n);
                             puts("Test program is running...");
 
@@ -49,7 +48,9 @@ _code   Start entry:        libc.StartMain(&Main);
                             lea         rsp, [rsp+8]
                             ret
 
-; How to compile:
+; Easily build: > ./build test.libexample -L. --rpath=. -lexample
+
+; Or, compile it step by step:
 ;
 ; > fasm2 test.libexample.asm
 ; > ld.lld -L /usr/lib -L. --rpath=. -s -lc -lexample -pie --dynamic-linker=/lib64/ld-linux-x86-64.so.2 -o test.libexample test.libexample.o

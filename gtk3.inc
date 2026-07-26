@@ -3,21 +3,23 @@ if ~ defined __GTK3_INC_INCLUDED__
 	define __GTK3_INC_INCLUDED__
 
     if ~ defined __USE_FASTCALL_v2__
-        library 'libgtk-3.so.0'
-        library 'libgdk-3.so.0'
-        library 'libz.so.1'
-        library 'libpangocairo-1.0.so.0'
-        library 'libpango-1.0.so.0'
-        library 'libharfbuzz.so.0'
-        library 'libatk-1.0.so.0'
-        library 'libcairo-gobject.so.2'
-        if ~ defined __CAIRO_INC_INCLUDED__
-            library 'libcairo.so.2'
+        if ~ defined __ELF_MODE_DYNAMIC__
+            library 'libgtk-3.so.0'
+            library 'libgdk-3.so.0'
+            library 'libz.so.1'
+            library 'libpangocairo-1.0.so.0'
+            library 'libpango-1.0.so.0'
+            library 'libharfbuzz.so.0'
+            library 'libatk-1.0.so.0'
+            library 'libcairo-gobject.so.2'
+            if ~ defined __CAIRO_INC_INCLUDED__
+                library 'libcairo.so.2'
+            end if
+            library 'libgdk_pixbuf-2.0.so.0'
+            library 'libgio-2.0.so.0'
+            library 'libgobject-2.0.so.0'
+            library 'libglib-2.0.so.0'
         end if
-        library 'libgdk_pixbuf-2.0.so.0'
-        library 'libgio-2.0.so.0'
-        library 'libgobject-2.0.so.0'
-        library 'libglib-2.0.so.0'
     end if
 
     define G_APPLICATION_DEFAULT_FLAGS 0

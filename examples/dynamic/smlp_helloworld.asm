@@ -5,8 +5,7 @@
 
 format ELF64
 
-include 'fastcall.inc'
-include 'stdmacros.inc'
+include 'fastcall3.inc'
 include 'stdio.inc'
 include 'smlp.inc'
 
@@ -104,7 +103,7 @@ _code   Start entry:            endbr64
 
                                 SMLP_ParseEscapedString([rax], [rax]);
 
-                                fprintf(*stdout, [rbx], rbp, [rbx+8]);
+                                fprintf(stdout, [rbx], rbp, [rbx+8]);
 
                                 add         r15, 8
                                 cmp         [r15], byte -1
@@ -119,4 +118,10 @@ _code   Start entry:            endbr64
                                 exit(0);
 
             .err:               exit(1);
+
+; NOTE: To run this, you'll need to install libsmlproto; or, download the library and
+; link this project locally. See test.libexample.asm and locallib.asm to see how to 
+; do it properly.
+
+; To compile: > ./build smlp_helloworld -l:libsmlproto.so.0
 

@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+
+# Easy compile shell script with fasm2 assembler
+# By Jessé Gonçalves (jesse6)
+# NOTE: it requires 'lld' linker to be installed, as well as fasm2!
+#
+# Usage:     build MODE file options
+#            build file options
+#
+# NOTE: options will be appended to the linker command line.
+
+if [[ $# < 1 ]]; then
+    echo -ne "Usage is:\n           \e[1mbuild [MODE] file options\e[0m\n"
+    echo -ne "           \e[1mbuild file options\e[0m\n"
+    echo -ne "\n\nMODE can be: GTK3, GTK4, LIB or RAW for no libc linking.\n"
+    echo -ne "If omitted, then files will be linked with libc only by default.\n"
+    exit
+fi
+
+ldline='-L /usr/lib -s -lc'
+
+# Get construction options
+if [[ $1 == 'LIB' ]]; then
+    dest=$2
+    shift 2
+    ldline="$ldline --shared $@"
+    mode=LIB
+elif [[ $1 == 'GTK3' ]]; then
+    dest=$2
+    shift 2
+    ldline="$ldline `pkg-config --libs gtk+-3.0` -pie --dynamic-linker=/lib64/ld-linux-x86-64.so.2 $@"
+    mode=EXEC
+elif [[ $1 == 'GTK4' ]]; then
+    dest=$2
+    shift 2
+    ldline="$ldline `pkg-config --libs gtk4` -pie --dynamic-linker=/lib64/ld-linux-x86-64.so.2 $@"
+    mode=EXEC
+elif [[ $1 == 'RAW' ]]; then
+    dest=$2
+    shift 2
+    ldline="-L /usr/lib -s -pie --dynamic-linker=/lib64/ld-linux-x86-64.so.2 $@"
+    mode=EXEC
+else
+    dest=$1
+    shift 1
+    ldline="$ldline -pie --dynamic-linker=/lib64/ld-linux-x86-64.so.2 $@"
+    mode=EXEC
+fi
+
+# Parse filename without extension
+ext=${dest##*.}
+
+# Iterate to remove extension and remove previously compiled file (if exists)
+# Also adjust 'dest' to contain only file name, without the last extension
+if [[ $ext != asm ]]; then
+    if [[ $mode == LIB ]]; then
+        if [ -f $dest.so ]; then
+            rm $dest.so
+        fi
+    else
+        if [ -f $dest ]; then
+            rm $dest
+        fi
+    fi
+else
+    dest=${dest%.*}
+    if [[ $mode == LIB ]]; then
+        if [ -f $dest.so ]; then
+            rm $dest.so
+        fi
+    else
+        if [ -f $dest ]; then
+            rm $dest
+        fi
+    fi
+fi
+
+# Count compilation times at dest.subver file
+if [ -f "$dest.subver" ]; then
+        echo -ne $(($(<$dest.subver)+1)) > $dest.subver
+else
+        echo -ne 1 > $dest.subver
+fi
+
+# Check source file existence and compile it
+if [ -f $dest.asm ]; then
+    echo -ne "Bash Assembly Builder Utility - version 0.1\n"
+    echo -ne "With: \e[96m"
+    fasm2 $FASM2_OPTIONS $dest.asm
+    echo -ne "\n\e[0m"
+else
+    echo -ne "File '$dest' does not exist.\n"
+    exit 1
+fi
+
+# Check object file existence and link it, if exists
+if [[ $mode == LIB ]]; then
+    if [ -f $dest.o ]; then
+        ld.lld $LLD_OPTIONS $ldline $dest.o -o $dest.so
+    fi
+elif [[ $mode == EXEC ]]; then
+    if [ -f $dest.o ]; then
+        ld.lld $LLD_OPTIONS $ldline $dest.o -o $dest
+    fi
+fi
+
+# Remove object file and flag
+# STRIP (for dymamic executables that has been linked with lld) (format ELF64)
+# or SKIP (for static executables made only with fasm2) (format ELF64 executable 3)
+if [ -f $dest.o ]; then
+    rm $dest.o
+    lmode=STRIP
+else
+    lmode=SKIP
+fi
+
+# Optimize size by removing '.comment' section off final binary
+if [[ $mode == LIB ]]; then
+    if [ -f $dest.so ]; then
+        if [[ $lmode == STRIP ]]; then
+            strip $STRIP_OPTIONS -R .comment $dest.so
+        fi
+        echo -ne "Build of $dest.so is done.\nFile size: `stat -c %s $dest.so` bytes.\n"
+    else
+        echo -ne "\n\e[31mBuild of $dest.so has failed.\e[0m\n"
+    fi
+else
+    if [ -f $dest ]; then
+        if [[ $lmode == STRIP ]]; then
+            strip $STRIP_OPTIONS -R .comment $dest
+        fi
+        echo -ne "Build of $dest is done.\n"
+        if [[ $lmode != SKIP ]]; then
+            echo -ne "File size: `stat -c %s $dest` bytes.\n"
+        fi
+    else
+        echo -ne "\n\e[31mBuild of $dest has failed.\e[0m\n"
+    fi
+fi
+

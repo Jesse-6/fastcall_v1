@@ -1,7 +1,8 @@
 format ELF64
-public Start
 
-include 'fastcall.inc'
+public Start as '_start'
+
+include 'fastcall3.inc'
 include 'stdio.inc'
 
 _bss align 4096         ; bss segment and output point
@@ -36,13 +37,13 @@ _code                           fldpi
                                 nop     ; (¹)
 
 _data   ; This will be appended to the data output point above
-        fstring0                db 'String at cascading virtual data.', 10, 0
+        fstring0:               db 'String at cascading virtual data.', 10, 0
 
 _code   ; close virtual data above and restore the bare metal code segment from previous point (¹)
-                                fprintf(*stdout, <"New float80 algorithm: ", \
+                                fprintf(stdout, <"New float80 algorithm: ", \
                                     "%Lf, %Lf, %Lf, %Lf, %.18Lf.",10,0>, \
-                                    dt 1.0, dt 0.0, *floatnum, dt 100101.564732, st6);
-                                fprintf(*stdout, &fstring0);
+                                    dt 1.0, dt 0.0, floatnum, dt 100101.564732, st6);
+                                fprintf(stdout, fstring0);
                                 mov         [endptr], -1
                                 lea         rax, [array]
                                 lea         rdx, [buffer]
@@ -50,4 +51,4 @@ _code   ; close virtual data above and restore the bare metal code segment from 
                                 lea         r8, [endptr]
                                 exit(EXIT_SUCCESS);
 
-; NOTE: as of 2026-03-01, I redid this example to suit the newest features, including the fix at _bss macro. Which is  completely reusable now, just like _rdata, _data and _code.
+; To compile: > ./build test4

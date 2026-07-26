@@ -4,8 +4,7 @@
 
 format ELF64 executable 3
 
-include 'fastcall.inc'
-include 'stdmacros.inc'
+include 'fastcall3.inc'
 include 'stdio.inc'
 include 'smlp.inc'
 
@@ -88,8 +87,7 @@ _rdata  locales:                db 'af_ZA', 0, 0, 0
                                 db 'zu_ZA', 0, 0, 0
                                 db -1
 
-_code   Start entry:            endbr64
-                                sub         rsp, 32
+_code   Start entry:            sub         rsp, 32
 
                                 lea         r15, [locales]
                         @@      snprintf(rsp, 32, "%s.UTF-8", r15);
@@ -110,7 +108,7 @@ _code   Start entry:            endbr64
                                 je          @f
 
                                 SMLP_Cleanup(TRUE);
-                                usleep(250000);
+                                usleep(250'000);
                                 jmp         @b
 
                         @@      SMLP_Cleanup(FALSE);

@@ -1,26 +1,26 @@
-; Self modifying code section example: it kind of replaces the missing '_code rwx' functionality,
+; Self modifying code section example: it kind of replaces '_code rwx' functionality,
 ; unavailable to dynamic ELF '.text' section when using GNU 'ld' as linker.
 ; After succeeded mprotect() call, this '.text' section behaves the same as '_code rwx'.
+; NOTE: to not have these problems, install and use 'lld' or 'mold' as linkers instead.
 
 format ELF64
 
-include 'fastcall.inc'
-include 'stdmacros.inc'
+include 'fastcall3.inc'
 include 'stdio.inc'
 
 _code   Start entry:        lea         rdi, [$]
                             mov         r10, 0_FFFF_FFFF_FFFF_F000h
                             and         rdi, r10
-                            mprotect(rdi, 4096, (PROT_READ or PROT_WRITE or PROT_EXEC));
+                            mprotect(rdi, 4096, PROT_READ or PROT_WRITE or PROT_EXEC);
                             test        eax, eax
                             jz          @f
-                            fprintf(*stderr, &errfmt, "failed: ");
+                            fprintf(stderr, errfmt, "failed: ");
                             perror(NULL);
                             exit(1);
 
-                    @@      fprintf(*stderr, &errfmt, "succeeded!"\n);
+                    @@      fprintf(stderr, errfmt, "succeeded!"\n);
 
-                            signal(SIGINT, &.break);
+                            signal(SIGINT, .break);
 
                     @@      inc         [count]
 
@@ -28,24 +28,24 @@ _code   Start entry:        lea         rdi, [$]
                             test        [flags], 1
                             jnz         .end
 
-                            fprintf(*stdout, <13,"Code section counter value: %lu",0>, *count);
-                            fflush(*stdout);
+                            fprintf(stdout, <13,"Code section counter value: %lu",0>, count);
+                            fflush(stdout);
                             jmp         @b
 
-            .end:           fprintf(*stdout, "%s"\n "Finished."\n, <8,8,"  ",0>);
+            .end:           fprintf(stdout, "%s"\n "Finished."\n, <8,8,"  ",0>);
                             exit(0);
 
             .break:         or          [flags], 1
                             ret
 
-        errfmt              xb 'Change memory protection %s', 0
+        errfmt:             xb 'Change memory protection %s', 0
 
         count               xq 0
         flags               xb 1111_1110b
 
 ; To compile:
 ;
-; > ./build.sh code.rwx-dyn
+; > ./build code.rwx-dyn
 ;
 ; And then, run it:
 ;

@@ -1,4 +1,4 @@
-; This is a demo on the new feature: \n
+; This is a demo on the feature: \n
 ; It makes anon string parameters new line + null terminated,
 ; To make it as feasible as "string" parameter (which is also auto null terminated)
 ; Also to beautify your code :)
@@ -20,12 +20,10 @@
 
 format ELF64 executable 3
 
-include 'fastcall.inc'
-include 'stdmacros.inc'
+include 'fastcall3.inc'
 include 'stdio.inc'
 
-_code   Start entry:        endbr64
-                            fputs(<"This is the old fashioned way...",10,0>, **stdout);
+_code   Start entry:        fputs(<"This is the old fashioned way...",10,0>, **stdout);
                             fputs("And this is the NEW way!"\n, **stdout);
                             fputs("It is already auto null terminated."\n, **stdout);
                             fputs("Just like this format.", **stdout);

@@ -1,23 +1,21 @@
 format ELF64
 
-public Start
-
 use AMD64, CET_IBT
 
-include 'fastcall.inc'
+include 'fastcall3.inc'
+
+entry Start     ; This also works here, with fastcall version 3. Wraps to: 'public Start as '_start''
 
 TRUE    = 1
 FALSE   = 0
 NULL    = 0
-
 
 ext proto puts, qword
 ext noreturn proto __libc_start_main, qword, dword, qword, qword, qword, qword, qword, alias st_main
 ext proto printf, qword, vararg
 ext proto getpid, none
 
-_rdata
-        bytevar         db 1
+_rdata  bytevar         db 1
         wordvar         dw 2
         dwordvar        dd 4
         qwordvar        dq 8
@@ -33,7 +31,7 @@ _rdata
 
 _code   Start:          endbr64
                         ; WARNING! See the user guide about using rsp register as parameters! WARNING!
-                        st_main(&lcMain, [rsp+8], &rsp+16, NULL, NULL, rdx, rsp);
+                        st_main(lcMain, [rsp+8], rsp+16, NULL, NULL, rdx, rsp);
                         ud2
 
         lcMain:         endbr64
@@ -41,40 +39,41 @@ _code   Start:          endbr64
                         push    r14
                         enter   0, 0
                         getpid();
-                        printf(<"Starting test process with PID: %u",10,0>, eax);
+                        printf("Starting test process with PID: %u"\n, eax);
                         nop
                         nop
-                        printf(<"Test TRUE | FALSE: %d | %d",10,0>, TRUE, FALSE);
+                        printf("Test TRUE | FALSE: %d | %d"\n, TRUE, FALSE);
                         xor     esi, esi
                         nop
                         nop
-                        printf(<"Test force byte 0x%02X",10,0>, db 127);
+                        printf("Test force byte 0x%02X"\n, db 127);
                         xor     esi, esi
                         nop
                         nop
-                        printf(<"Test force word 0x%04X",10,0>, dw 32767);
+                        printf("Test force word 0x%04X"\n, dw 32767);
                         nop
                         nop
-                        printf(<"Test force dword 0x%08X",10,0>, dd 80000000h);
+                        printf("Test force dword 0x%08X"\n, dd 80000000h);
                         nop
                         nop
-                        printf(<"Test force float %.4f",10,0>, df 1000.5000);
+                        printf("Test force float %.4f"\n, df 1000.5000);
                         nop
                         nop
-                        printf(<"Test force double %.4lf",10,0>, dp 1.2345);
+                        printf("Test force double %.4lf"\n, dp 1.2345);
                         nop
                         nop
-                        printf(<"Byte var: %u",10,0>, *bytevar);
-                        printf(<"Word var: %u",10,0>, *wordvar);
-                        printf(<"Dword var: %u",10,0>, *dwordvar);
-                        printf(<"Qword var: %u",10,0>, *qwordvar);
-                        printf(<"Float var: %.1f",10,0>, df *floatvar);
-                        printf(<"Double var: %.1lf",10,0>, dp *doublevar);
-                        printf(<"Tword var: %.2Lf",10,0>, *twordvar);
+                        xor     esi, esi
+                        printf("Byte var: %u"\n, bytevar);
+                        printf("Word var: %u"\n, wordvar);
+                        printf("Dword var: %u"\n, dwordvar);
+                        printf("Qword var: %u"\n, qwordvar);
+                        printf("Float var: %.1f"\n, df floatvar);
+                        printf("Double var: %.1lf"\n, dp doublevar);
+                        printf("Tword var: %.2Lf"\n, twordvar);
                         nop
                         nop
                         mov     eax, 7
-                        printf(<"Testing 'lea' instruction for math. Result: %u",10,0>, &eax*2+eax+6);
+                        printf("Testing 'lea' instruction for math. Result: %u"\n, eax*2+eax+6);
                         nop
                         nop
                         puts("Tests done. Exiting...");
@@ -83,3 +82,5 @@ _code   Start:          endbr64
                         pop     r15
                         xor     eax, eax
                         ret
+
+; To compile: > ./build fc_testall

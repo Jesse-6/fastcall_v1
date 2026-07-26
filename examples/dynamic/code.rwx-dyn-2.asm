@@ -15,13 +15,12 @@
 
 format ELF64
 
-include 'fastcall.inc'
-include 'stdmacros.inc'
+include 'fastcall3.inc'
 include 'stdio.inc'
 
-_code rwx   Start entry:        signal(SIGINT, &.break);
+_code rwx   Start entry:        signal(SIGINT, .break);
 
-                                fprintf(*stdout, "This program modifies a counter present in a code section!"\n);
+                                fprintf(stdout, "This program modifies a counter present in a code section!"\n);
 
                         @@      inc         [count]
 
@@ -29,15 +28,15 @@ _code rwx   Start entry:        signal(SIGINT, &.break);
                                 test        [flags], 1
                                 jnz         .exit
 
-                                fprintf(*stdout, <13,"Counter value: %lu ",0>, *count);
-                                fflush(*stdout);
+                                fprintf(stdout, <13,"Counter value: %lu ",0>, count);
+                                fflush(stdout);
 
                                 jmp         @b
 
                 .break:         or          [flags], 1
                                 ret
 
-                .exit:          fprintf(*stdout, <8,8,32,32,10,0>);
+                .exit:          fprintf(stdout, <8,8,32,32,10,0>);
                                 exit(0);
 
             align 16
@@ -48,3 +47,5 @@ _code rwx   Start entry:        signal(SIGINT, &.break);
 ; I reupload this example as a clarification to this question.
 ; Also, some minor tweaks on macro codes in this package were necessary to fix the issue related to these macros.
 ;
+
+; To compile: > ./build code.rwx-dyn-2
