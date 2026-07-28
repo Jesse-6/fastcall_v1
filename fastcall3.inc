@@ -58,7 +58,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 
 	; Data interceptors that switch label namespace tracking when a root label is defined
 	iterate a, db, dw, dd, dq, dt, ddq, dqq, ddqq, \
-				emit, rb, rw, rd, rt, rq, rdq, rqq, rdqq
+				emit, rb, rw, rd, rt, rq, rdq, rqq, rdqq, dbx
 
 		calminstruction (dest) a? tail*&
 					local		symbol, command
@@ -3841,6 +3841,13 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
 					. rtyp rsv
 				else
 					. typ data
+				end match
+				match .symbol, lb
+				else match ., lb
+				else match ?symbol, lb
+					lns_attach_to_root 35, symbol
+				else
+					lns_attach_to_root 35, lb
 				end match
 			end struc
 			macro nam? data*&
