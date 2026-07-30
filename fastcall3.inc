@@ -8,7 +8,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 	define __FASTCALL_v3_INCLUDED__
 
 	if ~ defined UNDO_SHOW_VERSION	; to hide version string at command line: -i'define UNDO_SHOW_VERSION'
-		display 27, "[93mUsing 'fastcall' macro package version 3.0+", 27, "[0m", 10
+		display 27, "[93mUsing 'fastcall' macro package version 3.0.1+", 27, "[0m", 10
 	end if
 
 	if defined ELF.SECTION_NAME
