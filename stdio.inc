@@ -683,6 +683,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto open, qword, dword, dword     ; rdi = pathname, esi = flags, edx = mode
 	ext proto opendir, qword                        ; rdi = *dirpath
 	ext proto on_exit, qword, qword                 ; rdi = *function, rsi = *arg
+	ext proto pause, none
 	ext proto perror, qword                         ; rdi = *string before error string (can be NULL)
 	ext proto poll, qword, qword, dword				; * pollfd, num x pollfd, timeout ms
 	ext proto posix_openpt, dword                   ; edi = flags. eax = pts lowest number available

@@ -1198,21 +1198,21 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 				match =TRUE, dest
 				jno boolean0
 				arrange __type_id_, FUNC_PARA_TYPE_BOOLEAN
-				arrange __type_para_, 1
+				arrange __type_para_, =TRUE
 				compute __type_size_, 0
 				jump _end
 			boolean0:
 				match =FALSE, dest
 				jno null
 				arrange __type_id_, FUNC_PARA_TYPE_BOOLEAN
-				arrange __type_para_, 0
+				arrange __type_para_, =FALSE
 				compute __type_size_, 0
 				jump _end
 			null:
 				match =NULL, dest
 				jno num_pi
 				arrange __type_id_, FUNC_PARA_TYPE_NULL
-				arrange __type_para_, 0
+				arrange __type_para_, =NULL
 				compute __type_size_, 0
 				jump _end
 			num_pi:
@@ -2141,7 +2141,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 					err "Invalid register parameter size.", 10
 				end if
 			else if __type_id_ = FUNC_PARA_TYPE_BOOLEAN
-				if parameter eq TRUE
+				match =TRUE, parameter
 					if psize = qword
 						mov cregd, 1
 					else if psize = dword
@@ -2153,7 +2153,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 					else
 						err "Invalid register parameter size.", 10
 					end if
-				else if parameter eq FALSE
+				else match =FALSE, parameter
 					if psize = qword
 						xor cregd, cregd
 					else if psize = dword
@@ -2165,7 +2165,12 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 					else
 						err "Invalid register parameter size.", 10
 					end if
-				end if
+				else
+					put_value __type_para_, __type_para_
+					match a, __type_para_
+						err "parameter error: '", `a, "'"
+					end match
+				end match
 			else if __type_id_ = FUNC_PARA_TYPE_REGMM
 				if psize = qword
 					movq cregq, parameter
@@ -2452,11 +2457,11 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 					err "Invalid memory class parameter size.", 10
 				end if
 			else if __type_id_ = FUNC_PARA_TYPE_BOOLEAN
-				if parameter eq TRUE
+				match =TRUE, parameter
 					push 1
-				else if parameter eq FALSE
+				else match =FALSE, parameter
 					push 0
-				end if
+				end match
 			else if __type_id_ = FUNC_PARA_TYPE_REGMM
 				if psize = qword
 					movq [rsp-8], parameter
@@ -3978,7 +3983,7 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
 					define proxy name
 					match const == value, proxy
 						repeat 1, i:value
-							define const i
+							const := i
 							if defined __ENUM_DEBUG__
 								display "Const: ",`const," Value: ",`i,10
 							end if
@@ -3986,7 +3991,7 @@ if ~ defined __STANDARD_MACRO_PACKAGE_INCLUDED__
 						count = value
 					else
 						repeat 1, i:count
-							define name i
+							name := i
 							if defined __ENUM_DEBUG__
 								display "Const: ", `name, " Value: ", `i, 10
 							end if
