@@ -27,15 +27,15 @@ ext proto xcb_setup_roots_iterator, qword
 ext proto xcb_wait_for_event, qword
 
 ; XCB structures (offset only)
-struct atom     ; alias for XCB_INTERN_ATOM_REPLY_T
+struct XCB_INTERN_ATOM_REPLY_T
     .response_type          db ?
                             db ?
     .sequence               dw ?
     .length                 dd ?
     .atom                   dd ?
-end struct&
+end struct atom                     ; define 'atom' as the offset name for this structure
 
-struct cme      ; alias for XCB_CLIENT_MESSAGE_EVENT_T
+struct XCB_CLIENT_MESSAGE_EVENT_T
     .response_type          db ?
     .format                 db ?
     .sequence               dw ?
@@ -51,9 +51,9 @@ struct cme      ; alias for XCB_CLIENT_MESSAGE_EVENT_T
     virtual at .data
         .data32             rd 5
     end virtual
-end struct&
+end struct cme                      ; same as for 'atom', but 'cme' for this one
 
-struct screen   ; alias for XCB_SCREEN_T
+struct XCB_SCREEN_T
     .root                   dd ?
     .default_colormap       dd ?
     .white_pixel            dd ?
@@ -70,7 +70,11 @@ struct screen   ; alias for XCB_SCREEN_T
     .save_unders            db ?
     .root_depth             db ?
     .allowed_depths_len     db ?
-end struct&
+end struct screen                   ; explained above
+
+; NOTE: offset name is a new feature, as of version 3.0.2+.
+; Also supported 'end struct&' to define the same struct 'NAME'
+; as the offset name
 
 ; XCB constants
 XCB_ATOM_ATOM                   = 4

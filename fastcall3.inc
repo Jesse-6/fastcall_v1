@@ -8,7 +8,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 	define __FASTCALL_v3_INCLUDED__
 
 	if ~ defined UNDO_SHOW_VERSION	; to hide version string at command line: -i'define UNDO_SHOW_VERSION'
-		display 27, "[93mUsing 'fastcall' macro package version 3.0.1+", 27, "[0m", 10
+		display 27, "[93mUsing 'fastcall' macro package version 3.0.2+", 27, "[0m", 10
 	end if
 
 	if defined ELF.SECTION_NAME
@@ -174,6 +174,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 
 
 	; 'end struct&' creates offset symbol with struct name
+	; 'end struct short' creates 'short' as the offset symbol
 	; 'end struct' only the structure definition
 	macro end?.struct?! flag
 
@@ -183,14 +184,16 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 		end if
 		.___sizeof_:
 		esc end struc
-		match &, flag
-			virtual at 0
-				__AT_VIRTUAL_OFFSET_CREATE__ = 1    ; just a signaling variable
-				match a, __STRUCT_OPENED__
+		__AT_VIRTUAL_OFFSET_CREATE__ = 1
+		virtual at 0
+			match a, __STRUCT_OPENED__
+				match &, flag
 					a a
+				else match short, flag
+					short a
 				end match
-			end virtual
-		end match
+			end match
+		end virtual
 		restore __STRUCT_OPENED__
 		__AT_VIRTUAL_OFFSET_CREATE__ = 0
 
