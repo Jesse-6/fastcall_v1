@@ -64,7 +64,7 @@ struct XCB_SCREEN_T
     .width_in_millimeters   dw ?
     .height_in_millimeters  dw ?
     .min_installed_maps     dw ?
-    .mex_installed_maps     dw ?
+    .max_installed_maps     dw ?
     .root_visual            dd ?
     .backing_stores         db ?
     .save_unders            db ?
@@ -75,6 +75,8 @@ end struct screen                   ; explained above
 ; NOTE: offset name is a new feature, as of version 3.0.2+.
 ; Also supported 'end struct&' to define the same struct 'NAME'
 ; as the offset name
+; And, as stated in other examples, 'end struct' only creates
+; the structure definition to be bound to labels after
 
 ; XCB constants
 XCB_ATOM_ATOM                   = 4
@@ -142,7 +144,7 @@ _code   Start entry:        __libc_start_main(Main, [rsp+8], rsp+16, NULL, NULL,
                             mov         rbp, rax                ; save for release later, *event memory
                             mov         cl, [rax]               ; .event_type in all XCB structures
                             and         cl, not 80h             ; as did in any XCB example I've seen
-                            cmp         cl, XCB_CLIENT_MESSAGE  ; only message we deal in thie example
+                            cmp         cl, XCB_CLIENT_MESSAGE  ; only message we deal in this example
                             jne         @b
                             mov         r10d, [rax+cme.data32+0]    ; get atom to compare
                             cmp         r10d, [r12+atom.atom]       ; compare with WM_DELETE_WINDOW atom

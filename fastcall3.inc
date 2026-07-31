@@ -137,11 +137,11 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 				match a, __ROOT_LABEL_NAMESPACE__
 					define default.type.address.a.symbol
 					match b, __STRUCT_CURRENT_FQEN__
-						define default.type.address.a.symbol
+						define default.type.address.b.symbol
 						display "  -> Create property address to: ", `lb, " at: ", `b, 10
 						sns_current_push b.symbol
 					else
-						define default.type.address.b.symbol
+						define default.type.address.a.symbol
 						display "  -> Create property address to: ", `lb, " at: ", `a, 10
 						sns_current_push a.symbol
 					end match
