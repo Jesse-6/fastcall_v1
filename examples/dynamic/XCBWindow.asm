@@ -84,7 +84,7 @@ XCB_ATOM_STRING                 = 31
 XCB_ATOM_WM_NAME                = 39
 XCB_CLIENT_MESSAGE              = 33
 XCB_COPY_FROM_PARENT            = 0
-XCB_CW_EVENT_BACK_PIXEL         = 1 shl 1
+XCB_CW_BACK_PIXEL               = 1 shl 1
 XCB_PROP_MODE_REPLACE           = 0
 XCB_WINDOW_CLASS_INPUT_OUTPUT   = 1
 
@@ -120,7 +120,7 @@ _code   Start entry:        __libc_start_main(Main, [rsp+8], rsp+16, NULL, NULL,
                             ; Create a window, but do not show it yet
                             xcb_create_window(connection, XCB_COPY_FROM_PARENT, window, [rbp+screen.root], \
                                 0, 0, 480, 300, 2, XCB_WINDOW_CLASS_INPUT_OUTPUT, [rbp+screen.root_visual], \
-                                XCB_CW_EVENT_BACK_PIXEL, &window.bg_pixel);
+                                XCB_CW_BACK_PIXEL, &window.bg_pixel);
 
                             ; Receive atom replies and apply their properties to window
                             pop         r12

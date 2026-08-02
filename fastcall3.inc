@@ -5,10 +5,10 @@ else if defined __FASTCALL_v2_INCLUDED__
 else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ### ### ###
 
 	define __FASTCALL_v3_INCLUDED__
-	define __FASTCALL_v3_INCLUDED__
+	define __FASTCALL_v3_INCLUDED__ '3.0.3+'
 
 	if ~ defined UNDO_SHOW_VERSION	; to hide version string at command line: -i'define UNDO_SHOW_VERSION'
-		display 27, "[93mUsing 'fastcall' macro package version 3.0.2+", 27, "[0m", 10
+		display 27, "[93mUsing 'fastcall' macro package version ", __FASTCALL_v3_INCLUDED__, 27, "[0m", 10
 	end if
 
 	if defined ELF.SECTION_NAME
@@ -172,7 +172,6 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 	end macro
 
 
-
 	; 'end struct&' creates offset symbol with struct name
 	; 'end struct short' creates 'short' as the offset symbol
 	; 'end struct' only the structure definition
@@ -197,6 +196,17 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 		restore __STRUCT_OPENED__
 		__AT_VIRTUAL_OFFSET_CREATE__ = 0
 
+	end macro
+
+
+	; This macro can be used to create offset symbols later;
+	; when a previous struct definition exists
+	macro define_offset? statement
+		__AT_VIRTUAL_OFFSET_CREATE__ = 1
+		virtual at 0
+			statement
+		end virtual
+		__AT_VIRTUAL_OFFSET_CREATE__ = 0
 	end macro
 
 

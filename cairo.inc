@@ -91,6 +91,16 @@ if ~ defined __CAIRO_INC_INCLUDED__
     ext proto cairo_text_path, qword, qword
     ext proto cairo_transform, qword, qword
     ext proto cairo_translate, qword, double, double    ; *
+    ext proto cairo_xcb_device_debug_cap_xrender_version, qword, dword, dword
+    ext proto cairo_xcb_device_debug_cap_xshm_version, qword, dword, dword
+    ext proto cairo_xcb_device_debug_get_precision, qword
+    ext proto cairo_xcb_device_debug_set_precision, qword, dword
+    ext proto cairo_xcb_device_get_connection, qword
+    ext proto cairo_xcb_surface_create, qword, dword, qword, dword, dword
+    ext proto cairo_xcb_surface_create_for_bitmap, qword, qword, dword, dword, dword
+    ext proto cairo_xcb_surface_create_with_xrender_format, qword, qword, dword, qword, dword, dword
+    ext proto cairo_xcb_surface_set_drawable, qword, dword, dword, dword
+    ext proto cairo_xcb_surface_set_size, qword, dword, dword
 
 else
     err "Duplicated inclusion of ""cairo.inc"" file.", 10
