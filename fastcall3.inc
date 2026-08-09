@@ -5,7 +5,7 @@ else if defined __FASTCALL_v2_INCLUDED__
 else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ### ### ###
 
 	define __FASTCALL_v3_INCLUDED__
-	define __FASTCALL_v3_INCLUDED__ '3.0.3+'
+	define __FASTCALL_v3_INCLUDED__ '3.0.4+'
 
 	if ~ defined UNDO_SHOW_VERSION	; to hide version string at command line: -i'define UNDO_SHOW_VERSION'
 		display 27, "[93mUsing 'fastcall' macro package version ", __FASTCALL_v3_INCLUDED__, 27, "[0m", 10
@@ -422,7 +422,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 	__BSS_ONLINE__ = 0
 	__V_SECTION_OPEN__ = 0
 
-	__SECTION_OP_MODE__ = 0		; Reserved: for future usage regarding section recognition
+	__SECTION_OP_MODE__ = 0
 
 	if defined __ELF_MODE_STATIC__
 
@@ -438,17 +438,16 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 				end if
 				segment readable
 				__RDATA_ONLINE__ = 1
-				virtual
-					__rdata_ptr:: ; Anonymous data from higher macros
-				end virtual
+				define __HAS_RDATA_SECTION__
+				__RDATA_ADDRESS__ = $
 				postpone
+					if __V_SECTION_OPEN__
+						esc end virtual
+					end if
 					virtual __rdata_ptr
-						if __V_SECTION_OPEN__
-							esc end virtual
-						end if
 						load __rdata_ptr.contents : $ - $$ from $$
-						__V_SECTION_OPEN__ = 0
 					end virtual
+					__V_SECTION_OPEN__ = 0
 				end postpone
 				virtual __rdata_ptr
 					match =align?= any, line
@@ -483,9 +482,8 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 				end if
 				segment readable writeable
 				__DATA_ONLINE__ = 1
-				virtual
-					__data_ptr::
-				end virtual
+				define __HAS_DATA_SECTION__
+				__DATA_ADDRESS__ = $
 				postpone
 					if __V_SECTION_OPEN__
 						esc end virtual
@@ -523,15 +521,13 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 			end if
 			__SECTION_OP_MODE__ = 4
 			if __BSS_ONLINE__ = 0
-				if __CODE_ONLINE__
-					err "_bss section macro must be placed before any _code statement!", 10
-				end if
 				if __V_SECTION_OPEN__
 					esc end virtual
 				end if
 				__V_SECTION_OPEN__ = 0
 				segment readable writeable
 				__BSS_ONLINE__ = 1
+				define __HAS_BSS_SECTION__
 				postpone
 					if __V_SECTION_OPEN__
 						esc end virtual
@@ -546,9 +542,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 				end postpone
 				match =align?= any, line
 					line
-					virtual at $
-						__bss_ptr::
-					end virtual
+					__BSS_ADDRESS__ = $
 					if __BSS_SIZE_ALLOCATE__ <> 0
 						emit __BSS_SIZE_ALLOCATE__, ?
 					end if
@@ -556,9 +550,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 					__V_SECTION_OPEN__ = 1
 				else
 					align 64
-					virtual at $
-						__bss_ptr::
-					end virtual
+					__BSS_ADDRESS__ = $
 					if __BSS_SIZE_ALLOCATE__ <> 0
 						emit __BSS_SIZE_ALLOCATE__, ?
 					end if
@@ -594,9 +586,8 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 					segment readable executable
 				end match
 				__CODE_ONLINE__ = 1
-				virtual
-					__code_ptr::	; This is for outputing anonymous data in the same section
-				end virtual
+				define __HAS_CODE_SECTION__
+				__CODE_ADDRESS__ = $
 				postpone
 					if __V_SECTION_OPEN__
 						esc end virtual
@@ -663,21 +654,22 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 				end if
 				match =align?= any, line
 					section '.rdata' align any
+					__RDATA_DYN_ALIGN__ = any
 				else
 					section '.rdata' align 64
+					__RDATA_DYN_ALIGN__ = 64
 				end match
 				__RDATA_ONLINE__ = 1
-				virtual
-					__rdata_ptr:: ; Anonymous data from higher macros
-				end virtual
+				define __HAS_RDATA_SECTION__
+				__RDATA_ADDRESS__ = $
 				postpone
+					if __V_SECTION_OPEN__
+						esc end virtual
+					end if
 					virtual __rdata_ptr
-						if __V_SECTION_OPEN__
-							esc end virtual
-						end if
 						load __rdata_ptr.contents : $ - $$ from $$
-						__V_SECTION_OPEN__ = 0
 					end virtual
+					__V_SECTION_OPEN__ = 0
 				end postpone
 				virtual __rdata_ptr
 					match =align?= any, line
@@ -706,13 +698,14 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 				end if
 				match =align?= any, line
 					section '.data' writeable align any
+					__DATA_DYN_ALIGN__ = any
 				else
 					section '.data' writeable align 64
+					__DATA_DYN_ALIGN__ = 64
 				end match
 				__DATA_ONLINE__ = 1
-				virtual
-					__data_ptr::
-				end virtual
+				define __HAS_DATA_SECTION__
+				__DATA_ADDRESS__ = $
 				postpone
 					if __V_SECTION_OPEN__
 						esc end virtual
@@ -741,25 +734,23 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 			end if
 		end macro
 
-		macro _bss &line&	; NOTE: Beta stage: now it can be reused!
+		macro _bss &line&
 			__SECTION_OP_MODE__ = 4
 			if __BSS_ONLINE__ = 0
-				if __CODE_ONLINE__
-					err "_bss section macro must be placed before any _code statement!", 10
-				end if
 				if __V_SECTION_OPEN__
 					esc end virtual
 				end if
 				__V_SECTION_OPEN__ = 0
 				match =align?= any, line
 					section '.bss' writeable align any
+					__BSS_DYN_ALIGN__ = any
 				else
 					section '.bss' writeable align 64
+					__BSS_DYN_ALIGN__ = 64
 				end match
 				__BSS_ONLINE__ = 1
-				virtual at $
-					__bss_ptr::
-				end virtual
+				define __HAS_BSS_SECTION__
+				__BSS_ADDRESS__ = $
 				postpone
 					if __V_SECTION_OPEN__
 						esc end virtual
@@ -799,22 +790,26 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 				match =rwx?= any, line
 					match =align? val, any
 						section '.text' writeable executable align val
+						__CODE_DYN_ALIGN__ = val
 					else
 						section '.text' writeable executable align 16
+						__CODE_DYN_ALIGN__ = 16
 					end match
 				else match =rwx?, line
 					section '.text' writeable executable align 16
+					__CODE_DYN_ALIGN__ = 16
 				else
 					match =align?= any, line
 						section '.text' executable align any
+						__CODE_DYN_ALIGN__ = any
 					else
 						section '.text' executable align 16
+						__CODE_DYN_ALIGN__ = 16
 					end match
 				end match
 				__CODE_ONLINE__ = 1
-				virtual
-					__code_ptr::	; This is for outputing anonymous data in the same section
-				end virtual
+				define __HAS_CODE_SECTION__
+				__CODE_ADDRESS__ = $
 				postpone
 					if __V_SECTION_OPEN__
 						esc end virtual
@@ -864,21 +859,74 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 
 	end if
 
+	; In order for sections to be interchangeable,
+	; virtual output areas must need to be resolved
+	; before the sections themselves:
+	if defined __HAS_RDATA_SECTION__
+		virtual at __RDATA_ADDRESS__
+			__rdata_ptr::
+			if defined __ELF_MODE_DYNAMIC__
+				align.assume __RDATA_ADDRESS__, __RDATA_DYN_ALIGN__
+			end if
+		end virtual
+	end if
+	if defined __HAS_DATA_SECTION__
+		virtual at __DATA_ADDRESS__
+			__data_ptr::
+			if defined __ELF_MODE_DYNAMIC__
+				align.assume __DATA_ADDRESS__, __DATA_DYN_ALIGN__
+			end if
+		end virtual
+	end if
+	if defined __HAS_BSS_SECTION__
+		virtual at __BSS_ADDRESS__
+			__bss_ptr::
+			if defined __ELF_MODE_DYNAMIC__
+				align.assume __BSS_ADDRESS__, __BSS_DYN_ALIGN__
+			end if
+		end virtual
+	end if
+	if defined __HAS_CODE_SECTION__
+		virtual at __CODE_ADDRESS__
+			__code_ptr::
+			if defined __ELF_MODE_DYNAMIC__
+				align.assume __CODE_ADDRESS__, __CODE_DYN_ALIGN__
+			end if
+		end virtual
+	end if
 
 
+
+	; Convenience macros to be used inside _code territory,
+	; to add a single data line at its respective section
 	macro @bss line*&
-		_bss line
-		_code
+		if __SECTION_OP_MODE__ = 1
+			virtual __bss_ptr
+				line
+			end virtual
+		else
+			err "@bss must be used inside code section"
+		end if
 	end macro
 
 	macro @data line*&
-		_data line
-		_code
+		if __SECTION_OP_MODE__ = 1
+			virtual __data_ptr
+				line
+			end virtual
+		else
+			err "@data must be used inside code section"
+		end if
 	end macro
 
 	macro @rdata line*&
-		_rdata line
-		_code
+		if __SECTION_OP_MODE__ = 1
+			virtual __rdata_ptr
+				line
+			end virtual
+		else
+			err "@rdata must be used inside code section"
+		end if
 	end macro
 
 
@@ -1750,17 +1798,20 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 	calminstruction put_anon_data dtype*, data*&
 		_start:
 			local cmd1, cmd2, cmd3, i
-			check __RDATA_ONLINE__
+			; check __RDATA_ONLINE__
+			check defined __HAS_RDATA_SECTION__
 			jno _nextD
 			arrange cmd1, =virtual =__rdata_ptr
 			jump _put_data
 		_nextD:
-			check __DATA_ONLINE__
+			; check __DATA_ONLINE__
+			check defined __HAS_DATA_SECTION__
 			jno _nextC
 			arrange cmd1, =virtual =__data_ptr
 			jump _put_data
 		_nextC:
-			check __CODE_ONLINE__
+			; check __CODE_ONLINE__
+			check defined __HAS_CODE_SECTION__
 			jno _err_context
 			arrange cmd1, =virtual =__code_ptr
 			jump _put_data

@@ -8,6 +8,9 @@ if ~ defined __STDIO_INC_INCLUDED__
 			if defined __INCLUDE_LIBPTHREAD__	; older distros might need this to work!
 				library 'libpthread.so.0'
 			end if
+			if defined __INCLUDE_LIBRT__		;
+				library 'librt.so.1'
+			end if
 		end if
 	end if
 
@@ -360,6 +363,8 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define MAP_ANONYMOUS		0x20	; Don't use a file
 	define MAP_ANON				MAP_ANONYMOUS
 
+	define MAP_FAILED			-1
+
 	define PROT_READ			0x1		; Page can be read
 	define PROT_WRITE			0x2		; Page can be written
 	define PROT_EXEC			0x4		; Page can be executed
@@ -610,6 +615,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto dup, dword                            ; edi = int file descriptor
 	ext proto dup2, dword, dword                    ; esi = new file descriptor
 	ext proto dup3, dword, dword, dword             ; edx = flags
+	ext noreturn proto err, dword, qword, vararg	; value, fmt, ...
 	ext proto execl, qword, qword, vararg           ; rdi = *path, rsi = *arg, ... = args, NULL
 	ext proto execle, qword, qword, vararg          ; Same as execl(), plus (after NULL): *envp[]
 	ext proto execlp, qword, qword, vararg          ; rdi = * str file, rsi *arg
@@ -723,6 +729,9 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto sched_setscheduler, dword, dword, qword
 	ext proto sched_yield, none
 	ext proto select, dword, qword, qword, qword, qword
+	ext proto sem_init, qword, dword, dword
+	ext proto sem_post, qword
+	ext proto sem_wait, qword
 	ext proto sendmsg, dword, qword, dword
 	ext proto sendto, dword, qword, qword, dword, qword, dword
 	ext proto setegid, dword
@@ -733,6 +742,11 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto setpriority, dword, dword, dword
 	ext proto setsockopt, dword, dword, dword, qword, dword	; socket, level, option, *value, size
 	ext proto setuid, dword
+	ext proto shmat, dword, qword, dword
+	ext proto shmdt, qword
+	ext proto shmget, dword, qword, dword
+	ext proto shm_open, qword, dword, dword
+	ext proto shm_unlink, qword
 	ext proto signal, dword, qword                  ; edi = sig, rsi = *handler
 	ext proto sleep, dword                          ; edi = seconds to sleep
 	ext proto snprintf, qword, qword, qword, vararg ; rdi = *buffer, rsi = size, rdx = format, ...
@@ -744,6 +758,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto strerrordesc_np, dword
 	ext proto strerrorname_np, dword
 	ext proto strftime, qword, dword, qword, qword  ; *buffer; max-size; *format; *TM structure
+	ext proto strlen, qword
 	ext proto strtod, qword, qword                  ; see below ¹
 	ext proto strtol, qword, qword, dword           ; *nptr, *endptr (or NULL), base ²
 	ext proto strtold, qword, qword                 ; ¹ *buffer; **nbuffer (variable which receives character pointer next to converted string
@@ -765,6 +780,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto thrd_yield, none
 	ext proto time, qword                           ; rdi = *time_t (may be null); rax = Posix Time (Epoch based)
 	ext proto tmpfile, none                         ; rax = returns a file pointer to temporary file
+	ext proto truncate, qword, dword
 	ext proto unlink, qword                         ; rdi = char path filename to be removed
 	ext proto unlockpt, dword                       ; edi = int file descriptor
 	ext proto usleep, qword                         ; edi = microsseconds to sleep
