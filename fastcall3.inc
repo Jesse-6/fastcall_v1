@@ -3473,17 +3473,25 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 							if used sym
 								extrn sym:size
 								display "Importing: ", `sym, 10
+								if size = 0
+									define default.type.address.sym
+								end if
 							else if used GOT?.sym
 								extrn sym:size
 								display "Importing: ", `sym, 10
+								if size = 0
+									define default.type.address.sym
+								end if
 							end if
 						else
 							if used symbol
 								extrn symbol
 								display "Importing: ", `symbol, 10
+								define default.type.address.symbol
 							else if used GOT?.symbol
 								extrn symbol
 								display "Importing: ", `symbol, 10
+								define default.type.address.symbol
 							end if
 						end match
 					end iterate

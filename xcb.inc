@@ -15,6 +15,23 @@ if ~ defined __XCB_INC_INCLUDED__
         .angle2 dw A2
     end struct
 
+    struct XCB_BUTTON_PRESS_EVENT_T
+        .response_type      db ?
+        .detail             db ?
+        .sequence           dw ?
+        .time               dd ?
+        .root               dd ?
+        .event              dd ?
+        .child              dd ?
+        .root_x             dw ?
+        .root_y             dw ?
+        .event_x            dw ?
+        .event_y            dw ?
+        .state              dw ?
+        .same_screen        db ?
+                            rb 1
+    end struct
+
     struct XCB_CLIENT_MESSAGE_EVENT_T
         .response_type          db ?
         .format                 db ?
@@ -73,6 +90,19 @@ if ~ defined __XCB_INC_INCLUDED__
         .same_screen_focus      db ?
     end struct
 
+    struct XCB_EXPOSE_EVENT_T
+        .response_type          db ?
+                                db ?
+        .sequence               dw ?
+        .window                 dd ?
+        .x                      dw ?
+        .y                      dw ?
+        .width                  dw ?
+        .height                 dw ?
+        .count                  dw ?
+                                rb 2
+    end struct
+
     struct XCB_GENERIC_ERROR_T
         .response_type  db ?
         .error_code     db ?
@@ -114,9 +144,37 @@ if ~ defined __XCB_INC_INCLUDED__
         .atom                   dd ?
     end struct
 
+    struct XCB_MOTION_NOTIFY_EVENT_T
+        .response_type          db ?
+        .detail                 db ?
+        .sequence               dw ?
+        .time                   dd ?
+        .root                   dd ?
+        .event                  dd ?
+        .child                  dd ?
+        .root_x                 dw ?
+        .root_y                 dw ?
+        .event_x                dw ?
+        .event_y                dw ?
+        .state                  dw ?
+        .same_screen            db ?
+                                db ?
+    end struct
+
     struct XCB_POINT_T X:?, Y:?
         .x      dw X
         .y      dw Y
+    end struct
+
+    struct XCB_QUERY_EXTENSION_REPLY_T
+        .response_type      db ?
+                            db ?
+        .sequence           dw ?
+        .length             dd ?
+        .present            db ?
+        .major_opcode       db ?
+        .first_event        db ?
+        .first_error        db ?
     end struct
 
     struct XCB_RECTANGLE_T X:?, Y:?, W:?, H:?
@@ -202,6 +260,25 @@ if ~ defined __XCB_INC_INCLUDED__
                             rb 4
     end struct
 
+    ; NOTE: not standard names: created to ease major errors understanding
+    X11_ERROR_BAD_REQUEST           = 1
+    X11_ERROR_BAD_VALUE             = 2
+    X11_ERROR_BAD_WINDOW            = 3
+    X11_ERROR_BAD_PIXMAP            = 4
+    X11_ERROR_BAD_ATOM              = 5
+    X11_ERROR_BAD_CURSOR            = 6
+    X11_ERROR_BAD_FONT              = 7
+    X11_ERROR_BAD_MATCH             = 8
+    X11_ERROR_BAD_DRAWABLE          = 9
+    X11_ERROR_BAD_ACCESS            = 10
+    X11_ERROR_BAD_ALLOC             = 11
+    X11_ERROR_BAD_COLOR             = 12
+    X11_ERROR_BAD_GC                = 13
+    X11_ERROR_BAD_ID_CHOICE         = 14
+    X11_ERROR_BAD_NAME              = 15
+    X11_ERROR_BAD_LENGTH            = 16
+    X11_ERROR_BAD_IMPLEMENTATION    = 17
+
     XCB_COLORMAP_ALLOC_NONE := 0
     XCB_COLORMAP_ALLOC_ALL  := 1
 
@@ -277,7 +354,19 @@ if ~ defined __XCB_INC_INCLUDED__
     XCB_ATOM_WM_CLASS           := 67
     XCB_ATOM_WM_TRANSIENT_FOR   := 68
 
+    XCB_KEY_PRESS           := 2
+    XCB_KEY_RELEASE         := 3
+    XCB_BUTTON_PRESS        := 4
+    XCB_BUTTON_RELEASE      := 5
+    XCB_MOTION_NOTIFY       := 6
+    XCB_ENTER_NOTIFY        := 7
+    XCB_LEAVE_NOTIFY        := 8
     XCB_EXPOSE              := 12
+    XCB_CREATE_NOTIFY       := 16
+    XCB_DESTROY_NOTIFY      := 17
+    XCB_UNMAP_NOTIFY        := 18
+    XCB_MAP_NOTIFY          := 19
+    XCB_RESIZE_REQUEST      := 25
     XCB_CLIENT_MESSAGE      := 33
 
     XCB_CAP_STYLE_NOT_LAST      := 0
@@ -351,6 +440,10 @@ if ~ defined __XCB_INC_INCLUDED__
     XCB_GC_DASH_LIST                := 2097152
     XCB_GC_ARC_MODE                 := 4194304
 
+    XCB_IMAGE_FORMAT_XY_BITMAP  := 0
+    XCB_IMAGE_FORMAT_XY_PIXMAP  := 1
+    XCB_IMAGE_FORMAT_Z_PIXMAP   := 2
+
     XCB_JOIN_STYLE_MITER    := 0
     XCB_JOIN_STYLE_ROUND    := 1
     XCB_JOIN_STYLE_BEVEL    := 2
@@ -372,6 +465,10 @@ if ~ defined __XCB_INC_INCLUDED__
     ext proto xcb_change_gc_checked, qword, dword, dword, qword
     ext proto xcb_change_property, qword, byte, dword, dword, dword, byte, dword, qword
     ext proto xcb_change_property_checked, qword, byte, dword, dword, dword, byte, dword, qword
+    ext proto xcb_change_window_attributes, qword, dword, dword, qword
+    ext proto xcb_change_window_attributes_checked, qword, dword, dword, qword
+    ext proto xcb_clear_area, qword, byte, dword, word, word, word, word
+    ext proto xcb_clear_area_checked, qword, byte, dword, word, word, word, word
     ext proto xcb_close_font, qword, dword
     ext proto xcb_close_font_checked, qword, dword
     ext proto xcb_configure_window, qword, dword, word, qword
@@ -404,6 +501,7 @@ if ~ defined __XCB_INC_INCLUDED__
     ext proto xcb_free_pixmap, qword, dword
     ext proto xcb_free_pixmap_checked, qword, dword
     ext proto xcb_generate_id, qword
+    ext proto xcb_get_extension_data, qword, qword
     ext proto xcb_get_geometry, qword, dword
     ext proto xcb_get_geometry_reply, qword, dword, qword
     ext proto xcb_get_setup, qword

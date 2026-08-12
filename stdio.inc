@@ -336,6 +336,16 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define IP_RECVFRAGSIZE			25
 	define IP_RECVERR_RFC4884		26
 
+	IPC_CREAT	= 01000o
+	IPC_EXCL	= 02000o
+	IPC_NOWAIT	= 04000o
+
+	IPC_RMID	= 0
+	IPC_SET		= 1
+	IPC_STAT	= 2
+	IPC_INFO	= 3
+
+	IPC_PRIVATE	= 0
 
 	define IPPROTO_IP       0
 	define IPPROTO_ICMP     1
@@ -743,6 +753,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto setsockopt, dword, dword, dword, qword, dword	; socket, level, option, *value, size
 	ext proto setuid, dword
 	ext proto shmat, dword, qword, dword
+	ext proto shmctl, dword, dword, qword
 	ext proto shmdt, qword
 	ext proto shmget, dword, qword, dword
 	ext proto shm_open, qword, dword, dword
