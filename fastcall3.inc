@@ -131,41 +131,42 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 		else
 			define __STRUCT_OPENED__ definition
 		end match
-		esc struc (lb) definition
+		esc struc (lb_) definition
 		if ~ __AT_VIRTUAL_OFFSET_CREATE__
-			match .symbol, lb       ; Making a hint for the variable name to be handled as addressable by default
-				match a, __ROOT_LABEL_NAMESPACE__
-					define default.type.address.a.symbol
-					match b, __STRUCT_CURRENT_FQEN__
-						define default.type.address.b.symbol
-						display "  -> Create property address to: ", `lb, " at: ", `b, 10
-						sns_current_push b.symbol
+			match .symbol_, lb_      ; Making a hint for the variable name to be handled as addressable by default
+				match __T, __ROOT_LABEL_NAMESPACE__
+					match __U, __STRUCT_CURRENT_FQEN__
+						define default.type.address.__U.symbol_
+						display "  -> Create property address to: ", `lb_, " at: ", `__U, 10
+						sns_current_push __U.symbol_
 					else
-						define default.type.address.a.symbol
-						display "  -> Create property address to: ", `lb, " at: ", `a, 10
-						sns_current_push a.symbol
+						define default.type.address.__T.symbol_
+						display "  -> Create property address to: ", `lb_, " at: ", `__T, 10
+						sns_current_push __T.symbol_
 					end match
+				else
+					err "no root label defined for struct"
 				end match
 			else
-				define default.type.address.lb
-				lns_attach_to_root 94, lb
-				sns_current_push lb
+				define default.type.address.lb_
+				lns_attach_to_root 94, lb_
+				sns_current_push lb_
 			end match
 		end if
 		label . : .___sizeof_ - .
 		if ~ __AT_VIRTUAL_OFFSET_CREATE__
-			struc (lbl) ? line&     ; Trap every struct line to set address property wherever needed
-				display "--> Mount: ", `lbl, " ", `line, 10
-				match a, __STRUCT_CURRENT_FQEN__
-					match := rem, line
-						define default.type.address.a#lbl
-						display "  -> Create property address to: ", `lbl, " at: ", `a, 10
-					else match :, line
-						define default.type.address.a#lbl
-						display "  -> Create property address to: ", `lbl, " at: ", `a, 10
+			struc (lbl_) ? line_&     ; Trap every struct line to set address property wherever needed
+				display "--> Mount: ", `lbl_, " ", `line_, 10
+				match __ab, __STRUCT_CURRENT_FQEN__
+					match := rem_, line_
+						define default.type.address.__ab#lbl_
+						display "  -> Create property address to: ", `lbl_, " at: ", `__ab, 10
+					else match :, line_
+						define default.type.address.__ab#lbl_
+						display "  -> Create property address to: ", `lbl_, " at: ", `__ab, 10
 					end match
 				end match
-				lbl line
+				lbl_ line_
 			end struc
 		end if
 
@@ -175,7 +176,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 	; 'end struct&' creates offset symbol with struct name
 	; 'end struct short' creates 'short' as the offset symbol
 	; 'end struct' only the structure definition
-	macro end?.struct?! flag
+	macro end?.struct?! flag_
 
 		if ~ __AT_VIRTUAL_OFFSET_CREATE__
 			restruc ?
@@ -185,11 +186,11 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 		esc end struc
 		__AT_VIRTUAL_OFFSET_CREATE__ = 1
 		virtual at 0
-			match a, __STRUCT_OPENED__
-				match &, flag
-					a a
-				else match short, flag
-					short a
+			match __ab, __STRUCT_OPENED__
+				match &, flag_
+					__ab __ab
+				else match short_, flag_
+					short_ __ab
 				end match
 			end match
 		end virtual
