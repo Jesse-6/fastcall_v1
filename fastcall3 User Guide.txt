@@ -1,12 +1,12 @@
-=============== Fastcall macro quick guide, for v1. ===================
+=============== Fastcall macro quick guide, version 3. ===================
 
 1. How it works?
 
       Fastcall is a set of macros for fasmg (developed at fasm2 environment) used to call functions in a "horizontal" manner, by following what is defined at System V ABI specification. It is enhanced to not only be C-style looking macro (it is similar, not equal), but to generate assembly code that is very close to what C compilers generate when calling functions. Because C is very good at calling functions; by this aspect, it is almost impossible even for an experienced in assembly language human programmer to beat C generated code (a draw is not accounted under this quote). So, I keep the most benefits I've learned from debugging C code implemented in this macro, as a collection of decisions based on parameter types and sizes and ordering. Hence the countless if blocks inside its code. ;)
       Its usage is enabled by defining a prototype earlier using 'proto' macro. Then, the proto macro will create a lot of hints for every parameter of the prototyped function, so fastcall can parse them when used, setting proper sizes and types of parameters in the right place. Also, proto macro generates a macro with the name of the function for every function, so, no need to 'fastcall function, args': you just 'function(args);' and that's it.
 
-      To use it, just copy fastcall_v1.inc to the standard fasmg or fasm2 include path, and include it on your source files.
-      This package is also bundled with my partially made stdio.inc and gtk3.inc headers, also my anonymous multi level label macro anon_label.inc file. If you want to use them also, copy them to the same location.
+      To use it, just copy fastcall3.inc to the standard fasmg or fasm2 include path, and include it on your source files.
+      This package is also bundled with my partially made .inc example headers. If you want to use them, copy them to the same location.
 
 2. Important concepts
 
@@ -14,8 +14,8 @@
 
       This is the concept number 0 in understanding what you CANNOT do when using fastcall macro. In this case, avoid using the trashed register after is has been trashed. The order of trashed registers, are in reverse order, and the overall sequence of classes is also reverse ordering as follows:
 
-           - memory integer class parameters will be pushed onto stack, and r9 is the auxiliary register for anything that needs a register to be prepared (e.g., an effective addressor 64-bit sized immediate number);
-           - memory float point class parameters can be mixed with the above, following general prototyped RTL ordering, and they don't use any GP register at all; data is created as float point data in the first defined virtual location¹ found and then pushed as normal parameters;
+           - memory integer class parameters will be pushed onto stack, and r9 is the auxiliary register for anything that needs a register to be prepared (e.g., an effective address or 64-bit sized immediate number);
+           - memory float point class parameters can be mixed with the above, following general prototyped RTL ordering, and they don't use any GP register at all; data is created as float point data in the first defined virtual location¹ found and then pushed as normal parameter;
            - exception is tword (or long double or l_double, all synonyms) data types, they are allocated at stack, aligned, and uses FPU register st0 for moving the 10-byte data, and that data might be also created in the first virtual location¹ as above;
            - then, comes xmm class parameters, they're created as data if immediate FP numbers, and/or passed directly to current xmm register otherwise;
            - then, comes register class parameters, in reverse order, passed onto corresponding position register.
@@ -25,7 +25,7 @@
            Register class RTL order: r9, r8, rcx, rdx, rsi, rdi
            XMM class RTL order: xmm7, xmm6, xmm5, xmm4, xmm3, xmm2, xmm1, xmm0
 
-        This shows the order of trashed registers, so for the above, the leftmost, when used by the prototype, is always the most volatile. This is why I choose r9 for being the only auxiliary register; so all others are safe until it comes its time in the RTL queue. And r9 is not used if there are no memory class tyep integer parameters to be passed on. Trashed registers also depends on how many register parameters the function has: if less, the volatile level will be displaced to the right of the above sequece. Example:
+        This shows the order of trashed registers, so for the above, the leftmost, when used by the prototype, is always the most volatile. This is why I choose r9 for being the only auxiliary register; so all others are safe until it comes its time in the RTL queue. And r9 is not used if there are no memory class type integer parameters to be passed on. Trashed registers also depends on how many register parameters the function has: if less, the volatile level will be displaced to the right of the above sequece. Example:
 
             proto func, qword, qword, dword, double, double  ; 3 integer parameters (register), 2 float point parameters (xmm)
 
@@ -83,19 +83,18 @@
          - if any stX FPU register is used as parameter, issue emms assembly instruction;
          - calls or jumps function.
 
-        Also, an important thing to be known by the user: the default method for creating imported functions entries in the final program is by macros built-in inside fastcall: it is copy-based on 'import64.inc' and 'elfsym.inc' files that came as an example in fasmg package, which generates the cleanest executable possible (also the smallest), free from all of the unneeded bloat common external linkers (like 'ld' or 'gcc') append to your file. One intended to use standard .o object model externally linked should modify the macro to use 'extrn' directive instead. But I had not tested this approach in any time during developing: maybe I'll fully support it properly in later revisions of this macro collection. With which is already included, you'll get the final ELF64 executable by just adding 'include fastcall.inc' as it is now.
-        Note: version 2 of this (to be done) will have extrn support by default.
+        Also, an important thing to be known by the user: the default method for creating imported functions entries in the final program is by macros built-in inside fastcall: it is copy-based on 'import64.inc' and 'elfsym.inc' files that came as an example in fasmg package, which generates the cleanest executable possible (also the smallest), free from all of the unneeded bloat common external linkers (like 'ld' or 'gcc') append to your file.
+        There is now native support for dynamic ELF executable generation: in this case, issue a 'format ELF64' statement, then fastcall will adjust macros accordingly to support the new mode. 'format ELF64 executable 3' generates static ELF binaries as stated above, and the result is already the final binary. For 'format ELF64', and then dynamic ELF, it results in an object format (*.o), that needs to be linked with an external linker to obtain the final binary. As a recommendation, use 'lld' or 'mold' instead of 'ld'. Smaller executables, and the full benefit of this macro toolkit fully supported without any annoyance.
 
         2. parameter formatting
 
         Fastcall parameters follow the following rules:
 
             &location  -> passes effective address of location (will use r9 to be prepared if memory class)
-            *location  -> passes data at location
-            [location] -> also passes data at location
+            [location] -> passes data at location
             34567      -> pass 32 bit number
             9999999999 -> pass 64 bit number (will use r9 if integer memory class)
-            (23*4+FIX) -> pass result as a number, 32 or 64 bit
+            (23*4)+FIX -> pass result as a number, 32 or 64 bit
             ("CHARS")  -> pass up to qword size "CHARS" as direct data, not string
             +3245      -> pass signed number
             -45637     -> pass signed number
@@ -103,17 +102,17 @@
             xmm5       -> pass xmm register as xmm class parameter or memory class parameter
             mm3        -> pass MMX register as integer class parameter
             st4        -> pass FPU register as long double type, memory class parameter
-            &rax+rcx*2+14 -> pass effective address of complex addressing parameter
-            &esi+edi*2+18 -> pass 32 bit effective address parameter (recommended for algebra usage only)
+            rax+rcx*2+14 -> pass effective address of complex addressing parameter
+            esi+edi*2+18 -> pass 32 bit effective address parameter (recommended for algebra usage only)
             123.4567   -> pass float point parameter as (if prototyped) xmm or memory class
             **location -> gets the pointer at [location], and then pass the data located at this pointer
-            "stringz"  -> creates "string",0 as db data, then passes a pointer to string data
+            "stringz"  -> creates "stringz",0 as db data, then passes a pointer to string data
             "string"\n -> creates "string",10,0 as db data, then passes a pointer to its data
             <"string",10,0> creates "string",10,0 as db data and passes its pointer
             π or TT    -> pass π number constant as tword size, memory class parameter
             .          -> empty parameter: This parameter will be skipped, filled with an empty state in the output code
 
-         Float point and string datas are created as data in the first virtual location¹.
+         Float point and string data are created as data in the first virtual location¹.
          "string" simple string is always create with null termination, whereas <"string",...> is created literally as "string",... db data, without any addition.
 
          'proto' macro accepts the following types for parameters:
@@ -143,6 +142,19 @@
         'param' can be any of the fastcall supported parameters, be careful!
         When using size override, it can override even the prototyped sizes, and results can be unpredictable. Recommended usage is only as a hint for vararg types.
 
+        [] parameter attribute is only mandatory when using complex addressing or register as an indexer to that data. Now, data type that has size are automatically detected as data, an can be passed without it.
+        & parameter attribute is also optional, because addressable labels are recognized automatically.
+
+        The above depends on how symbols are defined. As follows:
+
+         - 'label:' is an address type label, and it will be recognized as effective address by default; it will behave same as '&label';
+         - 'label db data' is a data type label, and it will be recognized as data parameter by default; it will behave same as '[label]';
+         - 'label = value', 'label := value', 'label equ value', 'define label value' is a numeric (or expression) attribute type label, and it will be interpreted as a literal value; it will behave as 'label';
+         - any symbol attached to a structure definition will be address type by default;
+
+         The autodetection aforementioned allows 'label' to be passed as is, and how it will be interpreted will only depend on how it is defined in the source.
+
+
 3. Auxiliary macros
 
         There are the following macros used to support fastcall and proto macros:
@@ -161,9 +173,9 @@
              _code rwx -> create read write execute code segment, also the least favorite virtual location¹ for anonymous data to be placed.
 
             library -> defines the external libraries needed for the application, in quoted strings each;
-                    Can be used multiple times.
+                    Can be used multiple times. Used only with static ELF.
 
-            libpath -> adds a single, custom path to load libraries from (system library path will continue to function normally, will only add a custom path. Path should be passed in quoted string.
+            libpath -> adds a single, custom path to load libraries from (system library path will continue to function normally, will only add a custom path. Path should be passed in quoted string. Used only with static ELF.
 
             ext      -> proto prefix, indicates that this function should be prepared to be used from 'extern';
             noreturn -> proto prefix, prototypes the function as jmp function instead of call function;
@@ -179,52 +191,27 @@
 
             ext proto func, params                      ; external function, direct call func
             ext noreturn proto func, params             ; external function, direct jump func
-            proto func, params                          ; internal function, direct call _func ²
-            noreturn proto func, params                 ; internal function, direct jump _func ²
+            proto func, params                          ; internal function, direct call func
+            noreturn proto func, params                 ; internal function, direct jump func
             ext indirect proto func, params             ; external function, indirect call [func]
 
             ext noreturn indirect proto func, params    ;
             ext indirect noreturn proto func, params    ; external function, indirect jump [func]
 
-            indirect proto func, params                 ; internal function, indirect call [_ptr_func] ²
+            indirect proto func, params                 ; internal function, indirect call [ptr_func]
 
             noreturn indirect proto func, params        ;
-            indirect noreturn proto func, params        ; internal function, indirect jump [_ptr_func] ²
+            indirect noreturn proto func, params        ; internal function, indirect jump [ptr_func]
 
             ext data stdin, stdout                      ; external data variables stdin and stdout
-
-        ² For internal function, there is a limitation so far: due to fasm not having backward reference support (or forward reference), 'macro func()' cannot 'fascall func', because they have same names. So, internal called functions shoud be prefixed as '_function:' for direct call/jmp, or the variable holding the function pointer should the prefixed as '_ptr_func'. The underline '_' is the differentiator:
-
-             proto indirect pfunc1, qword
-             proto func2, qword
-
-             _pfunc1  dq func1
-             ; ...
-             func1: ; do stuff
-                    ret
-
-            _func2: ; do stuff
-                    ret
-
-            pfunc1(param); ; This calls [_pfunc1] pointer
-            func2(param);  ; This calls _func2 directly
-
-        Also for internal functions, it is possible to use alias macro to define a new function() name. By using it, the conflict is gone because alias is used to replace the original name with other.
-
-             proto func3, double, alias replace3
-             proto func4, dword, alias func4 ; This is allowed...
-
-             func3: ; do stuff
-                    ret
-
-             ?func4: ; do stuff
-                     ret
-
-             replace3(param); ; This calls func3 directly
-             func4(param);    ; This calls ?func4 directly
+            ext data stdin:8, stdout:8
+            ext data stdin:qword, stdout:qword          ; external data variables stdin and stdout, with
+                                                        ; 8 bytes in size attached to them. They will be
+                                                        ; accessed as qword size, and default to data
+                                                        ; types: used with dynamic ELF only
 
 
-        The external functions' namespace is '__imp', and the default jump point for direct calls to external functions (located at namespace __imp too) is prefixed as 'proto', resulting in 'proto.function' external jump point name. This is similar to what PLT does, but it is not PLT! PLT is loaded on demand by the linker, this has everything resolved by dynamic linker at startup.
+        For static ELF, the external functions' namespace is '__imp', and the default jump point for direct calls to external functions (located at namespace __imp too) is prefixed as 'proto', resulting in 'proto.function' external jump point name. This is similar to what PLT does, but it is not PLT! PLT is loaded on demand by the linker, this has everything resolved by dynamic linker at startup.
         'ext' defines one of two things: if direct type, it creates a jmp [__imp.function] entry at a separate code segment; if indirect type, it just append function name to a "list" of functions that can be parsed by internal importv macro on demand. So, only symbols used in code and data segments are installed in the final executable, allowing one to have a set of prototype headers to be reused.
         So, if your functions are called 'g_print', 'snprintf', 'exit' and 'getpid', for example, the whole thing will be:
 
@@ -300,6 +287,8 @@
             ;    ; ...
             ;    ; Jump table:
             ;    proto.exit: jmp [__imp.exit]
+
+      For dynamic ELF, there is no '__imp' namespace, and also no 'proto.function': everything is resolved using fasm2's 'extern' macro. Also 'library' statement doesn't exist in this mode, since an external linker is responsible to resolve library names. Besides this, everything else behaves almost as stated above.
 
 4. Tips, feedback and suggestions
 

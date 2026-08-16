@@ -678,6 +678,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	ext proto getpwuid, dword                       ; edi = user ID
 	ext proto getsockname, dword, qword, qword		; fd, * sockaddr, * size
 	ext proto getsockopt, dword, dword, dword, qword, qword	; socket, level, option, *value, *size
+	ext proto gettid, none
 	ext proto gettimeofday, qword, qword            ; *TIMEVAL structure, *TIMEZONE struct
 	ext proto grantpt, dword                        ; edi = int file descriptor
 	ext proto hstrerror, dword						; edi = int h_errno

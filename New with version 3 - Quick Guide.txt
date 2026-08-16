@@ -27,17 +27,16 @@ feature, by specifying only 'data' as a parameter for a previous defined 'data d
      - All macros related to auxiliary 'stdmacros.inc' and 'anon_label.inc' files are updated, and now are
 a permanent part of the fastcall main header package: a disable feature is planned for upcoming versions;
      - Only one '.inc' file is needed to be included to enjoy this package;
-     - Legacy versions 1 and 2 (with its respective auxiliary files and examples) are now moved to
-'legacy/' folder, and kept available if one find any issues with this new version: but they'll be removed as
-soon as stability is proven at version 3.
      - The new header is not compatible with previous 'anon_label.inc' and stdmacros.inc' as well
-as 'fastcall.inc' headers: use only (for now) 'fastcall3.inc', as it already has upgraded versions
-of the same macros;
+as previous 'fastcall.inc' headers: use only (for now) 'fastcall3.inc' or 'fastcall.inc', as it already
+has upgraded versions of the same macros;
      - Alongside with lots of features, this new version has been stated to perform up to 30% faster than the
 previous version, I suppose because most of its core functions are now calminstruction statements;
      - 'struct' statement now create only the structure by default, saving names: one intended to use offsets
 using the structure name (e.g., rax+RECT.y) must pair its structure definition with 'end struct&'
-instead of 'end struct'. Otherwise, only the structure definition exists to be bound to variables.
+instead of 'end struct'. Otherwise, only the structure definition exists to be bound to variables. It is also
+possible to assign an alias to refer to offsets, either using 'define_offset name STRUCT' or by using
+'end struct name', where 'name' is the new offset name;
 
     See the examples to figure out how (clean and beautiful, and how) the syntax has changed since previous
-versions. They are a good reference, until I write a new manual on this.
+versions. They are a good reference, much better than one could do with many text.
