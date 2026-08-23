@@ -13,6 +13,23 @@ if ~ defined __CAIRO_INC_INCLUDED__
         end if
     end if
 
+    struct CAIRO_TEXT_EXTENTS_T
+        .x_bearing      dq ?
+        .y_bearing      dq ?
+        .width          dq ?
+        .height         dq ?
+        .x_advance      dq ?
+        .y_advance      dq ?
+    end struct
+
+    struct CAIRO_FONT_EXTENTS_T
+        .ascent         dq ?
+        .descent        dq ?
+        .height         dq ?
+        .max_x_advance  dq ?
+        .max_y_advance  dq ?
+    end struct
+
     CAIRO_FORMAT_ARGB32 := 0
 
     CAIRO_FONT_SLANT_NORMAL     := 0
@@ -90,6 +107,7 @@ if ~ defined __CAIRO_INC_INCLUDED__
     ext proto cairo_pattern_create_linear, double, double, double, double
     ext proto cairo_pattern_create_radial, double, double, double, double, double, double
     ext proto cairo_pattern_destroy, qword
+    ext proto cairo_pattern_set_extend, qword, dword
     ext proto cairo_pattern_set_matrix, qword, qword
     ext proto cairo_rectangle, qword, double, double, double, double
     ext proto cairo_rel_curve_to, qword, double, double, double, double, double, double

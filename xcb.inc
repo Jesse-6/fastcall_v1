@@ -50,6 +50,21 @@ if ~ defined __XCB_INC_INCLUDED__
         end virtual
     end struct
 
+    struct XCB_CREATE_NOTIFY_EVENT_T
+        .response_type      db ?
+                            db ?
+        .sequence           dw ?
+        .parent             dd ?
+        .window             dd ?
+        .x                  dw ?
+        .y                  dw ?
+        .width              dw ?
+        .height             dw ?
+        .border_width       dw ?
+        .override_redirect  db ?
+                            db ?
+    end struct
+
     struct XCB_DEPTH_T
         .depth          db ?
                         db ?
@@ -374,6 +389,14 @@ if ~ defined __XCB_INC_INCLUDED__
     XCB_CAP_STYLE_ROUND         := 2
     XCB_CAP_STYLE_PROJECTING    := 3
 
+    XCB_CONFIG_WINDOW_X             := 1
+    XCB_CONFIG_WINDOW_Y             := 2
+    XCB_CONFIG_WINDOW_WIDTH         := 4
+    XCB_CONFIG_WINDOW_HEIGHT        := 8
+    XCB_CONFIG_WINDOW_BORDER_WIDTH  := 16
+    XCB_CONFIG_WINDOW_SIBLING       := 32
+    XCB_CONFIG_WINDOW_STACK_MODE    := 64
+
     XCB_COORD_MODE_ORIGIN   := 0
     XCB_COORD_MODE_PREVIOUS := 1
 
@@ -455,6 +478,12 @@ if ~ defined __XCB_INC_INCLUDED__
     XCB_PROP_MODE_REPLACE   := 0
     XCB_PROP_MODE_PREPEND   := 1
     XCB_PROP_MODE_APPEND    := 2
+
+    XCB_STACK_MODE_ABOVE        := 0
+    XCB_STACK_MODE_BELOW        := 1
+    XCB_STACK_MODE_TOP_IF       := 2
+    XCB_STACK_MODE_BOTTOM_IF    := 3
+    XCB_STACK_MODE_OPPOSITE     := 4
 
     XCB_WINDOW_CLASS_COPY_FROM_PARENT   := 0
     XCB_WINDOW_CLASS_INPUT_OUTPUT       := 1
