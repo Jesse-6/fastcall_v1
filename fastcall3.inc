@@ -5,7 +5,7 @@ else if defined __FASTCALL_v2_INCLUDED__
 else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ### ### ###
 
 	define __FASTCALL_v3_INCLUDED__
-	define __FASTCALL_v3_INCLUDED__ '3.0.4+'
+	define __FASTCALL_v3_INCLUDED__ '3.0.5+'
 
 	if ~ defined UNDO_SHOW_VERSION	; to hide version string at command line: -i'define UNDO_SHOW_VERSION'
 		display 27, "[93mUsing 'fastcall' macro package version ", __FASTCALL_v3_INCLUDED__, 27, "[0m", 10
@@ -2427,10 +2427,10 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 					err "Invalid memory class parameter size.", 10
 				end if
 			else if __type_id_ = FUNC_PARA_TYPE_FLOAT
-				if psize = qword | psize = double
+				if psize = qword | psize = 0.64
 					put_anon_data qword, parameter
 					push [_anon_data_curr_]
-				else if psize = dword | psize = float
+				else if psize = dword | psize = 0.32
 					mov	cregd, parameter
 					push cregq
 				else
@@ -2579,11 +2579,11 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 			end if
 
 			if __type_id_ = FUNC_PARA_TYPE_REGXMM
-				if psize = float
+				if psize = 0.32
 					if  ~ xmmsel eq parameter
 						movss xmmsel, parameter
 					end if
-				else if psize = double
+				else if psize = 0.64
 					if ~ xmmsel eq parameter
 						movsd xmmsel, parameter
 					end if
@@ -2591,22 +2591,22 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 					err "Wrong xmm class parameter size.", 10
 				end if
 			else if __type_id_ = FUNC_PARA_TYPE_MEMORY | __type_id_ = FUNC_PARA_TYPE_PTR
-				if psize = float
+				if psize = 0.32
 					movss xmmsel, [parameter]
-				else if psize = double
+				else if psize = 0.64
 					movsd xmmsel, [parameter]
 				else
 					err "Wrong xmm class parameter size.", 10
 				end if
 			else if __type_id_ = FUNC_PARA_TYPE_FLOAT
-				if psize = float
+				if psize = 0.32
 					if parameter = 0
 						pxor xmmsel, xmmsel
 					else
 						put_anon_data dword, parameter
 						movss xmmsel, [_anon_data_curr_]
 					end if
-				else if psize = double
+				else if psize = 0.64
 					if parameter = 0
 						pxor xmmsel, xmmsel
 					else
@@ -2729,13 +2729,13 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 			match a, parameter
 				testtype a
 				__type_size_ = 8
-				put_parameter index, class, __type_para_, double
+				put_parameter index, class, __type_para_, 0.64
 			end match
 		else if __type_id_ = FUNC_PARA_TYPE_FCFLOAT
 			match a, parameter
 				testtype a
 				__type_size_ = 4
-				put_parameter index, class, __type_para_, float
+				put_parameter index, class, __type_para_, 0.32
 			end match
 		else if __type_id_ = FUNC_PARA_TYPE_FCTWORD
 			match a, parameter
@@ -2942,7 +2942,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 									repeat 1, i:%, x:xmmcount
 										define __vararg.par#i.class SYSTEMV_PARA_CLASS_XMM
 										define __vararg.par#i.count x
-										define __vararg.par#i.size double
+										define __vararg.par#i.size 0.64
 										define __vararg.par#i.align %
 										__vararg.par#i.rawdata equ argp
 										put_value __vararg.par#i.data, __type_para_
@@ -2954,7 +2954,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 									repeat 1, i:%, m:memcount
 										define __vararg.par#i.class SYSTEMV_PARA_CLASS_MEMORY
 										define __vararg.par#i.count m
-										define __vararg.par#i.size double
+										define __vararg.par#i.size 0.64
 										define __vararg.par#i.align %
 										__vararg.par#i.rawdata equ argp
 										put_value __vararg.par#i.data, __type_para_
@@ -2968,7 +2968,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 									repeat 1, i:%, x:xmmcount
 										define __vararg.par#i.class SYSTEMV_PARA_CLASS_XMM
 										define __vararg.par#i.count x
-										define __vararg.par#i.size float
+										define __vararg.par#i.size 0.32
 										define __vararg.par#i.align %
 										__vararg.par#i.rawdata equ argp
 										put_value __vararg.par#i.data, __type_para_
@@ -2980,7 +2980,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 									repeat 1, i:%, m:memcount
 										define __vararg.par#i.class SYSTEMV_PARA_CLASS_MEMORY
 										define __vararg.par#i.count m
-										define __vararg.par#i.size float
+										define __vararg.par#i.size 0.32
 										define __vararg.par#i.align %
 										__vararg.par#i.rawdata equ argp
 										put_value __vararg.par#i.data, __type_para_
@@ -3558,14 +3558,9 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 
 
 
-	define vararg -1
-	define none 0
-	define float 0.32
-	define double 0.64
-	define l_double tword
 	define float32 float
 	define float64 double
-	define float80 l_double
+	define float80 tword
 
 	macro proto? func*, args&
 		local xmmcnt, regcnt, memcnt, ldcnt, totalcnt, nsfunc, ldalign, aliased
@@ -3612,7 +3607,82 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 				break
 			end match
 			define func__.#func.#par#% arg
-			if arg = qword | arg = dword | arg = word | arg = byte
+            match =float?, arg
+			; else if arg eq float | arg eq double
+				if xmmcnt <= 7
+					totalcnt = totalcnt + 1
+					xmmcnt = xmmcnt + 1
+					repeat 1, i:totalcnt, j:xmmcnt, k:%
+						define func__.func.par#k.class SYSTEMV_PARA_CLASS_XMM
+						define func__.func.par#k.count j
+						define func__.func.par#k.size 0.32
+						define func__.func.xmmpar#j.size 0.32	; index xmms separately
+					end repeat
+				else
+					totalcnt = totalcnt + 1
+					memcnt = memcnt + 1
+					repeat 1, i:totalcnt, j:memcnt, k:%
+						define func__.func.par#k.class SYSTEMV_PARA_CLASS_MEMORY
+						define func__.func.par#k.count j
+						define func__.func.par#k.size 0.32
+						define func__.func.mempar#j.size 0.32
+					end repeat
+				end if
+			else match =double?, arg
+				if xmmcnt <= 7
+					totalcnt = totalcnt + 1
+					xmmcnt = xmmcnt + 1
+					repeat 1, i:totalcnt, j:xmmcnt, k:%
+						define func__.func.par#k.class SYSTEMV_PARA_CLASS_XMM
+						define func__.func.par#k.count j
+						define func__.func.par#k.size 0.64
+						define func__.func.xmmpar#j.size 0.64	; index xmms separately
+					end repeat
+				else
+					totalcnt = totalcnt + 1
+					memcnt = memcnt + 1
+					repeat 1, i:totalcnt, j:memcnt, k:%
+						define func__.func.par#k.class SYSTEMV_PARA_CLASS_MEMORY
+						define func__.func.par#k.count j
+						define func__.func.par#k.size 0.64
+						define func__.func.mempar#j.size 0.64
+					end repeat
+				end if
+			else match =vararg?, arg
+				totalcnt = totalcnt + 1
+				repeat 1, i:totalcnt, k:%
+					define func__.func.par#k.class SYSTEMV_PARA_CLASS_VARARG
+					define func__.func.par#k.count k
+					define func__.func.par#k.size -1
+					define func__.func.par0.isVararg k	; index of vararg parameter
+				end repeat
+				if (% + 1) <= %%
+					indx % + 1
+					match =alias? gorgeous, arg
+						aliased = 0
+					else
+						break
+					end match
+				else
+					break
+				end if
+			else match =none?, arg
+				repeat 1, i:0 k:%
+					define func__.func.par#k.class SYSTEMV_PARA_CLASS_NONE
+					define func__.func.par#k.count 1
+					define func__.func.par#k.size 0
+				end repeat
+				if (% + 1) <= %%
+					indx % + 1
+					match =alias? gorgeous, arg
+						aliased = 0
+					else
+						break
+					end match
+				else
+					break
+				end if
+			else if arg = qword | arg = dword | arg = word | arg = byte
 				if regcnt <= 5
 					totalcnt = totalcnt + 1
 					regcnt = regcnt + 1
@@ -3632,26 +3702,6 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 						define func__.func.mempar#j.size arg	; index mems separately
 					end repeat
 				end if
-			else if arg eq float | arg eq double
-				if xmmcnt <= 7
-					totalcnt = totalcnt + 1
-					xmmcnt = xmmcnt + 1
-					repeat 1, i:totalcnt, j:xmmcnt, k:%
-						define func__.func.par#k.class SYSTEMV_PARA_CLASS_XMM
-						define func__.func.par#k.count j
-						define func__.func.par#k.size arg
-						define func__.func.xmmpar#j.size arg	; index xmms separately
-					end repeat
-				else
-					totalcnt = totalcnt + 1
-					memcnt = memcnt + 1
-					repeat 1, i:totalcnt, j:memcnt, k:%
-						define func__.func.par#k.class SYSTEMV_PARA_CLASS_MEMORY
-						define func__.func.par#k.count j
-						define func__.func.par#k.size arg
-						define func__.func.mempar#j.size arg
-					end repeat
-				end if
 			else if arg eq tword
 				totalcnt = totalcnt + 1
 				ldalign = memcnt
@@ -3665,40 +3715,6 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 					define func__.func.ldpar#j.size arg
 					define func__.func.mempar#l.size arg
 				end repeat
-			else if arg eq vararg
-				totalcnt = totalcnt + 1
-				repeat 1, i:totalcnt, k:%
-					define func__.func.par#k.class SYSTEMV_PARA_CLASS_VARARG
-					define func__.func.par#k.count k
-					define func__.func.par#k.size vararg
-					define func__.func.par0.isVararg k	; index of vararg parameter
-				end repeat
-				if (% + 1) <= %%
-					indx % + 1
-					match =alias? gorgeous, arg
-						aliased = 0
-					else
-						break
-					end match
-				else
-					break
-				end if
-			else if arg eq none
-				repeat 1, i:0 k:%
-					define func__.func.par#k.class SYSTEMV_PARA_CLASS_NONE
-					define func__.func.par#k.count 1
-					define func__.func.par#k.size none
-				end repeat
-				if (% + 1) <= %%
-					indx % + 1
-					match =alias? gorgeous, arg
-						aliased = 0
-					else
-						break
-					end match
-				else
-					break
-				end if
 			else
 				err "Unsupported: ", `arg, 10
 			end if
