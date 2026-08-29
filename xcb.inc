@@ -50,6 +50,22 @@ if ~ defined __XCB_INC_INCLUDED__
         end virtual
     end struct
 
+    struct XCB_CONFIGURE_NOTIFY_EVENT_T
+        .response_type      db ?
+                            db ?
+        .sequence           dw ?
+        .event              dd ?
+        .window             dd ?
+        .above_sibling      dd ?
+        .x                  dw ?
+        .y                  dw ?
+        .width              dw ?
+        .height             dw ?
+        .border_width       dw ?
+        .override_redirect  db ?
+                            db ?
+    end struct
+
     struct XCB_CREATE_NOTIFY_EVENT_T
         .response_type      db ?
                             db ?
@@ -197,6 +213,15 @@ if ~ defined __XCB_INC_INCLUDED__
         .y      dw Y
         .width  dw W
         .height dw H
+    end struct
+
+    struct XCB_RESIZE_REQUEST_EVENT_T
+        .response_type  db ?
+                        db ?
+        .sequence       dw ?
+        .window         dd ?
+        .width          dw ?
+        .height         dw ?
     end struct
 
     struct XCB_SCREEN_T
@@ -381,6 +406,7 @@ if ~ defined __XCB_INC_INCLUDED__
     XCB_DESTROY_NOTIFY      := 17
     XCB_UNMAP_NOTIFY        := 18
     XCB_MAP_NOTIFY          := 19
+    XCB_CONFIGURE_NOTIFY    := 22
     XCB_RESIZE_REQUEST      := 25
     XCB_CLIENT_MESSAGE      := 33
 
@@ -537,7 +563,7 @@ if ~ defined __XCB_INC_INCLUDED__
     ext proto xcb_image_text_8, qword, byte, dword, dword, word, word, qword
     ext proto xcb_image_text_8_checked, qword, byte, dword, dword, word, word, qword
     ext proto xcb_intern_atom, qword, byte, word, qword
-    ext proto xcb_intern_atom_reply, qword, qword, qword
+    ext proto xcb_intern_atom_reply, qword, dword, qword
     ext proto xcb_map_window, qword, dword
     ext proto xcb_map_window_checked, qword, dword
     ext proto xcb_open_font, qword, dword, word, qword

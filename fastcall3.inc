@@ -3608,7 +3608,6 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 			end match
 			define func__.#func.#par#% arg
             match =float?, arg
-			; else if arg eq float | arg eq double
 				if xmmcnt <= 7
 					totalcnt = totalcnt + 1
 					xmmcnt = xmmcnt + 1
