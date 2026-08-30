@@ -377,12 +377,20 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 				local count
 				count = 0
 				irpv name, definitions
-					Elf64_Sym strtab.name-strtab,0,0,STB_GLOBAL,STT_FUNC,0,0
+					match =dup, name
+						Elf64_Sym strtab._dup-strtab,0,0,STB_GLOBAL,STT_FUNC,0,0
+					else
+						Elf64_Sym strtab.name-strtab,0,0,STB_GLOBAL,STT_FUNC,0,0
+					end match
 					count = count+1
 				end irpv
 				rela:
 				irpv name, definitions
-					Elf64_Rela ?name-ELF.DYNAMIC,%,R_X86_64_64
+					match =dup, name
+						Elf64_Rela dup,%,R_X86_64_64
+					else
+						Elf64_Rela ?name-ELF.DYNAMIC,%,R_X86_64_64
+					end match
 				end irpv
 				relasz = $-rela
 				hash:
@@ -394,7 +402,11 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 				dd 0
 				strtab db 0
 				irpv name, definitions
-					strtab.name db `name,0
+					match =dup, name
+						strtab._dup db `name,0
+					else
+						strtab.name db `name,0
+					end match
 				end irpv
 				irpv library, needed@dynamic
 					strtab.needed#% db library,0
