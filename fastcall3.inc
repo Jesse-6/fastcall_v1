@@ -377,11 +377,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 				local count
 				count = 0
 				irpv name, definitions
-					match =dup, name
-						Elf64_Sym strtab._dup-strtab,0,0,STB_GLOBAL,STT_FUNC,0,0
-					else
-						Elf64_Sym strtab.name-strtab,0,0,STB_GLOBAL,STT_FUNC,0,0
-					end match
+					Elf64_Sym strtab.%-strtab,0,0,STB_GLOBAL,STT_FUNC,0,0
 					count = count+1
 				end irpv
 				rela:
@@ -402,11 +398,7 @@ else if ~ defined __FASTCALL_v3_INCLUDED__		; ### ### START OF FASTCALL3 CODE ##
 				dd 0
 				strtab db 0
 				irpv name, definitions
-					match =dup, name
-						strtab._dup db `name,0
-					else
-						strtab.name db `name,0
-					end match
+					strtab.% db `name,0
 				end irpv
 				irpv library, needed@dynamic
 					strtab.needed#% db library,0
