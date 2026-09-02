@@ -49,12 +49,12 @@ if ~ defined __PORTAUDIO_INC_INCLUDED__
         .sampleRate                 dq ?
     end struct
 
-    struct PA_STREAM_PARAMETERS
-        .device                     dd ?
-        .channelCount               dd ?
-        .sampleFormat               dq ?
-        .suggestedLatency           dq ?
-        .hostApiSpecificStreamInfo  dq ?
+    struct PA_STREAM_PARAMETERS dev:?, chcnt:?, sfmt:?, slat:?, hapisi:?
+        .device                     dd dev
+        .channelCount               dd chcnt
+        .sampleFormat               dq sfmt
+        .suggestedLatency           dq slat
+        .hostApiSpecificStreamInfo  dq hapisi
     end struct
 
     struct PA_VERSION_INFO
@@ -98,7 +98,6 @@ if ~ defined __PORTAUDIO_INC_INCLUDED__
     PA_BAD_BUFFER_PTR                               = -9972
     PA_CAN_NOT_INITIALIZE_RECURSIVELY               = -9971
 
-
     PA_IN_DEVELOPMENT   = 0
     PA_DIRECT_SOUND     = 1
     PA_MME              = 2
@@ -129,6 +128,11 @@ if ~ defined __PORTAUDIO_INC_INCLUDED__
     PA_UINT8            = 0000_0020h
     PA_CUSTOM_FORMAT    = 0001_0000h
     PA_NON_INTERLEAVED  = 8000_0000h
+
+    PA_CLIP_OFF         = 1
+    PA_DITHER_OFF       = 2
+    PA_NEVER_DROP_INPUT = 4
+
 
     ext proto Pa_AbortStream, qword
     ext proto Pa_CloseStream, qword

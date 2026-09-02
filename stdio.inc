@@ -179,7 +179,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define EXIT_FAILURE    1
 	define EXIT_SUCCESS    0
 
-	; define FALSE           0
+	FALSE  = 0
 
 	define F_GETFL         3
 	define F_SETFL         4
@@ -412,7 +412,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 	define NI_NAMEREQD		8	; Don't return numeric addresses.
 	define NI_DGRAM			16	; Look up UDP service rather than TCP.
 
-	; define NULL            0
+	NULL   = 0
 
 	define O_CLOEXEC       2000000o
 	define O_CREAT         100o
@@ -570,7 +570,7 @@ if ~ defined __STDIO_INC_INCLUDED__
 
 	define TIOCGWINSZ      0x5413
 
-	; define TRUE            1
+	TRUE   = 1
 
 	; TERMIOS .cc chars
 	define VINTR		0
